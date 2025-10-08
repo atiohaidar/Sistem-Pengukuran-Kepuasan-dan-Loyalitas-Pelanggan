@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +19,6 @@ class Pertanyaan extends Model
 
     public function id_dimensi()
     {
-        return $this->belongsTo('App\Pertanyaan_kat','id_dimensi');
+        return $this->belongsTo('App\Models\Pertanyaan_kat','id_dimensi');
     }
 }

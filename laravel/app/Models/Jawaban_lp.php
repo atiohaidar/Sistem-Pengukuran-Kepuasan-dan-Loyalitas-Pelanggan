@@ -1,20 +1,21 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Jawaban_applicability extends Model
+class Jawaban_lp extends Model
 {
     
 
     protected $primaryKey = 'id_jawaban';
-    protected $table = 'tbl_jawaban_applicability';
+    protected $table = 'tbl_jawaban_lp';
 
     protected $fillable = [
         'id_responden',
-        'ap1',
-        'ap2',
+        'l1',
+        'l2',
+        'l3',
         'kategori',
     ];
    

@@ -53,7 +53,7 @@
                           @foreach ($database  as $dt)
                       <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>@if($dt->id_bisnis == '') - @else {{ $dt->bisnis->nama_bisnis }} @endif</td>
+                        <td>@if($dt->id_bisnis == '' || !$dt->bisnis) - @else {{ $dt->bisnis->nama_bisnis }} @endif</td>
                         <td>
                           <a class="btn btn-primary btn-sm" href="{{ route('admin.detail.responden', $dt->id_responden) }}">
                           {{ $dt->email }}
@@ -73,7 +73,7 @@
                       <div class="modal fade" id="modal-sm-hapus{{ $dt->id_responden }}">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">
-                                <form class="form-horizontal" method="POST" action="{{ route('admin.responden.hapus',['id_responden' => $dt->id_responden]) }}">
+                                <form class="form-horizontal" method="POST" action="{{ route('admin.responden.hapus', $dt->id_responden) }}">
                                     @csrf
                                     @method('delete')
 

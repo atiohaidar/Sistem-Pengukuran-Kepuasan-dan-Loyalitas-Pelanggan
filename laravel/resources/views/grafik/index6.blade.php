@@ -13,11 +13,11 @@
       $probabilitas_5 = 1.00;
 
       //l1
-      $persentasel1_1 = ($l1_rata_count_1/$l1_rata_count)*100;
-      $persentasel1_2 = ($l1_rata_count_2/$l1_rata_count)*100;
-      $persentasel1_3 = ($l1_rata_count_3/$l1_rata_count)*100;
-      $persentasel1_4 = ($l1_rata_count_4/$l1_rata_count)*100;
-      $persentasel1_5 = ($l1_rata_count_5/$l1_rata_count)*100;
+      $persentasel1_1 = $l1_rata_count > 0 ? ($l1_rata_count_1/$l1_rata_count)*100 : 0;
+      $persentasel1_2 = $l1_rata_count > 0 ? ($l1_rata_count_2/$l1_rata_count)*100 : 0;
+      $persentasel1_3 = $l1_rata_count > 0 ? ($l1_rata_count_3/$l1_rata_count)*100 : 0;
+      $persentasel1_4 = $l1_rata_count > 0 ? ($l1_rata_count_4/$l1_rata_count)*100 : 0;
+      $persentasel1_5 = $l1_rata_count > 0 ? ($l1_rata_count_5/$l1_rata_count)*100 : 0;
 
       //persantase x probabilitas L1
       $persentase_probabilitas_l1_1 = $persentasel1_1*$probabilitas_1;
@@ -39,11 +39,11 @@
       //==============================================================
 
       //l2
-      $persentasel2_1 = ($l2_rata_count_1/$l2_rata_count)*100;
-      $persentasel2_2 = ($l2_rata_count_2/$l2_rata_count)*100;
-      $persentasel2_3 = ($l2_rata_count_3/$l2_rata_count)*100;
-      $persentasel2_4 = ($l2_rata_count_4/$l2_rata_count)*100;
-      $persentasel2_5 = ($l2_rata_count_5/$l2_rata_count)*100;
+      $persentasel2_1 = $l2_rata_count > 0 ? ($l2_rata_count_1/$l2_rata_count)*100 : 0;
+      $persentasel2_2 = $l2_rata_count > 0 ? ($l2_rata_count_2/$l2_rata_count)*100 : 0;
+      $persentasel2_3 = $l2_rata_count > 0 ? ($l2_rata_count_3/$l2_rata_count)*100 : 0;
+      $persentasel2_4 = $l2_rata_count > 0 ? ($l2_rata_count_4/$l2_rata_count)*100 : 0;
+      $persentasel2_5 = $l2_rata_count > 0 ? ($l2_rata_count_5/$l2_rata_count)*100 : 0;
 
       //persantase x probabilitas L1
       $persentase_probabilitas_l2_1 = $persentasel2_1*$probabilitas_1;
@@ -65,11 +65,11 @@
       //==============================================================
 
       //l3
-      $persentasel3_1 = ($l3_rata_count_1/$l3_rata_count)*100;
-      $persentasel3_2 = ($l3_rata_count_2/$l3_rata_count)*100;
-      $persentasel3_3 = ($l3_rata_count_3/$l3_rata_count)*100;
-      $persentasel3_4 = ($l3_rata_count_4/$l3_rata_count)*100;
-      $persentasel3_5 = ($l3_rata_count_5/$l3_rata_count)*100;
+      $persentasel3_1 = $l3_rata_count > 0 ? ($l3_rata_count_1/$l3_rata_count)*100 : 0;
+      $persentasel3_2 = $l3_rata_count > 0 ? ($l3_rata_count_2/$l3_rata_count)*100 : 0;
+      $persentasel3_3 = $l3_rata_count > 0 ? ($l3_rata_count_3/$l3_rata_count)*100 : 0;
+      $persentasel3_4 = $l3_rata_count > 0 ? ($l3_rata_count_4/$l3_rata_count)*100 : 0;
+      $persentasel3_5 = $l3_rata_count > 0 ? ($l3_rata_count_5/$l3_rata_count)*100 : 0;
 
       //persantase x probabilitas L3
       $persentase_probabilitas_l3_1 = $persentasel3_1*$probabilitas_1;

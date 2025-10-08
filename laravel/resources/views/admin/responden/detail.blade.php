@@ -27,7 +27,7 @@
                               <tr>
                                 <td width="15%">Nama Bisnis</td>
                                 <td width="3%">:</td>
-                                <td width="20%">{{ $data->bisnis->nama_bisnis }}</td>
+                                <td width="20%">@if($data->id_bisnis == '' || !$data->bisnis) - @else {{ $data->bisnis->nama_bisnis }} @endif</td>
                                 <td width="10%">Email</td>
                                 <td width="3%">:</td>
                                 <td>{{ $data->email }}</td>

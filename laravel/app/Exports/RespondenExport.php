@@ -2,20 +2,20 @@
 
 namespace App\Exports;
 use Illuminate\Support\Facades\DB;
-use App\Responden;
-use App\Provinsi;
-use App\Bisnis;
-use App\Jawaban_realibility;
-use App\Jawaban_empathy;
-use App\Jawaban_responsiveness;
-use App\Jawaban_relevance;
-use App\Jawaban_assurance;
-use App\Jawaban_tangible;
-use App\Jawaban_lp;
-use App\Jawaban_kp;
-use App\Jawaban_kritik_saran;
-use App\User;
-use App\Jawaban_applicability;
+use App\Models\Responden;
+use App\Models\Provinsi;
+use App\Models\Bisnis;
+use App\Models\Jawaban_realibility;
+use App\Models\Jawaban_empathy;
+use App\Models\Jawaban_responsiveness;
+use App\Models\Jawaban_relevance;
+use App\Models\Jawaban_assurance;
+use App\Models\Jawaban_tangible;
+use App\Models\Jawaban_lp;
+use App\Models\Jawaban_kp;
+use App\Models\Jawaban_kritik_saran;
+use App\Models\User;
+use App\Models\Jawaban_applicability;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;

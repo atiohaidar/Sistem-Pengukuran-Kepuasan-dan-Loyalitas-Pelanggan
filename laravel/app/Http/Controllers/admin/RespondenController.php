@@ -3,20 +3,20 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 
-use App\Responden;
-use App\Provinsi;
-use App\Bisnis;
-use App\Jawaban_realibility;
-use App\Jawaban_empathy;
-use App\Jawaban_responsiveness;
-use App\Jawaban_relevance;
-use App\Jawaban_assurance;
-use App\Jawaban_tangible;
-use App\Jawaban_lp;
-use App\Jawaban_kp;
-use App\Jawaban_kritik_saran;
-use App\User;
-use App\Jawaban_applicability;
+use App\Models\Responden;
+use App\Models\Provinsi;
+use App\Models\Bisnis;
+use App\Models\Jawaban_realibility;
+use App\Models\Jawaban_empathy;
+use App\Models\Jawaban_responsiveness;
+use App\Models\Jawaban_relevance;
+use App\Models\Jawaban_assurance;
+use App\Models\Jawaban_tangible;
+use App\Models\Jawaban_lp;
+use App\Models\Jawaban_kp;
+use App\Models\Jawaban_kritik_saran;
+use App\Models\User;
+use App\Models\Jawaban_applicability;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 use Charts;
-use App\Exports\RespondenExport;
+use App\Models\Exports\RespondenExport;
 
 class RespondenController extends Controller
 {
@@ -60,13 +60,13 @@ class RespondenController extends Controller
      */
     public function index()
     {
-        $data = Responden::orderBy('id_responden','desc')->get();
+        $data = Responden::with('bisnis:id_bisnis,nama_bisnis')->orderBy('id_responden','desc')->get();
         return view('admin.responden.index',['database' => $data]);
     }
 
     public function showdetailresponden($id_responden)
     {
-        $data = Responden::find($id_responden);
+        $data = Responden::with('bisnis')->find($id_responden);
         //kepentingan
         $jawaban_realibility1 = Jawaban_realibility::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
         $jawaban_empathy1 = Jawaban_empathy::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();

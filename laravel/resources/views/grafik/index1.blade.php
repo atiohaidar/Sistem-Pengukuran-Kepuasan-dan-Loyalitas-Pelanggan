@@ -15,11 +15,11 @@
     <figure class="highcharts-figure">
       <div id="grafik2"></div>
       <?php
-      $persentase_1 = ($k1_rata_count_1/$k1_count)*100;
-      $persentase_2 = ($k1_rata_count_2/$k1_count)*100;
-      $persentase_3 = ($k1_rata_count_3/$k1_count)*100;
-      $persentase_4 = ($k1_rata_count_4/$k1_count)*100;
-      $persentase_5 = ($k1_rata_count_5/$k1_count)*100;
+      $persentase_1 = $k1_count > 0 ? ($k1_rata_count_1/$k1_count)*100 : 0;
+      $persentase_2 = $k1_count > 0 ? ($k1_rata_count_2/$k1_count)*100 : 0;
+      $persentase_3 = $k1_count > 0 ? ($k1_rata_count_3/$k1_count)*100 : 0;
+      $persentase_4 = $k1_count > 0 ? ($k1_rata_count_4/$k1_count)*100 : 0;
+      $persentase_5 = $k1_count > 0 ? ($k1_rata_count_5/$k1_count)*100 : 0;
 
       $probabilitas_1 = 0.00;
       $probabilitas_2 = 0.25;

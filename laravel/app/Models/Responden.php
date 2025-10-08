@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,11 +24,11 @@ class Responden extends Model
 
     public function bisnis()
     {
-    	return $this->belongsTo('App\Bisnis','id_bisnis');
+    	return $this->belongsTo('App\Models\Bisnis','id_bisnis');
     }
 
     public function domi()
     {
-    	return $this->belongsTo('App\Provinsi','domisili');
+    	return $this->belongsTo('App\Models\Provinsi','domisili');
     }
 }

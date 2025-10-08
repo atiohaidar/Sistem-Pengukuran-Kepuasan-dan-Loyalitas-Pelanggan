@@ -11,6 +11,9 @@ use App\Models\Jawaban_empathy;
 use App\Models\Jawaban_responsiveness;
 use App\Models\Jawaban_applicability;
 use App\Models\Jawaban_lp;
+use App\Models\Jawaban_kritik_saran;
+use App\Models\Jawaban_kp;
+use App\Models\Jawaban_relevance;
 
 class JawabanSeeder extends Seeder
 {
@@ -214,6 +217,87 @@ class JawabanSeeder extends Seeder
             'l2' => 4,
             'l3' => 5,
             'kategori' => 'persepsi'
+        ]);
+
+        // Kritik dan Saran data
+        Jawaban_kritik_saran::create([
+            'id_responden' => 1,
+            'no1' => 'Layanan sudah cukup baik, namun perlu ditingkatkan kecepatan respon',
+            'no2' => 'Sarankan untuk menambah fitur notifikasi real-time',
+            'no3_online' => 'Platform online sudah user-friendly',
+            'no3_offlone' => 'Layanan offline perlu ditingkatkan',
+            'no3_streaming' => 'Fitur streaming berjalan lancar',
+            'no3_elearning' => 'Konten e-learning sangat membantu'
+        ]);
+
+        Jawaban_kritik_saran::create([
+            'id_responden' => 2,
+            'no1' => 'Aplikasi sering lag saat peak hours',
+            'no2' => 'Perlu lebih banyak tutorial untuk pemula',
+            'no3_online' => 'Interface online perlu diperbaiki',
+            'no3_offlone' => 'Layanan offline sangat membantu',
+            'no3_streaming' => 'Kualitas streaming perlu ditingkatkan',
+            'no3_elearning' => 'Konten e-learning kurang lengkap'
+        ]);
+
+        Jawaban_kritik_saran::create([
+            'id_responden' => 3,
+            'no1' => 'Secara keseluruhan sudah memuaskan',
+            'no2' => 'Tambahkan fitur chat support',
+            'no3_online' => 'Platform online sangat responsif',
+            'no3_offlone' => 'Layanan offline perlu lebih banyak lokasi',
+            'no3_streaming' => 'Streaming berjalan dengan baik',
+            'no3_elearning' => 'Konten e-learning berkualitas tinggi'
+        ]);
+
+        // Kepuasan Responden (KP) data
+        Jawaban_kp::create([
+            'id_responden' => 1,
+            'k1' => 4,
+            'k2' => 5,
+            'k3' => 4,
+            'kategori' => 'persepsi'
+        ]);
+
+        Jawaban_kp::create([
+            'id_responden' => 2,
+            'k1' => 3,
+            'k2' => 4,
+            'k3' => 3,
+            'kategori' => 'persepsi'
+        ]);
+
+        Jawaban_kp::create([
+            'id_responden' => 3,
+            'k1' => 5,
+            'k2' => 4,
+            'k3' => 5,
+            'kategori' => 'persepsi'
+        ]);
+
+        // Penilaian Tingkat Kepentingan Harapan (Relevance) data
+        Jawaban_relevance::create([
+            'id_responden' => 1,
+            'rl1' => 5,
+            'rl2' => 4,
+            'rl3' => 5,
+            'kategori' => 'harapan'
+        ]);
+
+        Jawaban_relevance::create([
+            'id_responden' => 2,
+            'rl1' => 4,
+            'rl2' => 5,
+            'rl3' => 4,
+            'kategori' => 'harapan'
+        ]);
+
+        Jawaban_relevance::create([
+            'id_responden' => 3,
+            'rl1' => 5,
+            'rl2' => 5,
+            'rl3' => 5,
+            'kategori' => 'harapan'
         ]);
     }
 }

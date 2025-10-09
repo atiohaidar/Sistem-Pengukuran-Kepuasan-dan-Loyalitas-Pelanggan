@@ -51,12 +51,12 @@ Route::get('/dataresponden', 'admin\RespondenController@index')->name('admin.res
 Route::delete('/dataresponden/hapus/{id}','admin\RespondenController@destroy')->name('admin.responden.hapus');
 Route::get('/dataresponden/detail/{id_responden}', 'admin\RespondenController@showdetailresponden')->name('admin.detail.responden');
 
-Route::get('/chart1', 'admin\GrafikController@grafik1')->name('admin.grafik.grafik1');
-Route::get('/chart2', 'admin\GrafikController@grafik2')->name('admin.grafik.grafik2');
-Route::get('/chart3', 'admin\GrafikController@grafik3')->name('admin.grafik.grafik3');
-Route::get('/chart4', 'admin\GrafikController@grafik4')->name('admin.grafik.grafik4');
-Route::get('/chart5', 'admin\GrafikController@grafik5')->name('admin.grafik.grafik5');
-Route::get('/chart6', 'admin\GrafikController@grafik6')->name('admin.grafik.grafik6');
+Route::get('/chart1', 'admin\GrafikNewController@grafik1')->name('admin.grafik.grafik1');
+Route::get('/chart2', 'admin\GrafikNewController@grafik2')->name('admin.grafik.grafik2');
+Route::get('/chart3', 'admin\GrafikNewController@grafik3')->name('admin.grafik.grafik3');
+Route::get('/chart4', 'admin\GrafikNewController@grafik4')->name('admin.grafik.grafik4');
+Route::get('/chart5', 'admin\GrafikNewController@grafik5')->name('admin.grafik.grafik5');
+Route::get('/chart6', 'admin\GrafikNewController@grafik6')->name('admin.grafik.grafik6');
 
 Route::get('/export', 'admin\RespondenController@export')->name('admin.export');
 

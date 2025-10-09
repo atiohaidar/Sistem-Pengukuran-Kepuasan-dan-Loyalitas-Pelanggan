@@ -6,17 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Responden;
 use App\Models\Provinsi;
 use App\Models\Bisnis;
-use App\Models\Jawaban_realibility;
-use App\Models\Jawaban_empathy;
-use App\Models\Jawaban_responsiveness;
-use App\Models\Jawaban_relevance;
-use App\Models\Jawaban_assurance;
-use App\Models\Jawaban_tangible;
-use App\Models\Jawaban_lp;
-use App\Models\Jawaban_kp;
-use App\Models\Jawaban_kritik_saran;
-use App\Models\User;
-use App\Models\Jawaban_applicability;
+use App\Models\Jawaban;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -53,6 +43,18 @@ class RespondenController extends Controller
         
         return view('admin.chart',compact('chart'));
     }
+
+    private function getJawabanData($id_responden, $dimensi_type, $kategori = null)
+    {
+        $query = Jawaban::where('id_responden', $id_responden)
+                       ->where('dimensi_type', $dimensi_type);
+        
+        if ($kategori) {
+            $query->where('kategori', $kategori);
+        }
+        
+        return $query;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -67,25 +69,30 @@ class RespondenController extends Controller
     public function showdetailresponden($id_responden)
     {
         $data = Responden::with('bisnis')->find($id_responden);
+        
+        if (!$data) {
+            return redirect('/dataresponden')->with('error', 'Data responden tidak ditemukan');
+        }
+        
         //kepentingan
-        $jawaban_realibility1 = Jawaban_realibility::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
-        $jawaban_empathy1 = Jawaban_empathy::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
-        $jawaban_responsiveness1 = Jawaban_responsiveness::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
-        $jawaban_relevance1 = Jawaban_applicability::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
-        $jawaban_assurance1 = Jawaban_assurance::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
-        $jawaban_tangible1 = Jawaban_tangible::where('id_responden','=',$id_responden)->where('kategori','=','kepentingan')->get();
+        $jawaban_realibility1 = $this->getJawabanData($id_responden, 'realibility', 'kepentingan')->get();
+        $jawaban_empathy1 = $this->getJawabanData($id_responden, 'empathy', 'kepentingan')->get();
+        $jawaban_responsiveness1 = $this->getJawabanData($id_responden, 'responsiveness', 'kepentingan')->get();
+        $jawaban_relevance1 = $this->getJawabanData($id_responden, 'applicability', 'kepentingan')->get();
+        $jawaban_assurance1 = $this->getJawabanData($id_responden, 'assurance', 'kepentingan')->get();
+        $jawaban_tangible1 = $this->getJawabanData($id_responden, 'tangible', 'kepentingan')->get();
         //persepsi
-        $jawaban_realibility2 = Jawaban_realibility::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
-        $jawaban_empathy2 = Jawaban_empathy::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
-        $jawaban_responsiveness2 = Jawaban_responsiveness::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
-        $jawaban_relevance2 = Jawaban_applicability::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
-        $jawaban_assurance2 = Jawaban_assurance::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
-        $jawaban_tangible2 = Jawaban_tangible::where('id_responden','=',$id_responden)->where('kategori','=','persepsi')->get();
+        $jawaban_realibility2 = $this->getJawabanData($id_responden, 'realibility', 'persepsi')->get();
+        $jawaban_empathy2 = $this->getJawabanData($id_responden, 'empathy', 'persepsi')->get();
+        $jawaban_responsiveness2 = $this->getJawabanData($id_responden, 'responsiveness', 'persepsi')->get();
+        $jawaban_relevance2 = $this->getJawabanData($id_responden, 'applicability', 'persepsi')->get();
+        $jawaban_assurance2 = $this->getJawabanData($id_responden, 'assurance', 'persepsi')->get();
+        $jawaban_tangible2 = $this->getJawabanData($id_responden, 'tangible', 'persepsi')->get();
         
         
-        $jawaban_lp = Jawaban_lp::where('id_responden','=',$id_responden)->get();
-        $jawaban_kp = Jawaban_kp::where('id_responden','=',$id_responden)->get();
-        $jawaban_kritik_saran = Jawaban_kritik_saran::where('id_responden','=',$id_responden)->get();
+        $jawaban_lp = $this->getJawabanData($id_responden, 'lp')->get();
+        $jawaban_kp = $this->getJawabanData($id_responden, 'kp')->get();
+        $jawaban_kritik_saran = $this->getJawabanData($id_responden, 'kritik_saran')->get();
         
         return view('admin.responden.detail',
             [
@@ -117,60 +124,8 @@ class RespondenController extends Controller
         $tabel1 = Responden::find($id);
         $tabel1->delete();
 
-        $tabel2count = Jawaban_realibility::where('id_responden','=',$id)->count();
-        if($tabel2count == null){}else{
-            $tabel2 = Jawaban_realibility::where('id_responden','=',$id);
-            $tabel2->delete();
-        }
-        
-        $tabel3count = Jawaban_empathy::where('id_responden','=',$id)->count();
-        if($tabel3count == null){}else{
-        $tabel3 = Jawaban_empathy::where('id_responden','=',$id);
-        $tabel3->delete();
-        }
-
-        $tabel4count = Jawaban_responsiveness::where('id_responden','=',$id)->count();
-        if($tabel4count == null){}else{
-        $tabel4 = Jawaban_responsiveness::where('id_responden','=',$id);
-        $tabel4->delete();
-        }
-
-        $tabel5count = Jawaban_applicability::where('id_responden','=',$id)->count();
-        if($tabel5count == null){}else{
-        $tabel5 = Jawaban_applicability::where('id_responden','=',$id);
-        $tabel5->delete();
-        }
-
-        $tabel6count = Jawaban_assurance::where('id_responden','=',$id)->count();
-        if($tabel6count == null){}else{
-        $tabel6 = Jawaban_assurance::where('id_responden','=',$id);
-        $tabel6->delete();
-        }
-
-        $tabel7count = Jawaban_tangible::where('id_responden','=',$id)->count();
-        if($tabel7count == null){}else{
-        $tabel7 = Jawaban_tangible::where('id_responden','=',$id);
-        $tabel7->delete();
-        }
-
-        $tabel8count = Jawaban_lp::where('id_responden','=',$id)->count();
-        if($tabel8count == null){}else{
-        $tabel8 = Jawaban_lp::where('id_responden','=',$id);
-        $tabel8->delete();
-        }
-
-        $tabel9count = Jawaban_kp::where('id_responden','=',$id)->count();
-        if($tabel9count == null){}else{
-        $tabel9 = Jawaban_kp::where('id_responden','=',$id);
-        $tabel9->delete();
-        }
-
-        $tabel10count = Jawaban_kritik_saran::where('id_responden','=',$id)->count();
-        if($tabel10count == null){}else{
-        $tabel10 = Jawaban_kritik_saran::where('id_responden','=',$id);
-        $tabel10->delete();
-        }
-
+        // Delete all jawaban data for this responden using unified Jawaban model
+        Jawaban::where('id_responden', $id)->delete();
 
         return redirect('/dataresponden')->with('success','Data berhasil dihapus');
     }

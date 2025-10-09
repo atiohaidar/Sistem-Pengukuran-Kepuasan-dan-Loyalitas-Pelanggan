@@ -6,16 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Responden;
 use App\Models\Provinsi;
 use App\Models\Bisnis;
-use App\Models\Jawaban_realibility;
-use App\Models\Jawaban_empathy;
-use App\Models\Jawaban_responsiveness;
-use App\Models\Jawaban_relevance;
-use App\Models\Jawaban_assurance;
-use App\Models\Jawaban_tangible;
-use App\Models\Jawaban_lp;
-use App\Models\Jawaban_kp;
-use App\Models\Jawaban_kritik_saran;
-use App\Models\Jawaban_applicability;
+use App\Models\Jawaban;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +23,18 @@ class RespondenController extends Controller
         $ip = request()->ip(); //Dynamic IP address get
         $data = \Location::get($ip);                
         return dd($data);
+    }
+
+    private function getJawabanData($id_responden, $dimensi_type, $kategori = null)
+    {
+        $query = Jawaban::where('id_responden', $id_responden)
+                       ->where('dimensi_type', $dimensi_type);
+        
+        if ($kategori) {
+            $query->where('kategori', $kategori);
+        }
+        
+        return $query;
     }
     
     public function index()
@@ -83,67 +86,87 @@ class RespondenController extends Controller
     {
         $data = Responden::where('id_responden', $request->id_responden)->first();
 
-        $realibility = new Jawaban_realibility;
+        // Save realibility data
+        $realibility = new Jawaban;
         $realibility->id_responden = $request->id_responden;
-        $realibility->r1 = $request->r1;
-        $realibility->r2 = $request->r2;
-        $realibility->r3 = $request->r3;
-        $realibility->r4 = $request->r4;
-        $realibility->r5 = $request->r5;
-        $realibility->r6 = $request->r6;
-        $realibility->r7 = $request->r7;
+        $realibility->dimensi_type = 'realibility';
         $realibility->kategori = 'kepentingan';
+        $realibility->nilai = [
+            'r1' => $request->r1,
+            'r2' => $request->r2,
+            'r3' => $request->r3,
+            'r4' => $request->r4,
+            'r5' => $request->r5,
+            'r6' => $request->r6,
+            'r7' => $request->r7
+        ];
         $realibility->save();
 
-        $assurance = new Jawaban_assurance;
+        // Save assurance data
+        $assurance = new Jawaban;
         $assurance->id_responden = $request->id_responden;
-        $assurance->a1 = $request->a1;
-        $assurance->a2 = $request->a2;
-        $assurance->a3 = $request->a3;
-        $assurance->a4 = $request->a4;
+        $assurance->dimensi_type = 'assurance';
         $assurance->kategori = 'kepentingan';
+        $assurance->nilai = [
+            'a1' => $request->a1,
+            'a2' => $request->a2,
+            'a3' => $request->a3,
+            'a4' => $request->a4
+        ];
         $assurance->save();
 
-        $empathy = new Jawaban_empathy;
+        // Save empathy data
+        $empathy = new Jawaban;
         $empathy->id_responden = $request->id_responden;
-        $empathy->e1 = $request->e1;
-        $empathy->e2 = $request->e2;
-        $empathy->e3 = $request->e3;
-        $empathy->e4 = $request->e4;
-        $empathy->e5 = $request->e5;
+        $empathy->dimensi_type = 'empathy';
         $empathy->kategori = 'kepentingan';
+        $empathy->nilai = [
+            'e1' => $request->e1,
+            'e2' => $request->e2,
+            'e3' => $request->e3,
+            'e4' => $request->e4,
+            'e5' => $request->e5
+        ];
         $empathy->save();
 
-        $relevance = new Jawaban_applicability;
+        // Save relevance data
+        $relevance = new Jawaban;
         $relevance->id_responden = $request->id_responden;
-        $relevance->ap1 = $request->ap1;
-        $relevance->ap2 = $request->ap2;
+        $relevance->dimensi_type = 'applicability';
         $relevance->kategori = 'kepentingan';
+        $relevance->nilai = [
+            'ap1' => $request->ap1,
+            'ap2' => $request->ap2
+        ];
         $relevance->save();
 
-        
-        $responsiveness = new Jawaban_responsiveness;
+        // Save responsiveness data
+        $responsiveness = new Jawaban;
         $responsiveness->id_responden = $request->id_responden;
-        $responsiveness->rs1 = $request->rs1;
-        $responsiveness->rs2 = $request->rs2;
+        $responsiveness->dimensi_type = 'responsiveness';
         $responsiveness->kategori = 'kepentingan';
+        $responsiveness->nilai = [
+            'rs1' => $request->rs1,
+            'rs2' => $request->rs2
+        ];
         $responsiveness->save();
 
-        $tangible = new Jawaban_tangible;
+        // Save tangible data
+        $tangible = new Jawaban;
         $tangible->id_responden = $request->id_responden;
-        $tangible->t1 = $request->t1;
-        $tangible->t2 = $request->t2;
-        $tangible->t3 = $request->t3;
-        $tangible->t4 = $request->t4;
-        $tangible->t5 = $request->t5;
-        $tangible->t6 = $request->t6;
+        $tangible->dimensi_type = 'tangible';
         $tangible->kategori = 'kepentingan';
+        $tangible->nilai = [
+            't1' => $request->t1,
+            't2' => $request->t2,
+            't3' => $request->t3,
+            't4' => $request->t4,
+            't5' => $request->t5,
+            't6' => $request->t6
+        ];
         $tangible->save();
 
-        
-      
-
-      return redirect('pertanyaan2/'.$data->email);
+        return redirect('pertanyaan2/'.$data->email);
     }
 
     public function pertanyaan2($email)
@@ -157,67 +180,87 @@ class RespondenController extends Controller
     {
         $data = Responden::where('id_responden', $request->id_responden)->first();
 
-        $realibility = new Jawaban_realibility;
+        // Save realibility data
+        $realibility = new Jawaban;
         $realibility->id_responden = $request->id_responden;
-        $realibility->r1 = $request->r1;
-        $realibility->r2 = $request->r2;
-        $realibility->r3 = $request->r3;
-        $realibility->r4 = $request->r4;
-        $realibility->r5 = $request->r5;
-        $realibility->r6 = $request->r6;
-        $realibility->r7 = $request->r7;
+        $realibility->dimensi_type = 'realibility';
         $realibility->kategori = 'persepsi';
+        $realibility->nilai = [
+            'r1' => $request->r1,
+            'r2' => $request->r2,
+            'r3' => $request->r3,
+            'r4' => $request->r4,
+            'r5' => $request->r5,
+            'r6' => $request->r6,
+            'r7' => $request->r7
+        ];
         $realibility->save();
 
-        $assurance = new Jawaban_assurance;
+        // Save assurance data
+        $assurance = new Jawaban;
         $assurance->id_responden = $request->id_responden;
-        $assurance->a1 = $request->a1;
-        $assurance->a2 = $request->a2;
-        $assurance->a3 = $request->a3;
-        $assurance->a4 = $request->a4;
+        $assurance->dimensi_type = 'assurance';
         $assurance->kategori = 'persepsi';
+        $assurance->nilai = [
+            'a1' => $request->a1,
+            'a2' => $request->a2,
+            'a3' => $request->a3,
+            'a4' => $request->a4
+        ];
         $assurance->save();
 
-        $empathy = new Jawaban_empathy;
+        // Save empathy data
+        $empathy = new Jawaban;
         $empathy->id_responden = $request->id_responden;
-        $empathy->e1 = $request->e1;
-        $empathy->e2 = $request->e2;
-        $empathy->e3 = $request->e3;
-        $empathy->e4 = $request->e4;
-        $empathy->e5 = $request->e5;
+        $empathy->dimensi_type = 'empathy';
         $empathy->kategori = 'persepsi';
+        $empathy->nilai = [
+            'e1' => $request->e1,
+            'e2' => $request->e2,
+            'e3' => $request->e3,
+            'e4' => $request->e4,
+            'e5' => $request->e5
+        ];
         $empathy->save();
 
-        $relevance = new Jawaban_applicability;
+        // Save relevance data
+        $relevance = new Jawaban;
         $relevance->id_responden = $request->id_responden;
-        $relevance->ap1 = $request->ap1;
-        $relevance->ap2 = $request->ap2;
+        $relevance->dimensi_type = 'applicability';
         $relevance->kategori = 'persepsi';
+        $relevance->nilai = [
+            'ap1' => $request->ap1,
+            'ap2' => $request->ap2
+        ];
         $relevance->save();
 
-        
-        $responsiveness = new Jawaban_responsiveness;
+        // Save responsiveness data
+        $responsiveness = new Jawaban;
         $responsiveness->id_responden = $request->id_responden;
-        $responsiveness->rs1 = $request->rs1;
-        $responsiveness->rs2 = $request->rs2;
+        $responsiveness->dimensi_type = 'responsiveness';
         $responsiveness->kategori = 'persepsi';
+        $responsiveness->nilai = [
+            'rs1' => $request->rs1,
+            'rs2' => $request->rs2
+        ];
         $responsiveness->save();
 
-        $tangible = new Jawaban_tangible;
+        // Save tangible data
+        $tangible = new Jawaban;
         $tangible->id_responden = $request->id_responden;
-        $tangible->t1 = $request->t1;
-        $tangible->t2 = $request->t2;
-        $tangible->t3 = $request->t3;
-        $tangible->t4 = $request->t4;
-        $tangible->t5 = $request->t5;
-        $tangible->t6 = $request->t6;
+        $tangible->dimensi_type = 'tangible';
         $tangible->kategori = 'persepsi';
+        $tangible->nilai = [
+            't1' => $request->t1,
+            't2' => $request->t2,
+            't3' => $request->t3,
+            't4' => $request->t4,
+            't5' => $request->t5,
+            't6' => $request->t6
+        ];
         $tangible->save();
 
-        
-      
-
-      return redirect('pertanyaan3/'.$data->email);
+        return redirect('pertanyaan3/'.$data->email);
     }
 
     
@@ -234,12 +277,15 @@ class RespondenController extends Controller
     {
         $data = Responden::where('id_responden', $request->id_responden)->first();
 
-        $realibility = new Jawaban_kp;
-        $realibility->id_responden = $request->id_responden;
-        $realibility->k1 = $request->k1;
-        $realibility->k2 = $request->k2;
-        $realibility->k3 = $request->k3;
-        $realibility->save();
+        $kp = new Jawaban;
+        $kp->id_responden = $request->id_responden;
+        $kp->dimensi_type = 'kp';
+        $kp->nilai = [
+            'k1' => $request->k1,
+            'k2' => $request->k2,
+            'k3' => $request->k3
+        ];
+        $kp->save();
 
         return redirect('pertanyaan4/'.$data->email);
     }
@@ -256,12 +302,15 @@ class RespondenController extends Controller
     {
         $data = Responden::where('id_responden', $request->id_responden)->first();
 
-        $realibility = new Jawaban_lp;
-        $realibility->id_responden = $request->id_responden;
-        $realibility->l1 = $request->l1;
-        $realibility->l2 = $request->l2;
-        $realibility->l3 = $request->l3;
-        $realibility->save();
+        $lp = new Jawaban;
+        $lp->id_responden = $request->id_responden;
+        $lp->dimensi_type = 'lp';
+        $lp->nilai = [
+            'l1' => $request->l1,
+            'l2' => $request->l2,
+            'l3' => $request->l3
+        ];
+        $lp->save();
 
         return redirect('pertanyaan5/'.$data->email);
     }
@@ -278,16 +327,18 @@ class RespondenController extends Controller
     {
         $data = Responden::where('id_responden', $request->id_responden)->first();
 
-        $realibility = new Jawaban_kritik_saran;
-        $realibility->id_responden = $request->id_responden;
-        $realibility->no1 = $request->kritik_saran;
-        $realibility->no2 = $request->tema_judul;
-        $realibility->no3_online = $request->online;
-        $realibility->no3_offlone = $request->offline;
-        $realibility->no3_streaming = $request->streaming;
-        $realibility->no3_elearning = $request->elearning;
-
-        $realibility->save();
+        $kritikSaran = new Jawaban;
+        $kritikSaran->id_responden = $request->id_responden;
+        $kritikSaran->dimensi_type = 'kritik_saran';
+        $kritikSaran->nilai = [
+            'no1' => $request->kritik_saran,
+            'no2' => $request->tema_judul,
+            'no3_online' => $request->online,
+            'no3_offline' => $request->offline,
+            'no3_streaming' => $request->streaming,
+            'no3_elearning' => $request->elearning
+        ];
+        $kritikSaran->save();
 
         return redirect('selesai');
     }

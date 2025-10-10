@@ -4,109 +4,22 @@
 @section('content')
 <div class="row">
   <div class="col-lg-12 mt-2">
-    <?php 
-      //probabilitas
-      $probabilitas_1 = 0.00;
-      $probabilitas_2 = 0.25;
-      $probabilitas_3 = 0.50;
-      $probabilitas_4 = 0.75;
-      $probabilitas_5 = 1.00;
-
-      //l1
-      $persentasel1_1 = $l1_rata_count > 0 ? ($l1_rata_count_1/$l1_rata_count)*100 : 0;
-      $persentasel1_2 = $l1_rata_count > 0 ? ($l1_rata_count_2/$l1_rata_count)*100 : 0;
-      $persentasel1_3 = $l1_rata_count > 0 ? ($l1_rata_count_3/$l1_rata_count)*100 : 0;
-      $persentasel1_4 = $l1_rata_count > 0 ? ($l1_rata_count_4/$l1_rata_count)*100 : 0;
-      $persentasel1_5 = $l1_rata_count > 0 ? ($l1_rata_count_5/$l1_rata_count)*100 : 0;
-
-      //persantase x probabilitas L1
-      $persentase_probabilitas_l1_1 = $persentasel1_1*$probabilitas_1;
-      $persentase_probabilitas_l1_2 = $persentasel1_2*$probabilitas_2;
-      $persentase_probabilitas_l1_3 = $persentasel1_3*$probabilitas_3;
-      $persentase_probabilitas_l1_4 = $persentasel1_4*$probabilitas_4;
-      $persentase_probabilitas_l1_5 = $persentasel1_5*$probabilitas_5;
-
-      //jumlah x probabilitas
-      $jumlah_probabilitas_l1_1 = $l1_rata_count_1*$probabilitas_1;
-      $jumlah_probabilitas_l1_2 = $l1_rata_count_2*$probabilitas_2;
-      $jumlah_probabilitas_l1_3 = $l1_rata_count_3*$probabilitas_3;
-      $jumlah_probabilitas_l1_4 = $l1_rata_count_4*$probabilitas_4;
-      $jumlah_probabilitas_l1_5 = $l1_rata_count_5*$probabilitas_5;
-
-      $total_jml_pro_l1 = $jumlah_probabilitas_l1_1+$jumlah_probabilitas_l1_2+$jumlah_probabilitas_l1_3+$jumlah_probabilitas_l1_4+$jumlah_probabilitas_l1_5;
-
-      //--------------------------
-      //==============================================================
-
-      //l2
-      $persentasel2_1 = $l2_rata_count > 0 ? ($l2_rata_count_1/$l2_rata_count)*100 : 0;
-      $persentasel2_2 = $l2_rata_count > 0 ? ($l2_rata_count_2/$l2_rata_count)*100 : 0;
-      $persentasel2_3 = $l2_rata_count > 0 ? ($l2_rata_count_3/$l2_rata_count)*100 : 0;
-      $persentasel2_4 = $l2_rata_count > 0 ? ($l2_rata_count_4/$l2_rata_count)*100 : 0;
-      $persentasel2_5 = $l2_rata_count > 0 ? ($l2_rata_count_5/$l2_rata_count)*100 : 0;
-
-      //persantase x probabilitas L1
-      $persentase_probabilitas_l2_1 = $persentasel2_1*$probabilitas_1;
-      $persentase_probabilitas_l2_2 = $persentasel2_2*$probabilitas_2;
-      $persentase_probabilitas_l2_3 = $persentasel2_3*$probabilitas_3;
-      $persentase_probabilitas_l2_4 = $persentasel2_4*$probabilitas_4;
-      $persentase_probabilitas_l2_5 = $persentasel2_5*$probabilitas_5;
-
-      //jumlah x probabilitas
-      $jumlah_probabilitas_l2_1 = $l2_rata_count_1*$probabilitas_1;
-      $jumlah_probabilitas_l2_2 = $l2_rata_count_2*$probabilitas_2;
-      $jumlah_probabilitas_l2_3 = $l2_rata_count_3*$probabilitas_3;
-      $jumlah_probabilitas_l2_4 = $l2_rata_count_4*$probabilitas_4;
-      $jumlah_probabilitas_l2_5 = $l2_rata_count_5*$probabilitas_5;
-
-      $total_jml_pro_l2 = $jumlah_probabilitas_l2_1+$jumlah_probabilitas_l2_2+$jumlah_probabilitas_l2_3+$jumlah_probabilitas_l2_4+$jumlah_probabilitas_l2_5;
-
-      //--------------------------
-      //==============================================================
-
-      //l3
-      $persentasel3_1 = $l3_rata_count > 0 ? ($l3_rata_count_1/$l3_rata_count)*100 : 0;
-      $persentasel3_2 = $l3_rata_count > 0 ? ($l3_rata_count_2/$l3_rata_count)*100 : 0;
-      $persentasel3_3 = $l3_rata_count > 0 ? ($l3_rata_count_3/$l3_rata_count)*100 : 0;
-      $persentasel3_4 = $l3_rata_count > 0 ? ($l3_rata_count_4/$l3_rata_count)*100 : 0;
-      $persentasel3_5 = $l3_rata_count > 0 ? ($l3_rata_count_5/$l3_rata_count)*100 : 0;
-
-      //persantase x probabilitas L3
-      $persentase_probabilitas_l3_1 = $persentasel3_1*$probabilitas_1;
-      $persentase_probabilitas_l3_2 = $persentasel3_2*$probabilitas_2;
-      $persentase_probabilitas_l3_3 = $persentasel3_3*$probabilitas_3;
-      $persentase_probabilitas_l3_4 = $persentasel3_4*$probabilitas_4;
-      $persentase_probabilitas_l3_5 = $persentasel3_5*$probabilitas_5;
-
-      //jumlah x probabilitas
-      $jumlah_probabilitas_l3_1 = $l3_rata_count_1*$probabilitas_1;
-      $jumlah_probabilitas_l3_2 = $l3_rata_count_2*$probabilitas_2;
-      $jumlah_probabilitas_l3_3 = $l3_rata_count_3*$probabilitas_3;
-      $jumlah_probabilitas_l3_4 = $l3_rata_count_4*$probabilitas_4;
-      $jumlah_probabilitas_l3_5 = $l3_rata_count_5*$probabilitas_5;
-
-      $total_jml_pro_l3 = $jumlah_probabilitas_l3_1+$jumlah_probabilitas_l3_2+$jumlah_probabilitas_l3_3+$jumlah_probabilitas_l3_4+$jumlah_probabilitas_l3_5;
-
-     
-
-
-    ?>
     <figure class="highcharts-figure">
       <div id="gfarik1"></div>
-      <center>Dari {{ $l1_rata_count }} orang, maka jumlah pelanggan yang diprediksikan akan mengonsumsi pelatihan ini lagi adalah sebanyak {{ number_format($total_jml_pro_l1,0) }} orang</center>
+            <center>Dari {{ $l1_rata_count }} orang, maka jumlah pelanggan yang diprediksikan akan mengulangi menggunakan jasa pelatihan ini adalah sebanyak {{ number_format($l1_probability_data['total_probability'],0) }} orang</center>
     </figure>
     
   </div>
   <div class="col-lg-12 mt-2">
     <figure class="highcharts-figure">
       <div id="gfarik2"></div>
-      <center>Dari {{ $l2_rata_count }} orang, maka jumlah pelanggan yang diprediksikan tidak akan berpindah ke pesaing adalah sebanyak {{ number_format($total_jml_pro_l2,0) }} orang</center>
+      <center>Dari {{ $l2_rata_count }} orang, maka jumlah pelanggan yang diprediksikan tidak akan berpindah ke pesaing adalah sebanyak {{ number_format($l2_probability_data['total_probability'],0) }} orang</center>
     </figure>
   </div>
   <div class="col-lg-12 mt-2">
     <figure class="highcharts-figure">
       <div id="gfarik3"></div>
-      <center>Dari {{ $l3_rata_count }} orang, maka jumlah pelanggan yang diprediksikan akan merekomendasikan pelatihan ini kepada orang lain adalah sebanyak {{ number_format($total_jml_pro_l3,0) }} orang</center>
+      <center>Dari {{ $l3_rata_count }} orang, maka jumlah pelanggan yang diprediksikan akan merekomendasikan pelatihan ini kepada orang lain adalah sebanyak {{ number_format($l3_probability_data['total_probability'],0) }} orang</center>
     </figure>
   </div>
   <div class="col-lg-4 mt-2">

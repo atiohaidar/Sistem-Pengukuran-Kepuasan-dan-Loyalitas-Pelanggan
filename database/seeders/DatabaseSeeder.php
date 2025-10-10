@@ -11,9 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(\Database\Seeders\JawabanMigrationSeeder::class);
         $this->call(\Database\Seeders\ProvinsiSeeder::class);
         $this->call(\Database\Seeders\DimensiSeeder::class);
+        $this->call(\Database\Seeders\BisnisSeeder::class);
 
         // Only seed users if none exist
         if (\App\Models\User::count() === 0) {
@@ -21,8 +21,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(\Database\Seeders\RespondenSeeder::class);
+        $this->call(\Database\Seeders\JawabanSeeder::class);
 
-        // Seed sample jawaban data for testing
-        $this->call(\Database\Seeders\SampleJawabanSeeder::class);
     }
 }

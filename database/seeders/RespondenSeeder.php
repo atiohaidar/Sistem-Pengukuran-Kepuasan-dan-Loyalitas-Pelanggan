@@ -16,7 +16,7 @@ class RespondenSeeder extends Seeder
     {
         // Get first bisnis and provinsi for reference
         $bisnis = DB::table('tbl_bisnis')->first();
-        $provinsi = DB::table('tbl_provinsi')->first();
+        $provinsi = DB::table('provinsi')->first();
 
         if (!$bisnis || !$provinsi) {
             $this->command->info('Bisnis or Provinsi data not found. Skipping responden creation.');

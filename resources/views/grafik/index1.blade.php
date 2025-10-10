@@ -14,37 +14,7 @@
   <div class="col-lg-12 mt-2">
     <figure class="highcharts-figure">
       <div id="grafik2"></div>
-      <?php
-      $persentase_1 = $k1_count > 0 ? ($k1_rata_count_1/$k1_count)*100 : 0;
-      $persentase_2 = $k1_count > 0 ? ($k1_rata_count_2/$k1_count)*100 : 0;
-      $persentase_3 = $k1_count > 0 ? ($k1_rata_count_3/$k1_count)*100 : 0;
-      $persentase_4 = $k1_count > 0 ? ($k1_rata_count_4/$k1_count)*100 : 0;
-      $persentase_5 = $k1_count > 0 ? ($k1_rata_count_5/$k1_count)*100 : 0;
-
-      $probabilitas_1 = 0.00;
-      $probabilitas_2 = 0.25;
-      $probabilitas_3 = 0.50;
-      $probabilitas_4 = 0.75;
-      $probabilitas_5 = 1.00;
-
-      $persentase_propabilitas_1 = $persentase_1*$probabilitas_1;
-      $persentase_propabilitas_2 = $persentase_2*$probabilitas_2;
-      $persentase_propabilitas_3 = $persentase_3*$probabilitas_3;
-      $persentase_propabilitas_4 = $persentase_4*$probabilitas_4;
-      $persentase_propabilitas_5 = $persentase_5*$probabilitas_5;
-
-      $frekuensi_probabilitas_1 = $k1_rata_count_1*$probabilitas_1;
-      $frekuensi_probabilitas_2 = $k1_rata_count_2*$probabilitas_2;
-      $frekuensi_probabilitas_3 = $k1_rata_count_3*$probabilitas_3;
-      $frekuensi_probabilitas_4 = $k1_rata_count_4*$probabilitas_4;
-      $frekuensi_probabilitas_5 = $k1_rata_count_5*$probabilitas_5;
-
-      $total = $frekuensi_probabilitas_1+$frekuensi_probabilitas_2+$frekuensi_probabilitas_3+$frekuensi_probabilitas_4+$frekuensi_probabilitas_5;
-
-    
-      ?>
-
-      <center>Dari {{ $k1_count }} orang, maka jumlah pelanggan yang berpotensi untuk menjadi loyal adalah sebanyak {{ number_format($total,0) }}  orang</center>
+      <center>Dari {{ $k1_count }} orang, maka jumlah pelanggan yang berpotensi untuk menjadi loyal adalah sebanyak {{ number_format($loyalty_probability, 0) }} orang</center>
     </figure>
     
   </div>

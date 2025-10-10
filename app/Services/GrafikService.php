@@ -2,31 +2,35 @@
 
 namespace App\Services;
 
+use App\Calculators\SurveyCalculator;
 use App\Models\Jawaban;
 use App\Models\Responden;
 use Illuminate\Support\Collection;
 
 class GrafikService
 {
-    /**
-     * Get data untuk grafik kepuasan (KP)
-     */
+    protected SurveyCalculator $calculator;
+
+    public function __construct(SurveyCalculator $calculator)
+    {
+        $this->calculator = $calculator;
+    }
     public function getGrafikKepuasanData(): array
     {
-                $k1_count = Jawaban::getCountDimensi('kp');
+            $k1_count = Jawaban::getCountDimensi('kp');
         $k1_sum = $this->getSumNilaiDimensi('kp', ['k1']);
-        $total_rata_k1 = $k1_count > 0 ? $k1_sum / $k1_count : 0;
+        $total_rata_k1 = $this->calculator->calculateAverage($k1_sum, $k1_count);
 
         $k2_count = Jawaban::getCountDimensi('kp');
         $k2_sum = $this->getSumNilaiDimensi('kp', ['k2']);
-        $total_rata_k2 = $k2_count > 0 ? $k2_sum / $k2_count : 0;
+        $total_rata_k2 = $this->calculator->calculateAverage($k2_sum, $k2_count);
 
         $k3_count = Jawaban::getCountDimensi('kp');
         $k3_sum = $this->getSumNilaiDimensi('kp', ['k3']);
-        $total_rata_k3 = $k3_count > 0 ? $k3_sum / $k3_count : 0;
+        $total_rata_k3 = $this->calculator->calculateAverage($k3_sum, $k3_count);
 
-        // Calculate gap (perception - expectation)
-        $gap = $total_rata_k3 - $total_rata_k2;
+        // Calculate gap using calculator
+        $gap = $this->calculator->calculateGap($total_rata_k3, $total_rata_k2);
 
         // Calculate rating counts for k1 (loyalty probability)
         $k1_rata_count_1 = $this->getCountByRating('kp', 'k1', 1);
@@ -34,6 +38,12 @@ class GrafikService
         $k1_rata_count_3 = $this->getCountByRating('kp', 'k1', 3);
         $k1_rata_count_4 = $this->getCountByRating('kp', 'k1', 4);
         $k1_rata_count_5 = $this->getCountByRating('kp', 'k1', 5);
+
+        // Calculate loyalty probability using calculator
+        $loyaltyData = $this->calculator->calculateLoyaltyProbability(
+            [$k1_rata_count_1, $k1_rata_count_2, $k1_rata_count_3, $k1_rata_count_4, $k1_rata_count_5],
+            $k1_count
+        );
 
         return [
             'k1_count' => $k1_count,
@@ -48,6 +58,11 @@ class GrafikService
             'k1_rata_count_3' => $k1_rata_count_3,
             'k1_rata_count_4' => $k1_rata_count_4,
             'k1_rata_count_5' => $k1_rata_count_5,
+            // Add loyalty probability data
+            'loyalty_probability' => $loyaltyData['total_probability'],
+            'loyalty_percentages' => $loyaltyData['percentages'],
+            'loyalty_weighted_sums' => $loyaltyData['weighted_sums'],
+            'loyalty_frequency_weighteds' => $loyaltyData['frequency_weighteds'],
         ];
     }
 
@@ -56,146 +71,143 @@ class GrafikService
      */
     public function getGrafikRealibilityData(): array
     {
+        // Calculate reliability data using calculator
         $r1_count = Jawaban::getCountDimensi('realibility');
         $r1_sum = $this->getSumNilaiDimensi('realibility', ['r1']);
-        $rata_r1 = $r1_count > 0 ? $r1_sum / $r1_count : 0;
+        $rata_r1 = $this->calculator->calculateDimensionAverage($r1_sum, $r1_count);
 
         $r2_count = Jawaban::getCountDimensi('realibility');
         $r2_sum = $this->getSumNilaiDimensi('realibility', ['r2']);
-        $rata_r2 = $r2_count > 0 ? $r2_sum / $r2_count : 0;
+        $rata_r2 = $this->calculator->calculateDimensionAverage($r2_sum, $r2_count);
 
         $r3_count = Jawaban::getCountDimensi('realibility');
         $r3_sum = $this->getSumNilaiDimensi('realibility', ['r3']);
-        $rata_r3 = $r3_count > 0 ? $r3_sum / $r3_count : 0;
+        $rata_r3 = $this->calculator->calculateDimensionAverage($r3_sum, $r3_count);
 
         $r4_count = Jawaban::getCountDimensi('realibility');
         $r4_sum = $this->getSumNilaiDimensi('realibility', ['r4']);
-        $rata_r4 = $r4_count > 0 ? $r4_sum / $r4_count : 0;
+        $rata_r4 = $this->calculator->calculateDimensionAverage($r4_sum, $r4_count);
 
         $r5_count = Jawaban::getCountDimensi('realibility');
         $r5_sum = $this->getSumNilaiDimensi('realibility', ['r5']);
-        $rata_r5 = $r5_count > 0 ? $r5_sum / $r5_count : 0;
+        $rata_r5 = $this->calculator->calculateDimensionAverage($r5_sum, $r5_count);
 
         $r6_count = Jawaban::getCountDimensi('realibility');
         $r6_sum = $this->getSumNilaiDimensi('realibility', ['r6']);
-        $rata_r6 = $r6_count > 0 ? $r6_sum / $r6_count : 0;
+        $rata_r6 = $this->calculator->calculateDimensionAverage($r6_sum, $r6_count);
 
         $r7_count = Jawaban::getCountDimensi('realibility');
         $r7_sum = $this->getSumNilaiDimensi('realibility', ['r7']);
-        $rata_r7 = $r7_count > 0 ? $r7_sum / $r7_count : 0;
+        $rata_r7 = $this->calculator->calculateDimensionAverage($r7_sum, $r7_count);
 
-        // Calculate tangible data
+        // Calculate tangible data using calculator
         $t1_count = Jawaban::getCountDimensi('tangible');
         $t1_sum = $this->getSumNilaiDimensi('tangible', ['t1']);
-        $rata_t1 = $t1_count > 0 ? $t1_sum / $t1_count : 0;
+        $rata_t1 = $this->calculator->calculateDimensionAverage($t1_sum, $t1_count);
 
         $t2_count = Jawaban::getCountDimensi('tangible');
         $t2_sum = $this->getSumNilaiDimensi('tangible', ['t2']);
-        $rata_t2 = $t2_count > 0 ? $t2_sum / $t2_count : 0;
+        $rata_t2 = $this->calculator->calculateDimensionAverage($t2_sum, $t2_count);
 
         $t3_count = Jawaban::getCountDimensi('tangible');
         $t3_sum = $this->getSumNilaiDimensi('tangible', ['t3']);
-        $rata_t3 = $t3_count > 0 ? $t3_sum / $t3_count : 0;
+        $rata_t3 = $this->calculator->calculateDimensionAverage($t3_sum, $t3_count);
 
         $t4_count = Jawaban::getCountDimensi('tangible');
         $t4_sum = $this->getSumNilaiDimensi('tangible', ['t4']);
-        $rata_t4 = $t4_count > 0 ? $t4_sum / $t4_count : 0;
+        $rata_t4 = $this->calculator->calculateDimensionAverage($t4_sum, $t4_count);
 
         $t5_count = Jawaban::getCountDimensi('tangible');
         $t5_sum = $this->getSumNilaiDimensi('tangible', ['t5']);
-        $rata_t5 = $t5_count > 0 ? $t5_sum / $t5_count : 0;
+        $rata_t5 = $this->calculator->calculateDimensionAverage($t5_sum, $t5_count);
 
         $t6_count = Jawaban::getCountDimensi('tangible');
         $t6_sum = $this->getSumNilaiDimensi('tangible', ['t6']);
-        $rata_t6 = $t6_count > 0 ? $t6_sum / $t6_count : 0;
+        $rata_t6 = $this->calculator->calculateDimensionAverage($t6_sum, $t6_count);
 
-        // Calculate responsiveness data
+        // Calculate responsiveness data using calculator
         $rs1_count = Jawaban::getCountDimensi('responsiveness');
         $rs1_sum = $this->getSumNilaiDimensi('responsiveness', ['rs1']);
-        $rata_rs1 = $rs1_count > 0 ? $rs1_sum / $rs1_count : 0;
+        $rata_rs1 = $this->calculator->calculateDimensionAverage($rs1_sum, $rs1_count);
 
         $rs2_count = Jawaban::getCountDimensi('responsiveness');
         $rs2_sum = $this->getSumNilaiDimensi('responsiveness', ['rs2']);
-        $rata_rs2 = $rs2_count > 0 ? $rs2_sum / $rs2_count : 0;
+        $rata_rs2 = $this->calculator->calculateDimensionAverage($rs2_sum, $rs2_count);
 
-        // Calculate assurance data
+        // Calculate assurance data using calculator
         $a1_count = Jawaban::getCountDimensi('assurance');
         $a1_sum = $this->getSumNilaiDimensi('assurance', ['a1']);
-        $rata_a1 = $a1_count > 0 ? $a1_sum / $a1_count : 0;
+        $rata_a1 = $this->calculator->calculateDimensionAverage($a1_sum, $a1_count);
 
         $a2_count = Jawaban::getCountDimensi('assurance');
         $a2_sum = $this->getSumNilaiDimensi('assurance', ['a2']);
-        $rata_a2 = $a2_count > 0 ? $a2_sum / $a2_count : 0;
+        $rata_a2 = $this->calculator->calculateDimensionAverage($a2_sum, $a2_count);
 
         $a3_count = Jawaban::getCountDimensi('assurance');
         $a3_sum = $this->getSumNilaiDimensi('assurance', ['a3']);
-        $rata_a3 = $a3_count > 0 ? $a3_sum / $a3_count : 0;
+        $rata_a3 = $this->calculator->calculateDimensionAverage($a3_sum, $a3_count);
 
         $a4_count = Jawaban::getCountDimensi('assurance');
         $a4_sum = $this->getSumNilaiDimensi('assurance', ['a4']);
-        $rata_a4 = $a4_count > 0 ? $a4_sum / $a4_count : 0;
+        $rata_a4 = $this->calculator->calculateDimensionAverage($a4_sum, $a4_count);
 
-        // Calculate empathy data
+        // Calculate empathy data using calculator
         $e1_count = Jawaban::getCountDimensi('empathy');
         $e1_sum = $this->getSumNilaiDimensi('empathy', ['e1']);
-        $rata_e1 = $e1_count > 0 ? $e1_sum / $e1_count : 0;
+        $rata_e1 = $this->calculator->calculateDimensionAverage($e1_sum, $e1_count);
 
         $e2_count = Jawaban::getCountDimensi('empathy');
         $e2_sum = $this->getSumNilaiDimensi('empathy', ['e2']);
-        $rata_e2 = $e2_count > 0 ? $e2_sum / $e2_count : 0;
+        $rata_e2 = $this->calculator->calculateDimensionAverage($e2_sum, $e2_count);
 
         $e3_count = Jawaban::getCountDimensi('empathy');
         $e3_sum = $this->getSumNilaiDimensi('empathy', ['e3']);
-        $rata_e3 = $e3_count > 0 ? $e3_sum / $e3_count : 0;
+        $rata_e3 = $this->calculator->calculateDimensionAverage($e3_sum, $e3_count);
 
         $e4_count = Jawaban::getCountDimensi('empathy');
         $e4_sum = $this->getSumNilaiDimensi('empathy', ['e4']);
-        $rata_e4 = $e4_count > 0 ? $e4_sum / $e4_count : 0;
+        $rata_e4 = $this->calculator->calculateDimensionAverage($e4_sum, $e4_count);
 
         $e5_count = Jawaban::getCountDimensi('empathy');
         $e5_sum = $this->getSumNilaiDimensi('empathy', ['e5']);
-        $rata_e5 = $e5_count > 0 ? $e5_sum / $e5_count : 0;
+        $rata_e5 = $this->calculator->calculateDimensionAverage($e5_sum, $e5_count);
 
-        // Calculate relevance data
+        // Calculate relevance data using calculator
         $rl1_count = Jawaban::getCountDimensi('relevance');
         $rl1_sum = $this->getSumNilaiDimensi('relevance', ['rl1']);
-        $rata_rl1 = $rl1_count > 0 ? $rl1_sum / $rl1_count : 0;
+        $rata_rl1 = $this->calculator->calculateDimensionAverage($rl1_sum, $rl1_count);
 
         $rl2_count = Jawaban::getCountDimensi('relevance');
         $rl2_sum = $this->getSumNilaiDimensi('relevance', ['rl2']);
-        $rata_rl2 = $rl2_count > 0 ? $rl2_sum / $rl2_count : 0;
+        $rata_rl2 = $this->calculator->calculateDimensionAverage($rl2_sum, $rl2_count);
 
-        // Calculate summary statistics for grafik2
+        // Calculate summary statistics for grafik2 using calculator
         // Average gaps (perception - importance) for each dimension
-        $rata_gap_r = ($rata_r1 + $rata_r2 + $rata_r3 + $rata_r4 + $rata_r5 + $rata_r6 + $rata_r7) / 7;
-        $rata_gap_t = ($rata_t1 + $rata_t2 + $rata_t3 + $rata_t4 + $rata_t5 + $rata_t6) / 6;
-        $rata_gap_rs = ($rata_rs1 + $rata_rs2) / 2;
-        $rata_gap_a = ($rata_a1 + $rata_a2 + $rata_a3 + $rata_a4) / 4;
-        $rata_gap_e = ($rata_e1 + $rata_e2 + $rata_e3 + $rata_e4 + $rata_e5) / 5;
-        $rata_gap_rl = ($rata_rl1 + $rata_rl2) / 2;
+        $rata_gap_r = $this->calculator->calculateGapAverage([$rata_r1, $rata_r2, $rata_r3, $rata_r4, $rata_r5, $rata_r6, $rata_r7]);
+        $rata_gap_t = $this->calculator->calculateGapAverage([$rata_t1, $rata_t2, $rata_t3, $rata_t4, $rata_t5, $rata_t6]);
+        $rata_gap_rs = $this->calculator->calculateGapAverage([$rata_rs1, $rata_rs2]);
+        $rata_gap_a = $this->calculator->calculateGapAverage([$rata_a1, $rata_a2, $rata_a3, $rata_a4]);
+        $rata_gap_e = $this->calculator->calculateGapAverage([$rata_e1, $rata_e2, $rata_e3, $rata_e4, $rata_e5]);
+        $rata_gap_rl = $this->calculator->calculateGapAverage([$rata_rl1, $rata_rl2]);
 
-        // Calculate deviations (simplified as absolute differences from mean)
-        $deviasi_r = abs($rata_gap_r);
-        $deviasi_t = abs($rata_gap_t);
-        $deviasi_rs = abs($rata_gap_rs);
-        $deviasi_a = abs($rata_gap_a);
-        $deviasi_e = abs($rata_gap_e);
-        $deviasi_rl = abs($rata_gap_rl);
+        // Calculate deviations using calculator
+        $deviasi_r = $this->calculator->calculateDeviation($rata_gap_r, $rata_gap_r);
+        $deviasi_t = $this->calculator->calculateDeviation($rata_gap_t, $rata_gap_t);
+        $deviasi_rs = $this->calculator->calculateDeviation($rata_gap_rs, $rata_gap_rs);
+        $deviasi_a = $this->calculator->calculateDeviation($rata_gap_a, $rata_gap_a);
+        $deviasi_e = $this->calculator->calculateDeviation($rata_gap_e, $rata_gap_e);
+        $deviasi_rl = $this->calculator->calculateDeviation($rata_gap_rl, $rata_gap_rl);
 
-        // Calculate total IKP (Indeks Kepuasan Pelanggan)
-        // Using a weighted average of all perception scores, converted to percentage
-        $total_persepsi = ($rata_r1 + $rata_r2 + $rata_r3 + $rata_r4 + $rata_r5 + $rata_r6 + $rata_r7 +
-                          $rata_t1 + $rata_t2 + $rata_t3 + $rata_t4 + $rata_t5 + $rata_t6 +
-                          $rata_rs1 + $rata_rs2 +
-                          $rata_a1 + $rata_a2 + $rata_a3 + $rata_a4 +
-                          $rata_e1 + $rata_e2 + $rata_e3 + $rata_e4 + $rata_e5 +
-                          $rata_rl1 + $rata_rl2);
-
-        $total_questions = 7 + 6 + 2 + 4 + 5 + 2; // 26 questions total
-        $avg_persepsi = $total_questions > 0 ? $total_persepsi / $total_questions : 0;
-
-        // Convert to percentage (assuming scale is 1-5, convert to 0-100)
-        $totalikp = (($avg_persepsi - 1) / 4) * 100;
+        // Calculate total IKP using calculator
+        $all_perception_values = [
+            $rata_r1, $rata_r2, $rata_r3, $rata_r4, $rata_r5, $rata_r6, $rata_r7,
+            $rata_t1, $rata_t2, $rata_t3, $rata_t4, $rata_t5, $rata_t6,
+            $rata_rs1, $rata_rs2,
+            $rata_a1, $rata_a2, $rata_a3, $rata_a4,
+            $rata_e1, $rata_e2, $rata_e3, $rata_e4, $rata_e5,
+            $rata_rl1, $rata_rl2
+        ];
+        $totalikp = $this->calculator->calculateTotalIKP($all_perception_values);
 
         return [
             // Persepsi (perception) - reliability
@@ -314,23 +326,23 @@ class GrafikService
     {
         $a1_count = Jawaban::getCountDimensi('assurance');
         $a1_sum = $this->getSumNilaiDimensi('assurance', ['a1']);
-        $rata_a1 = $a1_count > 0 ? $a1_sum / $a1_count : 0;
+        $rata_a1 = $this->calculator->calculateDimensionAverage($a1_sum, $a1_count);
 
         $a2_count = Jawaban::getCountDimensi('assurance');
         $a2_sum = $this->getSumNilaiDimensi('assurance', ['a2']);
-        $rata_a2 = $a2_count > 0 ? $a2_sum / $a2_count : 0;
+        $rata_a2 = $this->calculator->calculateDimensionAverage($a2_sum, $a2_count);
 
         $a3_count = Jawaban::getCountDimensi('assurance');
         $a3_sum = $this->getSumNilaiDimensi('assurance', ['a3']);
-        $rata_a3 = $a3_count > 0 ? $a3_sum / $a3_count : 0;
+        $rata_a3 = $this->calculator->calculateDimensionAverage($a3_sum, $a3_count);
 
         $a4_count = Jawaban::getCountDimensi('assurance');
         $a4_sum = $this->getSumNilaiDimensi('assurance', ['a4']);
-        $rata_a4 = $a4_count > 0 ? $a4_sum / $a4_count : 0;
+        $rata_a4 = $this->calculator->calculateDimensionAverage($a4_sum, $a4_count);
 
         $a5_count = Jawaban::getCountDimensi('assurance');
         $a5_sum = $this->getSumNilaiDimensi('assurance', ['a5']);
-        $rata_a5 = $a5_count > 0 ? $a5_sum / $a5_count : 0;
+        $rata_a5 = $this->calculator->calculateDimensionAverage($a5_sum, $a5_count);
 
         return [
             'a1_count' => $a1_count,
@@ -353,17 +365,17 @@ class GrafikService
     {
         $l1_count = Jawaban::getCountDimensi('lp');
         $l1_sum = $this->getSumNilaiDimensi('lp', ['l1']);
-        $rata_l1 = $l1_count > 0 ? $l1_sum / $l1_count : 0;
+        $rata_l1 = $this->calculator->calculateAverage($l1_sum, $l1_count);
 
         $l2_count = Jawaban::getCountDimensi('lp');
         $l2_sum = $this->getSumNilaiDimensi('lp', ['l2']);
-        $rata_l2 = $l2_count > 0 ? $l2_sum / $l2_count : 0;
+        $rata_l2 = $this->calculator->calculateAverage($l2_sum, $l2_count);
 
         $l3_count = Jawaban::getCountDimensi('lp');
         $l3_sum = $this->getSumNilaiDimensi('lp', ['l3']);
-        $rata_l3 = $l3_count > 0 ? $l3_sum / $l3_count : 0;
+        $rata_l3 = $this->calculator->calculateAverage($l3_sum, $l3_count);
 
-        // Calculate count distributions for L1 by rating level
+        // Calculate rating counts for L1
         $l1_rata_count_1 = $this->getCountByRating('lp', 'l1', 1);
         $l1_rata_count_2 = $this->getCountByRating('lp', 'l1', 2);
         $l1_rata_count_3 = $this->getCountByRating('lp', 'l1', 3);
@@ -371,7 +383,7 @@ class GrafikService
         $l1_rata_count_5 = $this->getCountByRating('lp', 'l1', 5);
         $l1_rata_count = $l1_rata_count_1 + $l1_rata_count_2 + $l1_rata_count_3 + $l1_rata_count_4 + $l1_rata_count_5;
 
-        // Calculate count distributions for L2 by rating level
+        // Calculate rating counts for L2
         $l2_rata_count_1 = $this->getCountByRating('lp', 'l2', 1);
         $l2_rata_count_2 = $this->getCountByRating('lp', 'l2', 2);
         $l2_rata_count_3 = $this->getCountByRating('lp', 'l2', 3);
@@ -379,7 +391,7 @@ class GrafikService
         $l2_rata_count_5 = $this->getCountByRating('lp', 'l2', 5);
         $l2_rata_count = $l2_rata_count_1 + $l2_rata_count_2 + $l2_rata_count_3 + $l2_rata_count_4 + $l2_rata_count_5;
 
-        // Calculate count distributions for L3 by rating level
+        // Calculate rating counts for L3
         $l3_rata_count_1 = $this->getCountByRating('lp', 'l3', 1);
         $l3_rata_count_2 = $this->getCountByRating('lp', 'l3', 2);
         $l3_rata_count_3 = $this->getCountByRating('lp', 'l3', 3);
@@ -387,8 +399,20 @@ class GrafikService
         $l3_rata_count_5 = $this->getCountByRating('lp', 'l3', 5);
         $l3_rata_count = $l3_rata_count_1 + $l3_rata_count_2 + $l3_rata_count_3 + $l3_rata_count_4 + $l3_rata_count_5;
 
-        // Calculate total loyalty index (average of L1, L2, L3 converted to percentage)
-        $total_l_rata = (($rata_l1 + $rata_l2 + $rata_l3) / 3 - 1) / 4 * 100;
+        // Calculate loyalty probability for L1 using calculator
+        $l1_rating_counts = [$l1_rata_count_1, $l1_rata_count_2, $l1_rata_count_3, $l1_rata_count_4, $l1_rata_count_5];
+        $l1_probability_data = $this->calculator->calculateLoyaltyProbability($l1_rating_counts, $l1_rata_count);
+
+        // Calculate loyalty probability for L2 using calculator
+        $l2_rating_counts = [$l2_rata_count_1, $l2_rata_count_2, $l2_rata_count_3, $l2_rata_count_4, $l2_rata_count_5];
+        $l2_probability_data = $this->calculator->calculateLoyaltyProbability($l2_rating_counts, $l2_rata_count);
+
+        // Calculate loyalty probability for L3 using calculator
+        $l3_rating_counts = [$l3_rata_count_1, $l3_rata_count_2, $l3_rata_count_3, $l3_rata_count_4, $l3_rata_count_5];
+        $l3_probability_data = $this->calculator->calculateLoyaltyProbability($l3_rating_counts, $l3_rata_count);
+
+        // Calculate total loyalty index using calculator
+        $total_l_rata = $this->calculator->calculateLoyaltyIndex($rata_l1, $rata_l2, $rata_l3);
 
         return [
             'l1_count' => $l1_count,
@@ -399,29 +423,32 @@ class GrafikService
             'rata_l3' => $rata_l3,
             'total_l_rata' => $total_l_rata,
 
-            // L1 rating distributions
+            // L1 rating distributions and probability data
             'l1_rata_count' => $l1_rata_count,
             'l1_rata_count_1' => $l1_rata_count_1,
             'l1_rata_count_2' => $l1_rata_count_2,
             'l1_rata_count_3' => $l1_rata_count_3,
             'l1_rata_count_4' => $l1_rata_count_4,
             'l1_rata_count_5' => $l1_rata_count_5,
+            'l1_probability_data' => $l1_probability_data,
 
-            // L2 rating distributions
+            // L2 rating distributions and probability data
             'l2_rata_count' => $l2_rata_count,
             'l2_rata_count_1' => $l2_rata_count_1,
             'l2_rata_count_2' => $l2_rata_count_2,
             'l2_rata_count_3' => $l2_rata_count_3,
             'l2_rata_count_4' => $l2_rata_count_4,
             'l2_rata_count_5' => $l2_rata_count_5,
+            'l2_probability_data' => $l2_probability_data,
 
-            // L3 rating distributions
+            // L3 rating distributions and probability data
             'l3_rata_count' => $l3_rata_count,
             'l3_rata_count_1' => $l3_rata_count_1,
             'l3_rata_count_2' => $l3_rata_count_2,
             'l3_rata_count_3' => $l3_rata_count_3,
             'l3_rata_count_4' => $l3_rata_count_4,
             'l3_rata_count_5' => $l3_rata_count_5,
+            'l3_probability_data' => $l3_probability_data,
         ];
     }
 
@@ -464,6 +491,22 @@ class GrafikService
     }
 
     /**
+     * Helper method untuk menghitung statistik dimensi (count, sum, average)
+     */
+    private function calculateDimensionStats(string $dimensiType, array $keys): array
+    {
+        $count = Jawaban::getCountDimensi($dimensiType);
+        $sum = $this->getSumNilaiDimensi($dimensiType, $keys);
+        $average = $this->calculator->calculateDimensionAverage($sum, $count);
+
+        return [
+            'count' => $count,
+            'sum' => $sum,
+            'average' => $average
+        ];
+    }
+
+    /**
      * Get data untuk grafik berdasarkan tipe
      */
     public function getGrafikData(string $type): array
@@ -484,123 +527,97 @@ class GrafikService
     {
         // Calculate all dimension data for summary view (grafik4)
 
-        // Reliability data
-        $r1_count = Jawaban::getCountDimensi('realibility');
-        $r1_sum = $this->getSumNilaiDimensi('realibility', ['r1']);
-        $rata_r1 = $r1_count > 0 ? $r1_sum / $r1_count : 0;
+        // Reliability data using calculator
+        $r1_stats = $this->calculateDimensionStats('realibility', ['r1']);
+        $rata_r1 = $r1_stats['average'];
 
-        $r2_count = Jawaban::getCountDimensi('realibility');
-        $r2_sum = $this->getSumNilaiDimensi('realibility', ['r2']);
-        $rata_r2 = $r2_count > 0 ? $r2_sum / $r2_count : 0;
+        $r2_stats = $this->calculateDimensionStats('realibility', ['r2']);
+        $rata_r2 = $r2_stats['average'];
 
-        $r3_count = Jawaban::getCountDimensi('realibility');
-        $r3_sum = $this->getSumNilaiDimensi('realibility', ['r3']);
-        $rata_r3 = $r3_count > 0 ? $r3_sum / $r3_count : 0;
+        $r3_stats = $this->calculateDimensionStats('realibility', ['r3']);
+        $rata_r3 = $r3_stats['average'];
 
-        $r4_count = Jawaban::getCountDimensi('realibility');
-        $r4_sum = $this->getSumNilaiDimensi('realibility', ['r4']);
-        $rata_r4 = $r4_count > 0 ? $r4_sum / $r4_count : 0;
+        $r4_stats = $this->calculateDimensionStats('realibility', ['r4']);
+        $rata_r4 = $r4_stats['average'];
 
-        $r5_count = Jawaban::getCountDimensi('realibility');
-        $r5_sum = $this->getSumNilaiDimensi('realibility', ['r5']);
-        $rata_r5 = $r5_count > 0 ? $r5_sum / $r5_count : 0;
+        $r5_stats = $this->calculateDimensionStats('realibility', ['r5']);
+        $rata_r5 = $r5_stats['average'];
 
-        $r6_count = Jawaban::getCountDimensi('realibility');
-        $r6_sum = $this->getSumNilaiDimensi('realibility', ['r6']);
-        $rata_r6 = $r6_count > 0 ? $r6_sum / $r6_count : 0;
+        $r6_stats = $this->calculateDimensionStats('realibility', ['r6']);
+        $rata_r6 = $r6_stats['average'];
 
-        $r7_count = Jawaban::getCountDimensi('realibility');
-        $r7_sum = $this->getSumNilaiDimensi('realibility', ['r7']);
-        $rata_r7 = $r7_count > 0 ? $r7_sum / $r7_count : 0;
+        $r7_stats = $this->calculateDimensionStats('realibility', ['r7']);
+        $rata_r7 = $r7_stats['average'];
 
-        // Tangible data
-        $t1_count = Jawaban::getCountDimensi('tangible');
-        $t1_sum = $this->getSumNilaiDimensi('tangible', ['t1']);
-        $rata_t1 = $t1_count > 0 ? $t1_sum / $t1_count : 0;
+        // Tangible data using calculator
+        $t1_stats = $this->calculateDimensionStats('tangible', ['t1']);
+        $rata_t1 = $t1_stats['average'];
 
-        $t2_count = Jawaban::getCountDimensi('tangible');
-        $t2_sum = $this->getSumNilaiDimensi('tangible', ['t2']);
-        $rata_t2 = $t2_count > 0 ? $t2_sum / $t2_count : 0;
+        $t2_stats = $this->calculateDimensionStats('tangible', ['t2']);
+        $rata_t2 = $t2_stats['average'];
 
-        $t3_count = Jawaban::getCountDimensi('tangible');
-        $t3_sum = $this->getSumNilaiDimensi('tangible', ['t3']);
-        $rata_t3 = $t3_count > 0 ? $t3_sum / $t3_count : 0;
+        $t3_stats = $this->calculateDimensionStats('tangible', ['t3']);
+        $rata_t3 = $t3_stats['average'];
 
-        $t4_count = Jawaban::getCountDimensi('tangible');
-        $t4_sum = $this->getSumNilaiDimensi('tangible', ['t4']);
-        $rata_t4 = $t4_count > 0 ? $t4_sum / $t4_count : 0;
+        $t4_stats = $this->calculateDimensionStats('tangible', ['t4']);
+        $rata_t4 = $t4_stats['average'];
 
-        $t5_count = Jawaban::getCountDimensi('tangible');
-        $t5_sum = $this->getSumNilaiDimensi('tangible', ['t5']);
-        $rata_t5 = $t5_count > 0 ? $t5_sum / $t5_count : 0;
+        $t5_stats = $this->calculateDimensionStats('tangible', ['t5']);
+        $rata_t5 = $t5_stats['average'];
 
-        $t6_count = Jawaban::getCountDimensi('tangible');
-        $t6_sum = $this->getSumNilaiDimensi('tangible', ['t6']);
-        $rata_t6 = $t6_count > 0 ? $t6_sum / $t6_count : 0;
+        $t6_stats = $this->calculateDimensionStats('tangible', ['t6']);
+        $rata_t6 = $t6_stats['average'];
 
-        // Responsiveness data
-        $rs1_count = Jawaban::getCountDimensi('responsiveness');
-        $rs1_sum = $this->getSumNilaiDimensi('responsiveness', ['rs1']);
-        $rata_rs1 = $rs1_count > 0 ? $rs1_sum / $rs1_count : 0;
+        // Responsiveness data using calculator
+        $rs1_stats = $this->calculateDimensionStats('responsiveness', ['rs1']);
+        $rata_rs1 = $rs1_stats['average'];
 
-        $rs2_count = Jawaban::getCountDimensi('responsiveness');
-        $rs2_sum = $this->getSumNilaiDimensi('responsiveness', ['rs2']);
-        $rata_rs2 = $rs2_count > 0 ? $rs2_sum / $rs2_count : 0;
+        $rs2_stats = $this->calculateDimensionStats('responsiveness', ['rs2']);
+        $rata_rs2 = $rs2_stats['average'];
 
-        // Assurance data
-        $a1_count = Jawaban::getCountDimensi('assurance');
-        $a1_sum = $this->getSumNilaiDimensi('assurance', ['a1']);
-        $rata_a1 = $a1_count > 0 ? $a1_sum / $a1_count : 0;
+        // Assurance data using calculator
+        $a1_stats = $this->calculateDimensionStats('assurance', ['a1']);
+        $rata_a1 = $a1_stats['average'];
 
-        $a2_count = Jawaban::getCountDimensi('assurance');
-        $a2_sum = $this->getSumNilaiDimensi('assurance', ['a2']);
-        $rata_a2 = $a2_count > 0 ? $a2_sum / $a2_count : 0;
+        $a2_stats = $this->calculateDimensionStats('assurance', ['a2']);
+        $rata_a2 = $a2_stats['average'];
 
-        $a3_count = Jawaban::getCountDimensi('assurance');
-        $a3_sum = $this->getSumNilaiDimensi('assurance', ['a3']);
-        $rata_a3 = $a3_count > 0 ? $a3_sum / $a3_count : 0;
+        $a3_stats = $this->calculateDimensionStats('assurance', ['a3']);
+        $rata_a3 = $a3_stats['average'];
 
-        $a4_count = Jawaban::getCountDimensi('assurance');
-        $a4_sum = $this->getSumNilaiDimensi('assurance', ['a4']);
-        $rata_a4 = $a4_count > 0 ? $a4_sum / $a4_count : 0;
+        $a4_stats = $this->calculateDimensionStats('assurance', ['a4']);
+        $rata_a4 = $a4_stats['average'];
 
-        // Empathy data
-        $e1_count = Jawaban::getCountDimensi('empathy');
-        $e1_sum = $this->getSumNilaiDimensi('empathy', ['e1']);
-        $rata_e1 = $e1_count > 0 ? $e1_sum / $e1_count : 0;
+        // Empathy data using calculator
+        $e1_stats = $this->calculateDimensionStats('empathy', ['e1']);
+        $rata_e1 = $e1_stats['average'];
 
-        $e2_count = Jawaban::getCountDimensi('empathy');
-        $e2_sum = $this->getSumNilaiDimensi('empathy', ['e2']);
-        $rata_e2 = $e2_count > 0 ? $e2_sum / $e2_count : 0;
+        $e2_stats = $this->calculateDimensionStats('empathy', ['e2']);
+        $rata_e2 = $e2_stats['average'];
 
-        $e3_count = Jawaban::getCountDimensi('empathy');
-        $e3_sum = $this->getSumNilaiDimensi('empathy', ['e3']);
-        $rata_e3 = $e3_count > 0 ? $e3_sum / $e3_count : 0;
+        $e3_stats = $this->calculateDimensionStats('empathy', ['e3']);
+        $rata_e3 = $e3_stats['average'];
 
-        $e4_count = Jawaban::getCountDimensi('empathy');
-        $e4_sum = $this->getSumNilaiDimensi('empathy', ['e4']);
-        $rata_e4 = $e4_count > 0 ? $e4_sum / $e4_count : 0;
+        $e4_stats = $this->calculateDimensionStats('empathy', ['e4']);
+        $rata_e4 = $e4_stats['average'];
 
-        $e5_count = Jawaban::getCountDimensi('empathy');
-        $e5_sum = $this->getSumNilaiDimensi('empathy', ['e5']);
-        $rata_e5 = $e5_count > 0 ? $e5_sum / $e5_count : 0;
+        $e5_stats = $this->calculateDimensionStats('empathy', ['e5']);
+        $rata_e5 = $e5_stats['average'];
 
-        // Relevance data
-        $rl1_count = Jawaban::getCountDimensi('relevance');
-        $rl1_sum = $this->getSumNilaiDimensi('relevance', ['rl1']);
-        $rata_rl1 = $rl1_count > 0 ? $rl1_sum / $rl1_count : 0;
+        // Relevance data using calculator
+        $rl1_stats = $this->calculateDimensionStats('relevance', ['rl1']);
+        $rata_rl1 = $rl1_stats['average'];
 
-        $rl2_count = Jawaban::getCountDimensi('relevance');
-        $rl2_sum = $this->getSumNilaiDimensi('relevance', ['rl2']);
-        $rata_rl2 = $rl2_count > 0 ? $rl2_sum / $rl2_count : 0;
+        $rl2_stats = $this->calculateDimensionStats('relevance', ['rl2']);
+        $rata_rl2 = $rl2_stats['average'];
 
         // Calculate total averages for perception (same as importance since we're using the same values)
-        $total_rpersepsi = ($rata_r1 + $rata_r2 + $rata_r3 + $rata_r4 + $rata_r5 + $rata_r6 + $rata_r7) / 7;
-        $total_apersepsi = ($rata_a1 + $rata_a2 + $rata_a3 + $rata_a4) / 4;
-        $total_tpersepsi = ($rata_t1 + $rata_t2 + $rata_t3 + $rata_t4 + $rata_t5 + $rata_t6) / 6;
-        $total_epersepsi = ($rata_e1 + $rata_e2 + $rata_e3 + $rata_e4 + $rata_e5) / 5;
-        $total_rspersepsi = ($rata_rs1 + $rata_rs2) / 2;
-        $total_rlpersepsi = ($rata_rl1 + $rata_rl2) / 2;
+        $total_rpersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_r1, $rata_r2, $rata_r3, $rata_r4, $rata_r5, $rata_r6, $rata_r7]);
+        $total_apersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_a1, $rata_a2, $rata_a3, $rata_a4]);
+        $total_tpersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_t1, $rata_t2, $rata_t3, $rata_t4, $rata_t5, $rata_t6]);
+        $total_epersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_e1, $rata_e2, $rata_e3, $rata_e4, $rata_e5]);
+        $total_rspersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_rs1, $rata_rs2]);
+        $total_rlpersepsi = $this->calculator->calculateDimensionGroupAverage([$rata_rl1, $rata_rl2]);
 
         // Calculate total averages for importance (same as perception in this simplified model)
         $total_rkepentingan = $total_rpersepsi;
@@ -674,20 +691,20 @@ class GrafikService
         $total_usia64 = $total_usia64_lk + $total_usia64_pr;
 
         // Hitung persentase usia laki-laki
-        $persentase_usia25_lk = $total_usia25 > 0 ? ($total_usia25_lk / $total_usia25) * 100 : 0;
-        $persentase_usia25_34_lk = $total_usia25_34 > 0 ? ($total_usia25_34_lk / $total_usia25_34) * 100 : 0;
-        $persentase_usia35_44_lk = $total_usia35_44 > 0 ? ($total_usia35_44_lk / $total_usia35_44) * 100 : 0;
-        $persentase_usia45_54_lk = $total_usia45_54 > 0 ? ($total_usia45_54_lk / $total_usia45_54) * 100 : 0;
-        $persentase_usia55_64_lk = $total_usia55_64 > 0 ? ($total_usia55_64_lk / $total_usia55_64) * 100 : 0;
-        $persentase_usia64_lk = $total_usia64 > 0 ? ($total_usia64_lk / $total_usia64) * 100 : 0;
+        $persentase_usia25_lk = $this->calculator->calculatePercentage($total_usia25_lk, $total_usia25);
+        $persentase_usia25_34_lk = $this->calculator->calculatePercentage($total_usia25_34_lk, $total_usia25_34);
+        $persentase_usia35_44_lk = $this->calculator->calculatePercentage($total_usia35_44_lk, $total_usia35_44);
+        $persentase_usia45_54_lk = $this->calculator->calculatePercentage($total_usia45_54_lk, $total_usia45_54);
+        $persentase_usia55_64_lk = $this->calculator->calculatePercentage($total_usia55_64_lk, $total_usia55_64);
+        $persentase_usia64_lk = $this->calculator->calculatePercentage($total_usia64_lk, $total_usia64);
 
         // Hitung persentase usia perempuan
-        $persentase_usia25_pr = $total_usia25 > 0 ? ($total_usia25_pr / $total_usia25) * 100 : 0;
-        $persentase_usia25_34_pr = $total_usia25_34 > 0 ? ($total_usia25_34_pr / $total_usia25_34) * 100 : 0;
-        $persentase_usia35_44_pr = $total_usia35_44 > 0 ? ($total_usia35_44_pr / $total_usia35_44) * 100 : 0;
-        $persentase_usia45_54_pr = $total_usia45_54 > 0 ? ($total_usia45_54_pr / $total_usia45_54) * 100 : 0;
-        $persentase_usia55_64_pr = $total_usia55_64 > 0 ? ($total_usia55_64_pr / $total_usia55_64) * 100 : 0;
-        $persentase_usia64_pr = $total_usia64 > 0 ? ($total_usia64_pr / $total_usia64) * 100 : 0;
+        $persentase_usia25_pr = $this->calculator->calculatePercentage($total_usia25_pr, $total_usia25);
+        $persentase_usia25_34_pr = $this->calculator->calculatePercentage($total_usia25_34_pr, $total_usia25_34);
+        $persentase_usia35_44_pr = $this->calculator->calculatePercentage($total_usia35_44_pr, $total_usia35_44);
+        $persentase_usia45_54_pr = $this->calculator->calculatePercentage($total_usia45_54_pr, $total_usia45_54);
+        $persentase_usia55_64_pr = $this->calculator->calculatePercentage($total_usia55_64_pr, $total_usia55_64);
+        $persentase_usia64_pr = $this->calculator->calculatePercentage($total_usia64_pr, $total_usia64);
 
         // Hitung jumlah responden sesuai pekerjaan
         $total_swasta = Responden::where('pekerjaan', '=', 'karyawan_swasta')->count('id_responden');
@@ -748,19 +765,67 @@ class GrafikService
 
     public function getGrafikResponsivenessData(): array
     {
-        // Implementasi serupa untuk responsiveness
-        return [];
+        // Responsiveness data using calculator
+        $rs1_stats = $this->calculateDimensionStats('responsiveness', ['rs1']);
+        $rata_rs1 = $rs1_stats['average'];
+
+        $rs2_stats = $this->calculateDimensionStats('responsiveness', ['rs2']);
+        $rata_rs2 = $rs2_stats['average'];
+
+        $rs3_stats = $this->calculateDimensionStats('responsiveness', ['rs3']);
+        $rata_rs3 = $rs3_stats['average'];
+
+        return [
+            'rs1_count' => $rs1_stats['count'],
+            'rata_rs1' => $rata_rs1,
+            'rs2_count' => $rs2_stats['count'],
+            'rata_rs2' => $rata_rs2,
+            'rs3_count' => $rs3_stats['count'],
+            'rata_rs3' => $rata_rs3,
+        ];
     }
 
     public function getGrafikApplicabilityData(): array
     {
-        // Implementasi serupa untuk applicability
-        return [];
+        // Applicability data using calculator
+        $ap1_stats = $this->calculateDimensionStats('applicability', ['ap1']);
+        $rata_ap1 = $ap1_stats['average'];
+
+        $ap2_stats = $this->calculateDimensionStats('applicability', ['ap2']);
+        $rata_ap2 = $ap2_stats['average'];
+
+        $ap3_stats = $this->calculateDimensionStats('applicability', ['ap3']);
+        $rata_ap3 = $ap3_stats['average'];
+
+        return [
+            'ap1_count' => $ap1_stats['count'],
+            'rata_ap1' => $rata_ap1,
+            'ap2_count' => $ap2_stats['count'],
+            'rata_ap2' => $rata_ap2,
+            'ap3_count' => $ap3_stats['count'],
+            'rata_ap3' => $rata_ap3,
+        ];
     }
 
     public function getGrafikRelevanceData(): array
     {
-        // Implementasi serupa untuk relevance
-        return [];
+        // Relevance data using calculator
+        $rl1_stats = $this->calculateDimensionStats('relevance', ['rl1']);
+        $rata_rl1 = $rl1_stats['average'];
+
+        $rl2_stats = $this->calculateDimensionStats('relevance', ['rl2']);
+        $rata_rl2 = $rl2_stats['average'];
+
+        $rl3_stats = $this->calculateDimensionStats('relevance', ['rl3']);
+        $rata_rl3 = $rl3_stats['average'];
+
+        return [
+            'rl1_count' => $rl1_stats['count'],
+            'rata_rl1' => $rata_rl1,
+            'rl2_count' => $rl2_stats['count'],
+            'rata_rl2' => $rata_rl2,
+            'rl3_count' => $rl3_stats['count'],
+            'rata_rl3' => $rata_rl3,
+        ];
     }
 }

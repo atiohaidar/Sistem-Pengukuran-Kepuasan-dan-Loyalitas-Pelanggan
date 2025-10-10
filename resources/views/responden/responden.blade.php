@@ -52,8 +52,8 @@
                                 <select class="form-control select2bs4" required name="jk" style="width: 100%;">
                                   <option value="">Pilih</option>
                                   
-                                  <option value="laki-laki">Laki-laki</option>
-                                  <option value="perempuan" >Perempuan</option>
+                                  <option value="L">Laki-laki</option>
+                                  <option value="P" >Perempuan</option>
                                           
                                 </select>
                               </div>
@@ -62,17 +62,7 @@
                             <div class="form-group">
                               <label class="col-sm-6 col-form-label">Usia</label>
                               <div class="col-sm-12">
-                                <select class="form-control select2bs4" required name="usia" style="width: 100%;">
-                                  <option value="">Pilih</option>
-                                  
-                                  <option value="<25"> < 25 tahun</option>
-                                  <option value="25-34" >25-34 tahun</option>
-                                  <option value="35-44" >35-44 tahun</option>
-                                  <option value="45-54" >45-54 tahun</option>
-                                  <option value="55-64" >55-64 tahun</option>
-                                  <option value=">64"> > 64 tahun</option>
-                                          
-                                </select>
+                                <input type="number" placeholder="Masukkan usia Anda" required class="form-control" name="usia" min="1" max="120">
                               </div>
                             </div>
                             
@@ -83,11 +73,12 @@
                                 <select class="form-control select2bs4" required name="pekerjaan" style="width: 100%;">
                                   <option value="">Pilih</option>
                                   
-                                  <option value="karyawan_swasta">Karyawan swasta</option>
-                                  <option value="wiraswasta" >Wiraswasta</option>
+                                  <option value="Pegawai Swasta">Karyawan swasta</option>
+                                  <option value="Wiraswasta" >Wiraswasta</option>
                                   <option value="PNS">PNS</option>
-                                  <option value="pelajar" >Pelajar/Mahasiswa</option>
-                                  <option value="lain" >Lainnya</option>
+                                  <option value="Pelajar" >Pelajar/Mahasiswa</option>
+                                  <option value="Mahasiswa" >Mahasiswa</option>
+                                  <option value="Lainnya" >Lainnya</option>
                                           
                                 </select>
 

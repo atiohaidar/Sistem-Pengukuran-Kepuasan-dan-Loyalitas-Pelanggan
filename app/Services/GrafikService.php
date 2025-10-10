@@ -668,19 +668,29 @@ class GrafikService
         $totalresponden = Responden::count('id_responden');
 
         // Hitung jumlah responden berdasarkan usia dan jenis kelamin
-        $total_usia25_lk = Responden::where('usia','=','<25')->where('jk','=','laki-laki')->count('id_responden');
-        $total_usia25_34_lk = Responden::where('usia','=','25-34')->where('jk','=','laki-laki')->count('id_responden');
-        $total_usia35_44_lk = Responden::where('usia','=','35-44')->where('jk','=','laki-laki')->count('id_responden');
-        $total_usia45_54_lk = Responden::where('usia','=','45-54')->where('jk','=','laki-laki')->count('id_responden');
-        $total_usia55_64_lk = Responden::where('usia','=','55-64')->where('jk','=','laki-laki')->count('id_responden');
-        $total_usia64_lk = Responden::where('usia','=','>64')->where('jk','=','laki-laki')->count('id_responden');
+        // Usia <25
+        $total_usia25_lk = Responden::whereRaw('CAST(usia AS INTEGER) < 25')->where('jk','=','L')->count('id_responden');
+        $total_usia25_pr = Responden::whereRaw('CAST(usia AS INTEGER) < 25')->where('jk','=','P')->count('id_responden');
 
-        $total_usia25_pr = Responden::where('usia','=','<25')->where('jk','=','perempuan')->count('id_responden');
-        $total_usia25_34_pr = Responden::where('usia','=','25-34')->where('jk','=','perempuan')->count('id_responden');
-        $total_usia35_44_pr = Responden::where('usia','=','35-44')->where('jk','=','perempuan')->count('id_responden');
-        $total_usia45_54_pr = Responden::where('usia','=','45-54')->where('jk','=','perempuan')->count('id_responden');
-        $total_usia55_64_pr = Responden::where('usia','=','55-64')->where('jk','=','perempuan')->count('id_responden');
-        $total_usia64_pr = Responden::where('usia','=','>64')->where('jk','=','perempuan')->count('id_responden');
+        // Usia 25-34
+        $total_usia25_34_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 25 AND 34')->where('jk','=','L')->count('id_responden');
+        $total_usia25_34_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 25 AND 34')->where('jk','=','P')->count('id_responden');
+
+        // Usia 35-44
+        $total_usia35_44_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 35 AND 44')->where('jk','=','L')->count('id_responden');
+        $total_usia35_44_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 35 AND 44')->where('jk','=','P')->count('id_responden');
+
+        // Usia 45-54
+        $total_usia45_54_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 45 AND 54')->where('jk','=','L')->count('id_responden');
+        $total_usia45_54_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 45 AND 54')->where('jk','=','P')->count('id_responden');
+
+        // Usia 55-64
+        $total_usia55_64_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 55 AND 64')->where('jk','=','L')->count('id_responden');
+        $total_usia55_64_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 55 AND 64')->where('jk','=','P')->count('id_responden');
+
+        // Usia >64
+        $total_usia64_lk = Responden::whereRaw('CAST(usia AS INTEGER) > 64')->where('jk','=','L')->count('id_responden');
+        $total_usia64_pr = Responden::whereRaw('CAST(usia AS INTEGER) > 64')->where('jk','=','P')->count('id_responden');
 
         // Hitung total per kelompok usia
         $total_usia25 = $total_usia25_lk + $total_usia25_pr;
@@ -707,21 +717,21 @@ class GrafikService
         $persentase_usia64_pr = $this->calculator->calculatePercentage($total_usia64_pr, $total_usia64);
 
         // Hitung jumlah responden sesuai pekerjaan
-        $total_swasta = Responden::where('pekerjaan', '=', 'karyawan_swasta')->count('id_responden');
-        $total_wiraswasta = Responden::where('pekerjaan', '=', 'wiraswasta')->count('id_responden');
+        $total_swasta = Responden::where('pekerjaan', '=', 'Pegawai Swasta')->count('id_responden');
+        $total_wiraswasta = Responden::where('pekerjaan', '=', 'Wiraswasta')->count('id_responden');
         $total_pns = Responden::where('pekerjaan', '=', 'PNS')->count('id_responden');
-        $total_pelajar = Responden::where('pekerjaan', '=', 'pelajar')->count('id_responden');
-        $total_lain = Responden::where('pekerjaan', '=', 'lain')->count('id_responden');
+        $total_pelajar = Responden::where('pekerjaan', '=', 'Pelajar')->count('id_responden');
+        $total_lain = Responden::where('pekerjaan', '=', 'Lainnya')->count('id_responden');
 
-        // Hitung jumlah responden sesuai domisili
-        $total_jawa = Responden::where('domisili', '=', '1')->count('id_responden');
-        $total_sulawesi = Responden::where('domisili', '=', '2')->count('id_responden');
-        $total_sumatera = Responden::where('domisili', '=', '3')->count('id_responden');
-        $total_kalimantan = Responden::where('domisili', '=', '4')->count('id_responden');
-        $total_papua = Responden::where('domisili', '=', '5')->count('id_responden');
-        $total_bali = Responden::where('domisili', '=', '6')->count('id_responden');
-        $total_ntb = Responden::where('domisili', '=', '7')->count('id_responden');
-        $total_maluku = Responden::where('domisili', '=', '8')->count('id_responden');
+        // Hitung jumlah responden sesuai domisili (provinsi)
+        $total_jawa = Responden::where('domisili', '=', 1)->count('id_responden');
+        $total_sulawesi = Responden::where('domisili', '=', 2)->count('id_responden');
+        $total_sumatera = Responden::where('domisili', '=', 3)->count('id_responden');
+        $total_kalimantan = Responden::where('domisili', '=', 4)->count('id_responden');
+        $total_papua = Responden::where('domisili', '=', 5)->count('id_responden');
+        $total_bali = Responden::where('domisili', '=', 6)->count('id_responden');
+        $total_ntb = Responden::where('domisili', '=', 7)->count('id_responden');
+        $total_maluku = Responden::where('domisili', '=', 8)->count('id_responden');
 
         return [
             // Total per kelompok usia

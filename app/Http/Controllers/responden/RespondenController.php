@@ -54,24 +54,31 @@ class RespondenController extends Controller
 
     public function simpanresponden(Request $request)
     {
-        
+        // Validasi input
+        $validatedData = $request->validate([
+            'id_bisnis' => 'required|integer',
+            'email' => 'required|email|unique:tbl_responden,email',
+            'whatsapp' => 'required|string|max:20',
+            'usia' => 'required|integer|min:1|max:120',
+            'pekerjaan' => 'required|string|in:Pegawai Swasta,Wiraswasta,PNS,Pelajar,Mahasiswa,Lainnya',
+            'lain' => 'nullable|string|max:255',
+            'jk' => 'required|in:L,P',
+            'domisili' => 'required|integer|exists:provinsi,id'
+        ]);
 
         $tabel = new Responden;
-        $tabel->id_bisnis = $request->id_bisnis;
-        $tabel->email = $request->email;
-        $tabel->whatsapp = $request->whatsapp;
-        $tabel->usia = $request->usia;
-        $tabel->pekerjaan = $request->pekerjaan;
-        $tabel->pekerjaan_lain = $request->lain;
-        $tabel->jk = $request->jk;
-        $tabel->domisili = $request->domisili;
+        $tabel->id_bisnis = $validatedData['id_bisnis'];
+        $tabel->email = $validatedData['email'];
+        $tabel->whatsapp = $validatedData['whatsapp'];
+        $tabel->usia = $validatedData['usia'];
+        $tabel->pekerjaan = $validatedData['pekerjaan'];
+        $tabel->pekerjaan_lain = $validatedData['lain'];
+        $tabel->jk = $validatedData['jk'];
+        $tabel->domisili = $validatedData['domisili'];
         
-          
         $tabel->save();
-        
 
-       
-        return redirect('/pertanyaan1/'.$request->email);
+        return redirect('/pertanyaan1/'.$validatedData['email']);
     }
 
     public function pertanyaan1($email)

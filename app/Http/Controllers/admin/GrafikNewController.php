@@ -37,11 +37,11 @@ class GrafikNewController extends Controller
     }
 
     /**
-     * Display grafik assurance
+     * Display grafik reliability vs tangible comparison
      */
     public function grafik3()
     {
-        $data = $this->grafikService->getGrafikRealibilityData();
+        $data = $this->grafikService->getGrafikReliabilityTangibleData();
 
         return view('grafik.index3', $data);
     }

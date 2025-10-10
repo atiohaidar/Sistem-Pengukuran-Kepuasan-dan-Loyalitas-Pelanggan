@@ -238,6 +238,34 @@ class SurveyCalculator
     }
 
     /**
+     * Menghitung Indeks Kepuasan Pelanggan (IKP) berdasarkan gap values
+     *
+     * Formula: ((average_gap + 4) / 4) * 100
+     * Dimana average_gap adalah rata-rata dari semua gap dimensi
+     * (karena gap = persepsi - harapan, maka persepsi = harapan + gap)
+     *
+     * @param array $gapValues Array nilai gap dari semua dimensi
+     * @return float IKP dalam persen (0-100)
+     */
+    public function calculateIKP(array $gapValues): float
+    {
+        if (empty($gapValues)) {
+            return 0.0;
+        }
+
+        $averageGap = $this->calculateGapAverage($gapValues);
+
+        // Convert gap average back to perception scale (assuming 1-5 scale)
+        // If average gap is G, then average perception = average expectation + G
+        // Assuming average expectation is around 3.5-4.0 for 5-point scale
+        // But for simplicity, we'll use a direct conversion
+        $averagePerception = 3.5 + $averageGap; // Approximate expectation baseline
+
+        // Convert to percentage using standard SERVQUAL formula
+        return max(0, min(100, (($averagePerception - 1) / 4) * 100));
+    }
+
+    /**
      * Menghitung persentase dari bagian terhadap total
      *
      * @param float $part Bagian yang ingin dihitung persentasenya

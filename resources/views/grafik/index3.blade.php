@@ -232,20 +232,20 @@
       </tr>
       <tr>
         <td>Rata-rata persepsi</td>
-        <td>{{ number_format($rl1_ratapersepsi_rata,2)  }}</td>
-        <td>{{ number_format($rl2_ratapersepsi_rata,2)  }}</td>
+        <td>{{ number_format($ap1_ratapersepsi_rata,2)  }}</td>
+        <td>{{ number_format($ap2_ratapersepsi_rata,2)  }}</td>
         
       </tr>
       <tr>
         <td>Rata-rata harapan</td>
-        <td>{{ number_format($rl1_ratakepentingan_rata,2)  }}</td>
-        <td>{{ number_format($rl2_ratakepentingan_rata,2)  }}</td>
+        <td>{{ number_format($ap1_ratakepentingan_rata,2)  }}</td>
+        <td>{{ number_format($ap2_ratakepentingan_rata,2)  }}</td>
         
       </tr>
       <tr>
         <td>Gap</td>
-        <td>{{ number_format($rl1_ratapersepsi_rata-$rl1_ratakepentingan_rata,2)  }}</td>
-        <td>{{ number_format($rl2_ratapersepsi_rata-$rl2_ratakepentingan_rata,2)  }}</td>
+        <td>{{ number_format($ap1_ratapersepsi_rata-$ap1_ratakepentingan_rata,2)  }}</td>
+        <td>{{ number_format($ap2_ratapersepsi_rata-$ap2_ratakepentingan_rata,2)  }}</td>
       
       </tr>
     </table>
@@ -487,15 +487,15 @@ Highcharts.chart('relevansi', {
     series: [{
         name: 'Rata-rata persepsi',
         color: '#0000FF',
-        data: [{{ number_format($rl1_ratapersepsi_rata,3)  }}, {{ number_format($rl2_ratapersepsi_rata,3)  }}]
+        data: [{{ number_format($ap1_ratapersepsi_rata,3)  }}, {{ number_format($ap2_ratapersepsi_rata,3)  }}]
     }, {
         name: 'Rata-rata harapan',
         color: '#D2691E',
-        data: [{{ number_format($rl1_ratakepentingan_rata,3)  }}, {{ number_format($rl2_ratakepentingan_rata,3)  }}]
+        data: [{{ number_format($ap1_ratakepentingan_rata,3)  }}, {{ number_format($ap2_ratakepentingan_rata,3)  }}]
     }, {
         name: 'Gap',
         color: '#2F4F4F',
-        data: [{{ number_format($rl1_ratapersepsi_rata-$rl1_ratakepentingan_rata,3)  }}, {{ number_format($rl2_ratapersepsi_rata-$rl2_ratakepentingan_rata,3)  }}]
+        data: [{{ number_format($ap1_ratapersepsi_rata-$ap1_ratakepentingan_rata,3)  }}, {{ number_format($ap2_ratapersepsi_rata-$ap2_ratakepentingan_rata,3)  }}]
     }]
 });
 

@@ -1933,3 +1933,184 @@ Sistem ini dikembangkan untuk keperluan penelitian dan implementasi praktis dala
 Dokumentasi ini bersifat **living document** dan akan terus diperbarui seiring dengan pengembangan sistem. Semua perhitungan matematis telah dijelaskan secara detail dengan contoh nyata untuk memudahkan pemahaman dan implementasi.
 
 **Terakhir diperbarui:** Oktober 2025
+
+---
+
+## 🆕 Perhitungan Evaluasi Sistem Pengelolaan Pelanggan (SPP)
+
+Mulai Oktober 2025 sistem survei dilengkapi modul **Evaluasi Sistem Pengelolaan Pelanggan (SPP)**. Seluruh perhitungan matematis fitur ini tersentral di service `App\Services\SppEvaluationResultService`, sehingga mudah diuji dan dipakai ulang di luar Blade view. Bagian ini merinci setiap formula serta asal angka yang digunakan.
+
+### 1. Data Masukan
+
+| Kelompok Input | Jumlah | Rentang Nilai | Keterangan |
+|----------------|--------|---------------|------------|
+| Maturity Assessment | 8 | 1-5 | Visi, Strategi, Pengalaman Konsumen, Kolaborasi, Proses, Informasi, Teknologi, Matriks |
+| Priority Weighting | 11 | 0-100 | Bobot kepentingan (kelipatan 5, total harus 100) |
+| Readiness Audit | 11 | 1-5 | Kepemimpinan Strategis hingga Pelaporan Kinerja |
+
+Semua nilai disimpan dalam tabel `spp_evaluations` dan diproses oleh service sebelum ditampilkan di Blade.
+
+### 2. Maturity Score & Insight
+
+```
+MaturityAverage = (Σ nilai_maturity) / 8
+MaturityLevel   = clamp(round(MaturityAverage), 1, 5)
+```
+
+- Pembagi **8** berasal dari jumlah pertanyaan maturity.
+- Fungsi `clamp()` memastikan level tetap di rentang 1–5.
+- `MaturityLevel` memetakan insight melalui konstanta `MATURITY_INSIGHTS[level]`.
+
+### 3. Performance Data (Importance-Performance)
+
+Untuk setiap item prioritas dibuat struktur data berikut:
+
+```
+importance_i  = priorityValues[i]
+readiness_i   = readinessScores[i]         // 1-5
+performance_i = round((readiness_i / 5) × 100, 2)
+short_label_i = kata_pertama(label_i)
+```
+
+- Pembagi **5** berasal dari skala Likert readiness.
+- Perkalian **100** mengubah rasio 0–1 menjadi persentase 0–100.
+- Pembulatan dua desimal menjaga presisi sebelum di-plot.
+
+### 4. Process Group Performance
+
+Kelompok proses mengikuti kerangka Payne (Strategy development, Value creation, dll). Untuk tiap grup:
+
+```
+GroupPerformance_g = round( (Σ performance_i untuk i ∈ items_g) / jumlah(items_g) )
+```
+
+- Jika sebuah grup tidak memiliki item, skor diset 0 agar tidak menyebabkan divisi nol.
+
+### 5. Overall Score (Customer Management Score)
+
+```
+TotalWeightedPerformance = Σ (performance_i × importance_i)
+TotalImportance          = Σ importance_i
+
+OverallScore =
+     jika TotalImportance = 0 → 0
+     selain itu → round(TotalWeightedPerformance / TotalImportance)
+```
+
+- Menghasilkan skor 0–100 yang ditampilkan besar di dashboard.
+- Rata-rata tertimbang memastikan item dengan bobot tinggi memberi efek lebih besar.
+
+### 6. Rekomendasi Proses
+
+```
+lowestGroup    = grup dengan nilai performance terendah
+Recommendation = RECOMMENDATIONS[lowestGroup.key] jika tersedia
+                    = pesan default bila tidak ditemukan
+```
+
+Tekstual rekomendasi disediakan dalam konstanta `RECOMMENDATIONS` untuk lima proses Payne.
+
+### 7. Importance-Performance Chart Points
+
+Service menyiapkan titik grafis sekaligus menangani posisi label agar tidak saling menutupi:
+
+1. **Pengelompokan Koordinat**
+
+    ```
+    bucketKey = importance_i + '-' + performance_i
+    buckets[bucketKey].push(item)
+    ```
+
+2. **Offset Label**
+    - Jika hanya satu titik di bucket → offset Y tetap `SINGLE_LABEL_OFFSET = 4`.
+    - Jika lebih dari satu:
+
+    ```
+    initialOffset = -((count - 1) × SPREAD) / 2
+    labelOffset_k = BASE_OFFSET + initialOffset + (k × SPREAD)
+    ```
+
+    - Konstanta `BASE_OFFSET = 6` dan `SPREAD = 16` dipilih setelah uji visual untuk menjaga keterbacaan label.
+
+3. **Clamping Koordinat**
+
+    ```
+    importance_clamped  = min(importance_i, 25)
+    performance_clamped = min(performance_i, 100)
+    ```
+
+    - Batas 25 dan 100 mengikuti skala chart referensi (importance 0–25, performance 0–100).
+
+4. **Palet Warna**
+
+    ```
+    palette    = ['#0c4a6e','#1e3c72','#2a5298','#0ea5e9','#075985','#1d4ed8']
+    colorIndex = crc32(seed) % |palette|
+    color      = palette[colorIndex]
+    ```
+
+    - Fungsi `crc32` memberikan distribusi warna deterministik berdasarkan `seed` titik.
+
+5. **Payload Titik**
+
+    Output struktur final:
+
+    ```
+    {
+      'label'          => 'Kepemimpinan Strategis',
+      'short_label'    => 'Kepemimpinan',
+      'importance'     => 15,
+      'performance'    => 68.0,
+      'label_y_offset' => 6,
+      'color'          => '#0c4a6e'
+    }
+    ```
+
+Blade hanya menggambar SVG berdasarkan payload; tidak ada kalkulasi ulang di sisi view.
+
+### 8. Nilai Turunan Tambahan
+
+- **Company Initial**: `strtoupper(substr(company_name, 0, 1))`
+- **Token Akses**: UUID (`Str::uuid()`) sebagai identifikasi hasil survei.
+
+### 9. Validasi & Penanganan Edge Case
+
+- Total prioritas wajib sama dengan 100; jika tidak, proses penyimpanan dibatalkan.
+- Saat `TotalImportance = 0`, service mengembalikan `OverallScore = 0` untuk menghindari divisi nol.
+
+### 10. Ringkasan Formula
+
+| Nama Perhitungan | Rumus |
+|------------------|-------|
+| Maturity Average | `(Σ maturitas) / 8` |
+| Process Group Performance | `round( Σ performance_item / jumlah_item )` |
+| Overall Score | `round( Σ(performance×importance) / Σ importance )` |
+| IPA Label Offset (multi) | `BASE_OFFSET + (-(count-1)×SPREAD/2) + index×SPREAD` |
+| IPA Warna Label | `palette[ crc32(seed) mod 6 ]` |
+
+### 11. Contoh Perhitungan Singkat
+
+Misal perusahaan X mengisi survey:
+
+- Maturity: [4,4,3,3,4,3,2,3] → `MaturityAverage = 3.25` → Level 3 (moderate insight).
+- Prioritas: kepemimpinan=20, informasi=15 (total keseluruhan 100).
+- Readiness kepemimpinan = 3 → `performance = (3/5)×100 = 60%`.
+
+Process group “Strategy development” (dua item: kepemimpinan 60, posisi 70):
+
+```
+GroupPerformance = round((60 + 70) / 2) = 65
+```
+
+Overall score contoh sederhana dua item, total bobot 35:
+
+```
+TotalWeightedPerformance = 60×20 + 70×15 = 2250
+OverallScore = round(2250 / 35) = 64
+```
+
+Karena 65 merupakan nilai terendah antar grup, rekomendasi diambil dari konstanta `RECOMMENDATIONS['Strategy development']`.
+
+---
+
+Dengan tambahan ini setiap angka dalam modul Evaluasi SPP memiliki rujukan jelas. Seluruh kalkulasi ditempatkan di service tunggal sehingga view tetap tipis dan penulisan unit test di masa depan menjadi lebih mudah.

@@ -60,7 +60,16 @@ Route::get('/chart6', 'admin\GrafikNewController@grafik6')->name('admin.grafik.g
 
 Route::get('/export', 'admin\RespondenController@export')->name('admin.export');
 
+// Routes untuk Evaluasi SPP (Public Access)
+Route::get('/evaluasi-spp', 'responden\SppSurveyController@index')->name('spp.survey.index');
+Route::post('/evaluasi-spp/submit', 'responden\SppSurveyController@store')->name('spp.survey.submit');
+Route::get('/evaluasi-spp/hasil/{token}', 'responden\SppSurveyController@result')->name('spp.survey.result');
 
+// Routes untuk Admin SPP Management (Protected)
+Route::get('/admin/spp', 'admin\SppEvaluationController@index')->name('admin.spp.index');
+Route::get('/admin/spp/{id}', 'admin\SppEvaluationController@show')->name('admin.spp.show');
+Route::delete('/admin/spp/{id}', 'admin\SppEvaluationController@destroy')->name('admin.spp.destroy');
+Route::get('/admin/spp-export', 'admin\SppEvaluationController@export')->name('admin.spp.export');
 
 
 

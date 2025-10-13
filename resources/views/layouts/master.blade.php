@@ -222,6 +222,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </ul>
               </li>
 
+              <li class="nav-item has-treeview">
+                <a href="{{ route('admin.spp.index') }}" class="nav-link">
+                  <i class="nav-icon fas fa-clipboard-check"></i>
+                  <p>
+                    Evaluasi SPP
+                    
+                  </p>
+                </a>
+                
+              </li>
+
              
               <li class="nav-item">
                 <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault();

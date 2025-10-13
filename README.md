@@ -11,6 +11,7 @@ Aplikasi web ini dibangun menggunakan framework Laravel untuk membantu mengukur 
 - **Analisis Hasil**: Lihat grafik dan laporan hasil survei secara real-time.
 - **Export Laporan**: Ekspor hasil survei ke format PDF atau Excel.
 - **Dashboard Admin**: Interface untuk mengelola survei dan melihat statistik.
+- **Evaluasi Sistem Pengelolaan Pelanggan (SPP)**: Multi-step wizard publik, kalkulasi otomatis menggunakan service layer, dan dashboard hasil yang mereplikasi aplikasi referensi React.
 
 ## Persyaratan Sistem
 
@@ -82,6 +83,16 @@ Untuk production, gunakan web server seperti Apache atau Nginx.
 3. **Bagikan Link Survei**: Berikan link survei kepada pelanggan.
 4. **Lihat Hasil**: Akses dashboard untuk melihat grafik dan laporan.
 5. **Export Data**: Unduh laporan dalam format PDF atau Excel.
+
+### Alur Evaluasi SPP
+
+1. Akses halaman publik `GET /evaluasi-spp` untuk memulai asesmen.
+2. Isi tiga tahap wizard: maturitas (8 pertanyaan), prioritas kepentingan (11 item, total 100), dan readiness audit (11 pertanyaan).
+3. Setelah submit, sistem menyimpan hasil ke tabel `spp_evaluations`, menghitung skor melalui `App\Services\SppEvaluationResultService`, dan mengarahkan ke `GET /evaluasi-spp/hasil/{token}`.
+4. Dashboard hasil menampilkan tabel, insight, grafik Importance-Performance, process group score, dan rekomendasi spesifik.
+5. Admin dapat memonitor seluruh submission melalui menu **Evaluasi SPP** di dashboard.
+
+> Seluruh kalkulasi (skor maturitas, process group, overall score, rekomendasi, serta plotting IPA chart) kini dipusatkan di service `App\Services\SppEvaluationResultService` agar mudah diuji dan dipakai ulang.
 
 ## Troubleshooting
 

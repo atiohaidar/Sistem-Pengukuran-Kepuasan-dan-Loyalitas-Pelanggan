@@ -1,60 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="login-box">
-    
-    <div class="card">
-      <div class="card-body login-card-body">
-        <p class="login-box-msg">Login</p>
-  
-        <form method="POST" action="{{ route('login') }}">
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="login-card">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <i class="bi bi-clipboard-data display-3 text-primary"></i>
+            <h3 class="mt-3">Login</h3>
+            <p class="text-muted">Aplikasi Survei</p>
+          </div>
+
+          <form method="POST" action="{{ route('login') }}">
             @csrf
-          <div class="input-group mb-3">
-            <input class="form-control" id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus placeholder="Email">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
+            
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
+                       name="email" value="{{ old('email') }}" required autofocus placeholder="Email">
+                @error('email')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
               </div>
             </div>
-            @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-          </div>
-          <div class="input-group mb-3">
-            <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required placeholder="Password">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
+
+            <div class="mb-4">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
+                       name="password" required placeholder="Password">
+                @error('password')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
               </div>
             </div>
-            @if ($errors->has('password'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-          </div>
-          <div class="row">
-            
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary btn-block">
-                    {{ __('Login') }}
-                </button>
-            </div>
-            
-          </div>
-        </form>
 
-
-        
-  
-        
+            <button type="submit" class="btn btn-primary w-100 py-2">
+              {{ __('Login') }}
+            </button>
+          </form>
+        </div>
       </div>
-      <!-- /.login-card-body -->
     </div>
   </div>
-  <!-- /.login-box -->
-
-  
+</div>
 @endsection

@@ -7,79 +7,88 @@
 @endphp
 
 <div class="spp-dashboard">
-    <div class="dashboard-card header-card">
-        <div class="header-left">
-            <div class="company-badge">{{ $companyInitial }}</div>
-            <div>
-                <h1>Dashboard Hasil Evaluasi</h1>
-                <h2>{{ $companyName }}</h2>
-                <p class="token">Token Akses: <code>{{ $sessionToken }}</code></p>
-            </div>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route('spp.survey.index') }}" class="btn btn-secondary">Mulai Asesmen Baru</a>
-            <button type="button" class="btn btn-tertiary" onclick="window.print()">Cetak Hasil</button>
-        </div>
-    </div>
-
-    <div class="dashboard-card">
-        <h3>Maturity Assessment</h3>
-        <div class="card-grid">
-            <div>
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Komponen</th>
-                            <th>Nilai</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($maturityQuestions as $question)
-                            <tr>
-                                <td>{{ $question['label'] }}</td>
-                                <td>{{ $question['value'] }}</td>
-                            </tr>
-                        @endforeach
-                        <tr class="table-total">
-                            <td>Rata-rata</td>
-                            <td>{{ number_format($maturityAverage, 2) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="insight-panel">
-                <span class="badge badge-primary">Level {{ $roundedAverage }}</span>
-                <h4>{{ $maturityInsight['title'] }}</h4>
-                <p>{!! nl2br(e($maturityInsight['description'])) !!}</p>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="company-badge">{{ $companyInitial }}</div>
+                    <div>
+                        <h1 class="h3 mb-1">Dashboard Hasil Evaluasi</h1>
+                        <h2 class="h5 text-muted mb-2">{{ $companyName }}</h2>
+                        <p class="mb-0 small text-muted">Token Akses: <code>{{ $sessionToken }}</code></p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 header-actions">
+                    <a href="{{ route('spp.survey.index') }}" class="btn btn-primary">Mulai Asesmen Baru</a>
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Cetak
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="dashboard-card">
-        <h3>Readiness Audit</h3>
-        <div class="card-grid">
-            <div>
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Bobot Kepentingan</th>
-                            <th>Bobot</th>
-                            <th>Performansi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($performanceData as $item)
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-4">Maturity Assessment</h3>
+            <div class="card-grid">
+                <div>
+                    <table class="table table-hover">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $item['label'] }}</td>
-                                <td>{{ $item['importance'] }}</td>
-                                <td>{{ number_format($item['performance']) }}%</td>
+                                <th>Komponen</th>
+                                <th>Nilai</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($maturityQuestions as $question)
+                                <tr>
+                                    <td>{{ $question['label'] }}</td>
+                                    <td>{{ $question['value'] }}</td>
+                                </tr>
+                            @endforeach
+                            <tr class="table-primary">
+                                <td><strong>Rata-rata</strong></td>
+                                <td><strong>{{ number_format($maturityAverage, 2) }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="insight-panel">
+                    <span class="badge bg-primary mb-2">Level {{ $roundedAverage }}</span>
+                    <h4 class="h5">{{ $maturityInsight['title'] }}</h4>
+                    <p>{!! nl2br(e($maturityInsight['description'])) !!}</p>
+                </div>
             </div>
-            <div class="ipa-wrapper">
-                <h4>Importance - Performance Analysis</h4>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-4">Readiness Audit</h3>
+            <div class="card-grid">
+                <div>
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Bobot Kepentingan</th>
+                                <th>Bobot</th>
+                                <th>Performansi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($performanceData as $item)
+                                <tr>
+                                    <td>{{ $item['label'] }}</td>
+                                    <td>{{ $item['importance'] }}</td>
+                                    <td>{{ number_format($item['performance']) }}%</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                <h4 class="h6 mb-3">Importance - Performance Analysis</h4>
                 <svg viewBox="0 0 {{ $ipaConfig['width'] }} {{ $ipaConfig['height'] }}" class="ipa-chart">
                     @php
                         $scaleX = function ($value, $offset = 0) use ($ipaConfig) {
@@ -143,94 +152,55 @@
         </div>
     </div>
 
-    <div class="dashboard-card">
-        <h3>Performance Assessment</h3>
-        <div class="card-grid">
-            <div>
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Proses Sistem Pengelolaan Pelanggan</th>
-                            <th>Performansi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($processGroups as $group)
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h3 class="card-title mb-4">Performance Assessment</h3>
+            <div class="card-grid">
+                <div>
+                    <table class="table table-hover">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $group['name'] }}</td>
-                                <td>{{ $group['performance'] }}%</td>
+                                <th>Proses Sistem Pengelolaan Pelanggan</th>
+                                <th>Performansi</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($processGroups as $group)
+                                <tr>
+                                    <td>{{ $group['name'] }}</td>
+                                    <td>{{ $group['performance'] }}%</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="overall-score">
+                    <h4 class="h6 mb-3">Nilai Sistem Pengelolaan Pelanggan</h4>
+                    <div class="score-value">{{ $overallScore }}</div>
+                </div>
             </div>
-            <div class="overall-score">
-                <h4>Nilai Sistem Pengelolaan Pelanggan</h4>
-                <div class="score-value">{{ $overallScore }}</div>
+            <hr class="my-4">
+            <div>
+                <h4 class="h5 mb-3">Rekomendasi</h4>
+                <p>{!! nl2br(e($recommendationText)) !!}</p>
             </div>
-        </div>
-        <div class="recommendation">
-            <h4>Rekomendasi</h4>
-            <p>{!! nl2br(e($recommendationText)) !!}</p>
         </div>
     </div>
 </div>
 
 <style>
-:root {
-    --primary-color: #1e3c72;
-    --secondary-color: #2a5298;
-    --accent-color: #0ea5e9;
-    --gray-color: #d1d5db;
-    --light-gray-color: #f3f4f6;
-    --dark-gray-color: #4b5563;
-    --text-color: #1f2937;
-    --muted-text-color: #6b7280;
-    --border-radius: 16px;
-}
-
 .spp-dashboard {
     max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 20px 40px;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-color);
-}
-
-.dashboard-card {
-    background: #ffffff;
-    border-radius: var(--border-radius);
-    box-shadow: 0 20px 40px rgba(30, 60, 114, 0.12);
-    padding: 32px;
-    margin-bottom: 32px;
-}
-
-.dashboard-card h3 {
-    margin-top: 0;
-    margin-bottom: 24px;
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-.header-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+    margin: 2rem auto;
+    padding: 0 1rem 2rem;
 }
 
 .company-badge {
     width: 64px;
     height: 64px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: #ffffff;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
     font-size: 2rem;
     font-weight: 600;
     display: flex;
@@ -238,124 +208,20 @@
     justify-content: center;
 }
 
-.header-card h1 {
-    margin: 0;
-    font-size: 1.75rem;
-}
-
-.header-card h2 {
-    margin: 6px 0 12px;
-    font-size: 1.2rem;
-    color: var(--muted-text-color);
-}
-
-.token {
-    margin: 0;
-    color: var(--muted-text-color);
-}
-
-.header-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.btn {
-    padding: 0.75rem 1.6rem;
-    border-radius: 999px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    border: none;
-}
-
-.btn-secondary {
-    background: var(--primary-color);
-    color: #ffffff;
-    box-shadow: 0 12px 24px rgba(30, 60, 114, 0.2);
-}
-
-.btn-tertiary {
-    background: #ffffff;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(30, 60, 114, 0.22);
-}
-
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 32px;
-}
-
-.dashboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #ffffff;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.dashboard-table thead {
-    background: var(--light-gray-color);
-}
-
-.dashboard-table th,
-.dashboard-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: left;
-}
-
-.dashboard-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.table-total td {
-    font-weight: 600;
-    background: rgba(14, 165, 233, 0.12);
+    gap: 2rem;
 }
 
 .insight-panel {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.25));
-    padding: 24px;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.insight-panel p {
-    margin: 0;
-    color: var(--dark-gray-color);
-}
-
-.badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.badge-primary {
-    background: rgba(30, 60, 114, 0.12);
-    color: var(--primary-color);
-}
-
-.ipa-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.2));
+    padding: 1.5rem;
+    border-radius: 0.5rem;
 }
 
 .ipa-chart {
     width: 100%;
-    background: #ffffff;
 }
 
 .quad {
@@ -390,7 +256,7 @@
 }
 
 .ipa-point {
-    fill: var(--accent-color);
+    fill: #0d6efd;
     stroke: #0c4a6e;
     stroke-width: 2;
 }
@@ -401,70 +267,19 @@
 }
 
 .overall-score {
-    background: var(--light-gray-color);
-    border-radius: 16px;
-    padding: 24px;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 2rem;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.overall-score h4 {
-    margin-top: 0;
-    margin-bottom: 12px;
 }
 
 .score-value {
     font-size: 4rem;
     font-weight: 700;
-    color: var(--primary-color);
-}
-
-.recommendation {
-    margin-top: 32px;
-    border-top: 1px solid var(--gray-color);
-    padding-top: 24px;
-}
-
-.recommendation p {
-    white-space: pre-wrap;
-    margin: 0;
-}
-
-@media (max-width: 768px) {
-    .header-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .header-actions {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    .ipa-wrapper {
-        align-items: center;
-    }
-
-    .overall-score {
-        padding: 32px 16px;
-    }
+    color: #0d6efd;
 }
 
 @media print {
-    body {
-        background: #ffffff;
-    }
-    .spp-dashboard {
-        padding: 0;
-    }
-    .dashboard-card {
-        box-shadow: none;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 16px;
-    }
     .btn, .header-actions {
         display: none !important;
     }

@@ -28,6 +28,11 @@
   overflow-y: auto;
   background-color: #212529;
   width: 250px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
 }
 
 .sidebar .nav-link {
@@ -48,14 +53,31 @@
 .main-content {
   margin-left: 250px;
   padding: 20px;
+  margin-top: 56px;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 0;
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    position: static;
-    width: 100%;
+    position: fixed;
+    width: 250px;
+    z-index: 1050;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
   }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+
   .main-content {
+    margin-left: 0;
+  }
+
+  .main-content.expanded {
     margin-left: 0;
   }
 }
@@ -63,8 +85,14 @@
 </head>
 <body>
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
+    <button class="btn btn-outline-light me-2 d-md-none" type="button" id="sidebarToggle">
+      <i class="bi bi-list"></i>
+    </button>
+    <button class="btn btn-outline-light me-2 d-none d-md-block" type="button" id="sidebarToggleDesktop">
+      <i class="bi bi-list"></i>
+    </button>
     <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
       <i class="bi bi-clipboard-data"></i> APLIKASI SURVEI
     </a>
@@ -83,10 +111,8 @@
   </div>
 </nav>
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+<!-- Sidebar -->
+<nav id="sidebar" class="d-md-block sidebar">
       <div class="position-sticky pt-3">
         <ul class="nav flex-column">
           <li class="nav-item">
@@ -156,7 +182,7 @@
     </nav>
 
     <!-- Main content -->
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+    <main id="main-content" class="px-md-4 main-content">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">@yield('judul')</h1>
         <nav aria-label="breadcrumb">
@@ -168,8 +194,6 @@
 
       @yield('content')
     </main>
-  </div>
-</div>
 
 <!-- Footer -->
 <footer class="bg-light text-center text-muted py-3 mt-5">
@@ -208,6 +232,37 @@
       "info": true,
       "autoWidth": false,
       "responsive": true,
+    });
+
+    // Sidebar toggle functionality
+    $('#sidebarToggle, #sidebarToggleDesktop').on('click', function() {
+      const sidebar = $('#sidebar');
+      const mainContent = $('#main-content');
+
+      sidebar.toggleClass('collapsed');
+      mainContent.toggleClass('expanded');
+
+      // Store sidebar state in localStorage
+      const isCollapsed = sidebar.hasClass('collapsed');
+      localStorage.setItem('sidebarCollapsed', isCollapsed);
+    });
+
+    // Restore sidebar state on page load
+    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (sidebarCollapsed) {
+      $('#sidebar').addClass('collapsed');
+      $('#main-content').addClass('expanded');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    $(document).on('click', function(e) {
+      if ($(window).width() < 768) {
+        if (!$(e.target).closest('#sidebar, #sidebarToggle').length) {
+          $('#sidebar').addClass('collapsed');
+          $('#main-content').addClass('expanded');
+          localStorage.setItem('sidebarCollapsed', 'true');
+        }
+      }
     });
   });
 </script>

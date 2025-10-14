@@ -1,106 +1,75 @@
 @extends('layouts.user')
-@section('judul','Pertanyaan I')
 
 @section('content')
 
-  <section class="content">
-    <div class="container-fluid">
-        
-        <div class="row">
-          
-          <div class="col-lg-3  d-lg-block d-md-block d-sm-block d-none"></div>
-        
-          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-5" style="background-color: #40916C">
-            <br/>
-            <br/>
-            <center><h4 style="color:black;"><b>Aplikasi Survei Kepuasan dan Loyalitas Pelanggan</b></h4></center>
-              <br/>
-          <form class="form-horizontal" enctype="multipart/form-data"  method="POST" action="{{ route('responden.simpanpertanyaan3') }}">
-            @csrf
-            <input type="hidden" readonly value="{{ $data->id_responden }}" class="form-control" name="id_responden">
-            <div class="card card-info">
-                <div class="card-header" style="background-color: #95D5B2; color:black;">
-                  <h3 class="card-title">IV. Kepuasan Responden </h3>
-                </div>
-               
-                  <div class="card-body">
-                    <div class="row">
-                        <!-- -->
-                          
-                          
-                          
-                          <div class="col-lg-12 mt-2">
-                            <div class="form-group">
-                                1. Secara keseluruhan, saya merasa puas pada layanan pelatihan ini.
-                                <div class="col-sm-12 mt-2">
-                                <select class="form-control select2bs4" required name="k1" style="width: 100%;">
-                                  <option value="">-- Pilih Jawaban --</option>
-                                  
-                                  <option value="1">Sangat tidak setuju</option>
-                                  <option value="2" >Tidak setuju</option>
-                                  <option value="3">Netral</option>
-                                  <option value="4" >Setuju</option>
-                                  <option value="5" >Sangat setuju</option>
-                                          
-                                </select>
-                              </div>
-                            </div>
-                            <div class="form-group">
-                              2. Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya.
-                              <div class="col-sm-12 mt-2">
-                                <select class="form-control select2bs4" required name="k2" style="width: 100%;">
-                                  <option value="">-- Pilih Jawaban --</option>
-                                  
-                                  <option value="1">Sangat tidak setuju</option>
-                                  <option value="2" >Tidak setuju</option>
-                                  <option value="3">Netral</option>
-                                  <option value="4" >Setuju</option>
-                                  <option value="5" >Sangat setuju</option>
-                                          
-                                </select>
-                              </div>
-                            </div>
-                            <div class="form-group">
-                              3. Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal.
-                              <div class="col-sm-12 mt-2">
-                                <select class="form-control select2bs4" required name="k3" style="width: 100%;">
-                                  <option value="">-- Pilih Jawaban --</option>
-                                  
-                                  <option value="1">Sangat tidak setuju</option>
-                                  <option value="2" >Tidak setuju</option>
-                                  <option value="3">Netral</option>
-                                  <option value="4" >Setuju</option>
-                                  <option value="5" >Sangat setuju</option>
-                                          
-                                </select>
-                              </div>
-                            </div>
-
-                          </div>
-                          
-
-
-
-                      </div>
-                      
-                  </div>
-                 
-                  <div class="card-footer">
-                    
-                    <button type="submit" style="background-color: rgba(19, 88, 25, 0.925)" class="btn btn-success btn-block">LANJUTKAN >></button>
-                  </div>
-                
-              </div>
-             
-              </form>
-            </div>
-    
-    
-    
-        
-            <div class="col-lg-3  d-lg-block d-md-block d-sm-block d-none"></div>  
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card shadow-lg">
+        <div class="card-header bg-success text-white text-center py-4">
+          <h4 class="mb-0"><strong>Aplikasi Survei Kepuasan dan Loyalitas Pelanggan</strong></h4>
         </div>
+        
+        <div class="card-body p-4">
+          <form method="POST" action="{{ route('responden.simpanpertanyaan3') }}">
+            @csrf
+            <input type="hidden" value="{{ $data->id_responden }}" name="id_responden">
+            
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">IV. Kepuasan Responden</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">1. Secara keseluruhan, saya merasa puas pada layanan pelatihan ini.</label>
+                  <select class="form-select" name="k1" required>
+                    <option value="">-- Pilih Jawaban --</option>
+                    <option value="1">Sangat tidak setuju</option>
+                    <option value="2">Tidak setuju</option>
+                    <option value="3">Netral</option>
+                    <option value="4">Setuju</option>
+                    <option value="5">Sangat setuju</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">2. Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya.</label>
+                  <select class="form-select" name="k2" required>
+                    <option value="">-- Pilih Jawaban --</option>
+                    <option value="1">Sangat tidak setuju</option>
+                    <option value="2">Tidak setuju</option>
+                    <option value="3">Netral</option>
+                    <option value="4">Setuju</option>
+                    <option value="5">Sangat setuju</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">3. Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal.</label>
+                  <select class="form-select" name="k3" required>
+                    <option value="">-- Pilih Jawaban --</option>
+                    <option value="1">Sangat tidak setuju</option>
+                    <option value="2">Tidak setuju</option>
+                    <option value="3">Netral</option>
+                    <option value="4">Setuju</option>
+                    <option value="5">Sangat setuju</option>
+                  </select>
+                </div>
+                          
+
+
+
+              </div>
+              
+              <div class="card-footer">
+                <button type="submit" class="btn btn-success w-100 py-2">LANJUTKAN <i class="bi bi-arrow-right"></i></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</div>
 
 @endsection

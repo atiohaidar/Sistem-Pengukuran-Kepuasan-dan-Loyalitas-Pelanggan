@@ -41,7 +41,7 @@ class RespondenController extends Controller
     {
         //$data = Bisnis::all();
         $data = Provinsi::all();
-//        return view('responden.bisnis',['data' => $data]);
+    //    return view('responden.bisnis',['data' => $data]);
         return view('responden.responden',['data' => $data]);
         
     }

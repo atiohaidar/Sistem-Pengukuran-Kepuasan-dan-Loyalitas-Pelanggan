@@ -121,11 +121,12 @@ class RespondenController extends Controller
 
     public function destroy($id)
     {
+        // Delete all jawaban data for this responden first (child records)
+        Jawaban::where('id_responden', $id)->delete();
+
+        // Then delete the responden data (parent record)
         $tabel1 = Responden::find($id);
         $tabel1->delete();
-
-        // Delete all jawaban data for this responden using unified Jawaban model
-        Jawaban::where('id_responden', $id)->delete();
 
         return redirect('/dataresponden')->with('success','Data berhasil dihapus');
     }

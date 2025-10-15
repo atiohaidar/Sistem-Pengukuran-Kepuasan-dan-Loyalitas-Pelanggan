@@ -84,22 +84,22 @@
                       <div class="card-header p-0 pt-1">
                         <ul class="nav nav-tabs nav-fill" id="custom-tabs-one-tab" role="tablist">
                           <li class="nav-item">
-                            <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">1.</a>
+                            <a class="nav-link active" id="custom-tabs-one-home-tab" data-bs-toggle="tab" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">1.</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">2.</a>
+                            <a class="nav-link" id="custom-tabs-one-profile-tab" data-bs-toggle="tab" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">2.</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-profile-tab1" data-toggle="pill" href="#custom-tabs-one-profile1" role="tab" aria-controls="custom-tabs-one-profile1" aria-selected="false">3.</a>
+                            <a class="nav-link" id="custom-tabs-one-profile-tab1" data-bs-toggle="tab" href="#custom-tabs-one-profile1" role="tab" aria-controls="custom-tabs-one-profile1" aria-selected="false">3.</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-profile-tab2" data-toggle="pill" href="#custom-tabs-one-profile2" role="tab" aria-controls="custom-tabs-one-profile2" aria-selected="false">4.</a>
+                            <a class="nav-link" id="custom-tabs-one-profile-tab2" data-bs-toggle="tab" href="#custom-tabs-one-profile2" role="tab" aria-controls="custom-tabs-one-profile2" aria-selected="false">4.</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" id="custom-tabs-one-profile-tab3" data-toggle="pill" href="#custom-tabs-one-profile3" role="tab" aria-controls="custom-tabs-one-profile3" aria-selected="false">5.</a>
+                            <a class="nav-link" id="custom-tabs-one-profile-tab3" data-bs-toggle="tab" href="#custom-tabs-one-profile3" role="tab" aria-controls="custom-tabs-one-profile3" aria-selected="false">5.</a>
                           </li>
 
-                         
+
                         </ul>
                       </div>
                       <div class="card-body table-responsive p-1" style="height: 300px;">
@@ -1292,4 +1292,21 @@
   </section>
 
  
+@endsection
+
+@section('footer')
+<script>
+$(document).ready(function() {
+    // Initialize Bootstrap 5 tabs
+    var triggerTabList = [].slice.call(document.querySelectorAll('#custom-tabs-one-tab a'))
+    triggerTabList.forEach(function (triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl)
+
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault()
+            tabTrigger.show()
+        })
+    })
+});
+</script>
 @endsection

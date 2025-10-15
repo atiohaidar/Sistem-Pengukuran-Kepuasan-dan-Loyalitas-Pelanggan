@@ -153,7 +153,7 @@ class SurveyDashboardController extends Controller
         $surveyResponse = PelatihanSurveyResponse::findOrFail($id);
         $surveyResponse->delete();
 
-        return redirect()->route('dashboard.survey-management')
+        return redirect()->route('dashboard.customer-evaluation-management.index')
             ->with('success', 'Data survei berhasil dihapus');
     }
 

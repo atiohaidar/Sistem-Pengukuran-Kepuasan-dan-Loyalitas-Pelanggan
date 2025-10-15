@@ -109,246 +109,228 @@
                         </div>
                     </div>
 
-                                <!-- Survey Answers -->
-                                @if($surveyResponse->status === 'completed')
-                                <!-- Importance Answers -->
-                                @if($surveyResponse->importance_answers)
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Jawaban Pentingnya (Importance)</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        @foreach($questionLabels['importance_answers'] as $dimension => $questions)
-                                        <h5 class="text-primary">{{ ucfirst($dimension) }}</h5>
-                                        <div class="table-responsive mb-4">
-                                            <table class="table table-sm">
-                                                <thead>
+                    <!-- Survey Answers -->
+                    @if($surveyResponse->status === 'completed')
+                        <!-- Importance Answers -->
+                        @if($surveyResponse->importance_answers)
+                            <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                                <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Pentingnya (Importance)</h3>
+                                </div>
+                                <div class="p-6">
+                                    @foreach($questionLabels['importance_answers'] as $dimension => $questions)
+                                        <h5 class="text-lg font-semibold text-blue-600 mb-3">{{ ucfirst($dimension) }}</h5>
+                                        <div class="overflow-x-auto mb-6">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
                                                     <tr>
-                                                        <th>Pertanyaan</th>
-                                                        <th width="100">Skor</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Skor</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody class="bg-white divide-y divide-gray-200">
                                                     @foreach($questions as $key => $question)
-                                                    <tr>
-                                                        <td>{{ $question }}</td>
-                                                        <td>
-                                                            <span class="badge badge-info">
-                                                                {{ $surveyResponse->importance_answers[$dimension][$key] ?? '-' }}/5
-                                                            </span>
-                                                        </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                    {{ $surveyResponse->importance_answers[$dimension][$key] ?? '-' }}/5
+                                                                </span>
+                                                            </td>
+                                                        </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
                                         </div>
-                                        @endforeach
-                                    </div>
+                                    @endforeach
                                 </div>
-                                @endif
+                            </div>
+                        @endif
 
-                                <!-- Performance Answers -->
-                                @if($surveyResponse->performance_answers)
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Jawaban Kinerja (Performance)</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        @foreach($questionLabels['performance_answers'] as $dimension => $questions)
-                                        <h5 class="text-success">{{ ucfirst($dimension) }}</h5>
-                                        <div class="table-responsive mb-4">
-                                            <table class="table table-sm">
-                                                <thead>
+                        <!-- Performance Answers -->
+                        @if($surveyResponse->performance_answers)
+                            <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                                <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kinerja (Performance)</h3>
+                                </div>
+                                <div class="p-6">
+                                    @foreach($questionLabels['performance_answers'] as $dimension => $questions)
+                                        <h5 class="text-lg font-semibold text-green-600 mb-3">{{ ucfirst($dimension) }}</h5>
+                                        <div class="overflow-x-auto mb-6">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
                                                     <tr>
-                                                        <th>Pertanyaan</th>
-                                                        <th width="100">Skor</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Skor</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody class="bg-white divide-y divide-gray-200">
                                                     @foreach($questions as $key => $question)
-                                                    <tr>
-                                                        <td>{{ $question }}</td>
-                                                        <td>
-                                                            <span class="badge badge-success">
-                                                                {{ $surveyResponse->performance_answers[$dimension][$key] ?? '-' }}/5
-                                                            </span>
-                                                        </td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    {{ $surveyResponse->performance_answers[$dimension][$key] ?? '-' }}/5
+                                                                </span>
+                                                            </td>
+                                                        </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
                                         </div>
-                                        @endforeach
-                                    </div>
+                                    @endforeach
                                 </div>
-                                @endif
+                            </div>
+                        @endif
 
-                                <!-- Satisfaction Answers -->
-                                @if($surveyResponse->satisfaction_answers)
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Jawaban Kepuasan (Satisfaction)</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-sm">
-                                                <thead>
+                        <!-- Satisfaction Answers -->
+                        @if($surveyResponse->satisfaction_answers)
+                            <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                                <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kepuasan (Satisfaction)</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Skor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                @foreach($questionLabels['satisfaction_answers'] as $key => $question)
                                                     <tr>
-                                                        <th>Pertanyaan</th>
-                                                        <th width="100">Skor</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($questionLabels['satisfaction_answers'] as $key => $question)
-                                                    <tr>
-                                                        <td>{{ $question }}</td>
-                                                        <td>
-                                                            <span class="badge badge-warning">
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                                 {{ $surveyResponse->satisfaction_answers[$key] ?? '-' }}/5
                                                             </span>
                                                         </td>
                                                     </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                @endif
+                            </div>
+                        @endif
 
-                                <!-- Loyalty Answers -->
-                                @if($surveyResponse->loyalty_answers)
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Jawaban Loyalitas (Loyalty)</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-sm">
-                                                <thead>
+                        <!-- Loyalty Answers -->
+                        @if($surveyResponse->loyalty_answers)
+                            <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                                <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Loyalitas (Loyalty)</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertanyaan</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Skor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                @foreach($questionLabels['loyalty_answers'] as $key => $question)
                                                     <tr>
-                                                        <th>Pertanyaan</th>
-                                                        <th width="100">Skor</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($questionLabels['loyalty_answers'] as $key => $question)
-                                                    <tr>
-                                                        <td>{{ $question }}</td>
-                                                        <td>
-                                                            <span class="badge badge-primary">
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                                                 {{ $surveyResponse->loyalty_answers[$key] ?? '-' }}/5
                                                             </span>
                                                         </td>
                                                     </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                @endif
+                            </div>
+                        @endif
 
-                                <!-- Feedback Answers -->
-                                @if($surveyResponse->feedback_answers)
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Feedback dan Saran</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        @if(isset($surveyResponse->feedback_answers['kritik_saran']) && $surveyResponse->feedback_answers['kritik_saran'])
-                                        <div class="mb-3">
-                                            <h6>Kritik dan Saran:</h6>
-                                            <p class="border p-2 rounded">{{ $surveyResponse->feedback_answers['kritik_saran'] }}</p>
+                        <!-- Feedback Answers -->
+                        @if($surveyResponse->feedback_answers)
+                            <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                                <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium text-gray-900">Feedback dan Saran</h3>
+                                </div>
+                                <div class="p-6 space-y-6">
+                                    @if(isset($surveyResponse->feedback_answers['kritik_saran']) && $surveyResponse->feedback_answers['kritik_saran'])
+                                        <div>
+                                            <h6 class="text-sm font-medium text-gray-700 mb-2">Kritik dan Saran:</h6>
+                                            <div class="bg-white border border-gray-300 rounded-md p-4 text-sm text-gray-900">
+                                                {{ $surveyResponse->feedback_answers['kritik_saran'] }}
+                                            </div>
                                         </div>
-                                        @endif
+                                    @endif
 
-                                        @if(isset($surveyResponse->feedback_answers['tema_judul']) && $surveyResponse->feedback_answers['tema_judul'])
-                                        <div class="mb-3">
-                                            <h6>Tema/Judul Pelatihan yang Diinginkan:</h6>
-                                            <p class="border p-2 rounded">{{ $surveyResponse->feedback_answers['tema_judul'] }}</p>
+                                    @if(isset($surveyResponse->feedback_answers['tema_judul']) && $surveyResponse->feedback_answers['tema_judul'])
+                                        <div>
+                                            <h6 class="text-sm font-medium text-gray-700 mb-2">Tema/Judul Pelatihan yang Diinginkan:</h6>
+                                            <div class="bg-white border border-gray-300 rounded-md p-4 text-sm text-gray-900">
+                                                {{ $surveyResponse->feedback_answers['tema_judul'] }}
+                                            </div>
                                         </div>
-                                        @endif
+                                    @endif
 
-                                        @if(isset($surveyResponse->feedback_answers['bentuk_pelatihan']))
-                                        <div class="mb-3">
-                                            <h6>Bentuk Pelatihan yang Diinginkan:</h6>
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['online'] ?? false) ? 'checked' : '' }}
-                                                               disabled>
-                                                        <label class="form-check-label">Online</label>
-                                                    </div>
+                                    @if(isset($surveyResponse->feedback_answers['bentuk_pelatihan']))
+                                        <div>
+                                            <h6 class="text-sm font-medium text-gray-700 mb-3">Bentuk Pelatihan yang Diinginkan:</h6>
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <div class="flex items-center">
+                                                    <input type="checkbox"
+                                                           {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['online'] ?? false) ? 'checked' : '' }}
+                                                           disabled
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label class="ml-2 block text-sm text-gray-900">Online</label>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['offline'] ?? false) ? 'checked' : '' }}
-                                                               disabled>
-                                                        <label class="form-check-label">Offline</label>
-                                                    </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox"
+                                                           {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['offline'] ?? false) ? 'checked' : '' }}
+                                                           disabled
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label class="ml-2 block text-sm text-gray-900">Offline</label>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['streaming'] ?? false) ? 'checked' : '' }}
-                                                               disabled>
-                                                        <label class="form-check-label">Streaming</label>
-                                                    </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox"
+                                                           {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['streaming'] ?? false) ? 'checked' : '' }}
+                                                           disabled
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label class="ml-2 block text-sm text-gray-900">Streaming</label>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                               {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['elearning'] ?? false) ? 'checked' : '' }}
-                                                               disabled>
-                                                        <label class="form-check-label">E-Learning</label>
-                                                    </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox"
+                                                           {{ ($surveyResponse->feedback_answers['bentuk_pelatihan']['elearning'] ?? false) ? 'checked' : '' }}
+                                                           disabled
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label class="ml-2 block text-sm text-gray-900">E-Learning</label>
                                                 </div>
                                             </div>
                                         </div>
-                                        @endif
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Survei Belum Selesai</h3>
+                                    <div class="mt-2 text-sm text-yellow-700">
+                                        <p>Survei ini masih dalam status draft dan belum diisi lengkap.</p>
                                     </div>
                                 </div>
-                                @endif
-                                @else
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="alert alert-warning">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                            Survei ini masih dalam status draft dan belum diisi lengkap.
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-
-    @push('styles')
-    <style>
-    .badge {
-        font-size: 0.9em;
-    }
-
-    .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-    }
-
-    .card {
-        margin-bottom: 1.5rem;
-    }
-
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-    }
-    </style>
-    @endpush
 </x-app-layout>

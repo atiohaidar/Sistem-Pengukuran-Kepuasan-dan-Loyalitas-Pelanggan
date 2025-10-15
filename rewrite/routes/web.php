@@ -5,6 +5,7 @@ use App\Http\Controllers\PelatihanSurveyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerManagementEvaluationController;
+use App\Http\Controllers\CustomerManagementEvaluationDashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/show/{id}', [SurveyDashboardController::class, 'show'])->name('show');
         Route::delete('/{id}', [SurveyDashboardController::class, 'destroy'])->name('destroy');
         Route::get('/export', [SurveyDashboardController::class, 'export'])->name('export');
+    });
+        Route::prefix('dashboard/customer-evaluation-management')->name('dashboard.customer-evaluation-management.')->group(function () {
+        Route::get('/', [CustomerManagementEvaluationDashboardController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [CustomerManagementEvaluationDashboardController::class, 'show'])->name('show');
+        Route::delete('/{id}', [CustomerManagementEvaluationDashboardController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [CustomerManagementEvaluationDashboardController::class, 'export'])->name('export');
     });
 });
 

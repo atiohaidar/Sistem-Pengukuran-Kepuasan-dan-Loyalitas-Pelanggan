@@ -28,9 +28,8 @@ class CustomerManagementEvaluationService
         return CustomerManagementEvaluation::where('token', $token)->where('completed', true)->first();
     }
 
-    public function updateMaturityData($token, $maturityData)
+    public function updateMaturityData($evaluation, $maturityData)
     {
-        $evaluation = $this->getEvaluationByToken($token);
         if ($evaluation) {
             $evaluation->update(['maturity_data' => $maturityData]);
         }

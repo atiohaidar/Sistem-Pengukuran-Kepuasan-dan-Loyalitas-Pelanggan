@@ -97,21 +97,96 @@
                 </div>
                 <div>
                     <h4 class="text-lg font-medium text-gray-900 mb-4">Importance - Performance Analysis</h4>
-                    <!-- Simple scatter plot placeholder -->
-                    <div class="bg-gray-100 p-4 rounded-lg">
-                        <p class="text-sm text-gray-600">Grafik IPA akan ditampilkan di sini. Untuk implementasi penuh, gunakan library seperti Chart.js.</p>
-                        <!-- Placeholder for IPA graph -->
-                        <div class="mt-4">
-                            @foreach($results['performanceData'] as $item)
-                                <div class="flex items-center mb-2">
-                                    <span class="w-32 text-sm">{{ $item['label'] }}</span>
-                                    <div class="flex-1 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ $item['importance'] }}%"></div>
-                                    </div>
-                                    <span class="ml-2 text-sm">{{ $item['importance'] }}</span>
-                                </div>
+                    <div class="bg-white p-4 rounded-lg border">
+                        <svg width="450" height="300" viewBox="0 0 450 300" class="w-full h-auto">
+                            @php
+                                $width = 450;
+                                $height = 300;
+                                $padding = 40;
+                                $xMax = 25;
+                                $yMax = 100;
+                                $xMid = 12.5;
+                                $yMid = 70;
+
+                                $scaleX = function($val) use ($width, $padding, $xMax) {
+                                    return ($val / $xMax) * ($width - $padding * 2) + $padding;
+                                };
+
+                                $scaleY = function($val) use ($height, $padding, $yMax) {
+                                    return $height - $padding - ($val / $yMax) * ($height - $padding * 2);
+                                };
+
+                                $xTicks = [0, 5, 10, 15, 20, 25];
+                                $yTicks = [0, 20, 40, 60, 80, 100];
+                            @endphp
+
+                            <!-- Grid lines -->
+                            @foreach($xTicks as $tick)
+                                <line x1="{{ $scaleX($tick) }}" y1="{{ $padding }}" x2="{{ $scaleX($tick) }}" y2="{{ $height - $padding }}" stroke="#e5e7eb" stroke-width="1"/>
                             @endforeach
-                        </div>
+                            @foreach($yTicks as $tick)
+                                <line x1="{{ $padding }}" y1="{{ $scaleY($tick) }}" x2="{{ $width - $padding }}" y2="{{ $scaleY($tick) }}" stroke="#e5e7eb" stroke-width="1"/>
+                            @endforeach
+
+                            <!-- Quadrants -->
+                            <rect x="{{ $padding }}" y="{{ $padding }}" width="{{ $scaleX($xMid) - $padding }}" height="{{ $scaleY($yMid) - $padding }}" fill="#fef3c7" opacity="0.3"/>
+                            <rect x="{{ $scaleX($xMid) }}" y="{{ $padding }}" width="{{ $width - $padding - $scaleX($xMid) }}" height="{{ $scaleY($yMid) - $padding }}" fill="#d1fae5" opacity="0.3"/>
+                            <rect x="{{ $padding }}" y="{{ $scaleY($yMid) }}" width="{{ $scaleX($xMid) - $padding }}" height="{{ $height - $padding - $scaleY($yMid) }}" fill="#fee2e2" opacity="0.3"/>
+                            <rect x="{{ $scaleX($xMid) }}" y="{{ $scaleY($yMid) }}" width="{{ $width - $padding - $scaleX($xMid) }}" height="{{ $height - $padding - $scaleY($yMid) }}" fill="#d1fae5" opacity="0.3"/>
+
+                            <!-- Quadrant labels -->
+                            <text x="{{ $padding + 10 }}" y="{{ $padding + 20 }}" font-size="12" fill="#92400e">Low Priority</text>
+                            <text x="{{ $width - $padding - 60 }}" y="{{ $padding + 20 }}" font-size="12" fill="#166534">Keep Up</text>
+                            <text x="{{ $padding + 10 }}" y="{{ $height - $padding - 10 }}" font-size="12" fill="#dc2626">Low Priority</text>
+                            <text x="{{ $width - $padding - 60 }}" y="{{ $height - $padding - 10 }}" font-size="12" fill="#166534">High Priority</text>
+
+                            <!-- X and Y axis -->
+                            <line x1="{{ $padding }}" y1="{{ $height - $padding }}" x2="{{ $width - $padding }}" y2="{{ $height - $padding }}" stroke="#374151" stroke-width="2"/>
+                            <line x1="{{ $padding }}" y1="{{ $padding }}" x2="{{ $padding }}" y2="{{ $height - $padding }}" stroke="#374151" stroke-width="2"/>
+
+                            <!-- X axis ticks and labels -->
+                            @foreach($xTicks as $tick)
+                                <line x1="{{ $scaleX($tick) }}" y1="{{ $height - $padding }}" x2="{{ $scaleX($tick) }}" y2="{{ $height - $padding + 5 }}" stroke="#374151" stroke-width="1"/>
+                                <text x="{{ $scaleX($tick) }}" y="{{ $height - $padding + 20 }}" text-anchor="middle" font-size="10" fill="#6b7280">{{ $tick }}</text>
+                            @endforeach
+
+                            <!-- Y axis ticks and labels -->
+                            @foreach($yTicks as $tick)
+                                <line x1="{{ $padding }}" y1="{{ $scaleY($tick) }}" x2="{{ $padding - 5 }}" y2="{{ $scaleY($tick) }}" stroke="#374151" stroke-width="1"/>
+                                <text x="{{ $padding - 10 }}" y="{{ $scaleY($tick) + 4 }}" text-anchor="end" font-size="10" fill="#6b7280">{{ $tick }}</text>
+                            @endforeach
+
+                            <!-- Axis labels -->
+                            <text x="{{ $width / 2 }}" y="{{ $height - 10 }}" text-anchor="middle" font-size="12" fill="#374151">Importance</text>
+                            <text x="15" y="{{ $height / 2 }}" text-anchor="middle" transform="rotate(-90 15 {{ $height / 2 }})" font-size="12" fill="#374151">Performance (%)</text>
+
+                            <!-- Data points -->
+                            @foreach($results['performanceData'] as $index => $item)
+                                @php
+                                    $importance = $item['importance'] * 5; // Scale 1-5 to 5-25
+                                    $performance = $item['performance'];
+                                    $x = $scaleX($importance);
+                                    $y = $scaleY($performance);
+                                    $colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280', '#374151', '#f59e0b', '#10b981'];
+                                    $color = $colors[$index % count($colors)];
+                                    // Use 4 directions to avoid overlap: right-top, left-top, right-bottom, left-bottom
+                                    $directions = [
+                                        ['x' => 25, 'y' => -10], // right-top
+                                        ['x' => -90, 'y' => -10], // left-top
+                                        ['x' => 25, 'y' => 20], // right-bottom
+                                        ['x' => -90, 'y' => 20], // left-bottom
+                                    ];
+                                    $dir = $directions[$index % 4];
+                                    $offsetX = $dir['x'];
+                                    $offsetY = $dir['y'];
+                                    $labelX = $x + $offsetX;
+                                    $labelY = $y + $offsetY;
+                                @endphp
+                                <circle cx="{{ $x }}" cy="{{ $y }}" r="6" fill="{{ $color }}" stroke="#ffffff" stroke-width="2"/>
+                                <line x1="{{ $x }}" y1="{{ $y }}" x2="{{ $labelX }}" y2="{{ $labelY }}" stroke="{{ $color }}" stroke-width="1"/>
+                                <text x="{{ $labelX }}" y="{{ $labelY }}" font-size="10" fill="#374151" stroke="#ffffff" stroke-width="3" paint-order="stroke fill">{{ substr($item['label'], 0, 15) }}</text>
+                            @endforeach
+                        </svg>
                     </div>
                 </div>
             </div>

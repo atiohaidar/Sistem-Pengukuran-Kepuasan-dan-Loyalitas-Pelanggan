@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Survei Kepuasan Pelatihan')
 
@@ -6,42 +6,80 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+        <div class="text-center mb-16 px-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-6 shadow-lg">
+                <i class="fas fa-poll-h text-white text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
                 Survei Kepuasan dan Loyalitas Pelanggan
             </h1>
-            <p class="text-xl text-gray-600 mb-8">
+            <p class="text-xl text-gray-600 mb-2 font-medium">
                 Lembaga Pelatihan Professional
             </p>
-            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Selamat Datang!</h2>
-                <p class="text-gray-600 mb-6">
+            <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full mb-8"></div>
+        </div>
+            <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border border-gray-100">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-4">
+                        <i class="fas fa-clipboard-check text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Selamat Datang!</h2>
+                    <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full"></div>
+                </div>
+                <p class="text-gray-600 mb-8 text-lg leading-relaxed text-center max-w-2xl mx-auto">
                     Terima kasih atas partisipasi Anda dalam survei ini. Survei ini bertujuan untuk mengukur
                     tingkat kepuasan dan loyalitas Anda terhadap layanan pelatihan yang kami berikan.
                 </p>
-                <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="text-center">
-                        <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-clipboard-check text-blue-600 text-2xl"></i>
+
+                <!-- <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <h3 class="font-semibold text-gray-800 mb-2">6 Langkah Sederhana</h3>
-                        <p class="text-sm text-gray-600">Survei terdiri dari 6 bagian yang mudah diisi</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Profil</p>
+                        <p class="text-xs text-gray-500">Data diri</p>
                     </div>
-                    <div class="text-center">
-                        <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-clock text-green-600 text-2xl"></i>
+
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-star"></i>
                         </div>
-                        <h3 class="font-semibold text-gray-800 mb-2">Waktu 10-15 Menit</h3>
-                        <p class="text-sm text-gray-600">Survei dapat diselesaikan dalam waktu singkat</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Harapan</p>
+                        <p class="text-xs text-gray-500">Tingkat kepentingan</p>
                     </div>
-                    <div class="text-center">
-                        <div class="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-shield-alt text-purple-600 text-2xl"></i>
+
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        <h3 class="font-semibold text-gray-800 mb-2">Data Aman</h3>
-                        <p class="text-sm text-gray-600">Data Anda dijaga kerahasiaannya</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Persepsi</p>
+                        <p class="text-xs text-gray-500">Kinerja layanan</p>
                     </div>
-                </div>
+
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Kepuasan</p>
+                        <p class="text-xs text-gray-500">Tingkat kepuasan</p>
+                    </div>
+
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Loyalitas</p>
+                        <p class="text-xs text-gray-500">Tingkat loyalitas</p>
+                    </div>
+
+                    <div class="text-center group">
+                        <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl w-14 h-14 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-800 mb-1">Saran</p>
+                        <p class="text-xs text-gray-500">Kritik & saran</p>
+                    </div>
+                </div> -->
             </div>
         </div>
 
@@ -49,52 +87,18 @@
         <div class="text-center">
             <form method="POST" action="{{ route('survey.start') }}">
                 @csrf
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition duration-300 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-play-circle mr-2"></i>
+                <button type="submit" class="group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-5 px-10 rounded-xl text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg border-2 border-transparent hover:border-indigo-300">
+                    <i class="fas fa-play-circle mr-3 group-hover:animate-pulse"></i>
                     Mulai Survei
+                    <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
                 </button>
             </form>
-            <p class="text-gray-500 mt-4 text-sm">
-                Dengan mengklik tombol di atas, Anda menyetujui untuk mengisi survei ini
+            <p class="text-gray-500 mt-6 text-sm max-w-md mx-auto leading-relaxed">
+                Dengan mengklik tombol di atas, Anda menyetujui untuk mengisi survei ini dengan jujur dan bertanggung jawab
             </p>
         </div>
 
-        <!-- Survey Steps Preview -->
-        <div class="mt-16 bg-white rounded-lg shadow-lg p-8">
-            <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Alur Survei</h3>
-            <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">1</div>
-                    <p class="text-sm font-medium">Profil</p>
-                    <p class="text-xs text-gray-500">Data diri</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">2</div>
-                    <p class="text-sm font-medium">Harapan</p>
-                    <p class="text-xs text-gray-500">Tingkat kepentingan</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">3</div>
-                    <p class="text-sm font-medium">Persepsi</p>
-                    <p class="text-xs text-gray-500">Kinerja layanan</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">4</div>
-                    <p class="text-sm font-medium">Kepuasan</p>
-                    <p class="text-xs text-gray-500">Tingkat kepuasan</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">5</div>
-                    <p class="text-sm font-medium">Loyalitas</p>
-                    <p class="text-xs text-gray-500">Tingkat loyalitas</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2 text-lg font-bold">6</div>
-                    <p class="text-sm font-medium">Saran</p>
-                    <p class="text-xs text-gray-500">Kritik & saran</p>
-                </div>
-            </div>
-        </div>
+       
     </div>
 </div>
 @endsection

@@ -7,11 +7,21 @@
         <div class="bg-white shadow rounded-lg p-6">
             <h1 class="text-3xl font-bold text-gray-900">Dashboard Hasil Evaluasi</h1>
             <h2 class="text-xl text-gray-700 mt-2">{{ $data['company_name'] }}</h2>
-            <div class="mt-4">
-                <a href="{{ route('customer-management-evaluation.welcome') }}"
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Mulai Asesmen Baru
-                </a>
+            <div class="mt-4 flex space-x-4">
+                @if(!$isShared)
+                    <a href="{{ route('customer-management-evaluation.maturity') }}"
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Edit Evaluasi
+                    </a>
+                    <a href="{{ route('customer-management-evaluation.welcome') }}"
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Mulai Asesmen Baru
+                    </a>
+                @endif
+                <div class="flex items-center">
+                    <label for="share-link" class="block text-sm font-medium text-gray-700 mr-2">Link Share:</label>
+                    <input id="share-link" type="text" readonly value="{{ url('/customer-management-evaluation/dashboard/' . $token) }}" class="block w-96 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm" onclick="this.select()">
+                </div>
             </div>
         </div>
 

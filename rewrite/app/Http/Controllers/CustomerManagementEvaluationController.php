@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\CustomerManagementEvaluation;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+
 class CustomerManagementEvaluationController extends Controller
 {
     public function welcome()
@@ -19,19 +21,37 @@ class CustomerManagementEvaluationController extends Controller
                 'company_name' => 'required|string|max:255',
             ]);
 
-            $data = $request->session()->get('evaluation_data', []);
-            $data['company_name'] = $validated['company_name'];
-            $request->session()->put('evaluation_data', $data);
+            $token = Str::uuid()->toString();
+            CustomerManagementEvaluation::create([
+                'token' => $token,
+                'company_name' => $validated['company_name'],
+                'maturity_data' => [],
+                'priority_data' => [],
+                'readiness_data' => [],
+                'completed' => false,
+            ]);
+
+            $request->session()->put('evaluation_token', $token);
 
             return redirect()->route('customer-management-evaluation.maturity');
         }
 
-        $data = $request->session()->get('evaluation_data', [
-            'company_name' => '',
-            'maturity' => [],
-            'priority' => [],
-            'readiness' => []
-        ]);
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $data = [
+            'company_name' => $evaluation->company_name,
+            'maturity' => $evaluation->maturity_data ?? [],
+            'priority' => $evaluation->priority_data ?? [],
+            'readiness' => $evaluation->readiness_data ?? [],
+        ];
 
         return view('customer-management-evaluation.maturity', compact('data'));
     }
@@ -39,7 +59,6 @@ class CustomerManagementEvaluationController extends Controller
     public function storeMaturity(Request $request)
     {
         $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
             'visi' => 'required|integer|min:1|max:5',
             'strategi' => 'required|integer|min:1|max:5',
             'pengalamanKonsumen' => 'required|integer|min:1|max:5',
@@ -50,19 +69,43 @@ class CustomerManagementEvaluationController extends Controller
             'matriks' => 'required|integer|min:1|max:5',
         ]);
 
-        $data = $request->session()->get('evaluation_data', []);
-        $data['company_name'] = $validated['company_name'];
-        $data['maturity'] = array_intersect_key($validated, array_flip([
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $maturityData = array_intersect_key($validated, array_flip([
             'visi', 'strategi', 'pengalamanKonsumen', 'kolaborasiOrganisasi', 'proses', 'informasi', 'teknologi', 'matriks'
         ]));
-        $request->session()->put('evaluation_data', $data);
+
+        $evaluation->update(['maturity_data' => $maturityData]);
 
         return redirect()->route('customer-management-evaluation.priority');
     }
 
     public function priority(Request $request)
     {
-        $data = $request->session()->get('evaluation_data', []);
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $data = [
+            'company_name' => $evaluation->company_name,
+            'maturity' => $evaluation->maturity_data ?? [],
+            'priority' => $evaluation->priority_data ?? [],
+            'readiness' => $evaluation->readiness_data ?? [],
+        ];
 
         return view('customer-management-evaluation.priority', compact('data'));
     }
@@ -92,16 +135,39 @@ class CustomerManagementEvaluationController extends Controller
             return back()->withErrors(['total' => 'Total bobot dari item yang diisi harus sama dengan 100.']);
         }
 
-        $data = $request->session()->get('evaluation_data', []);
-        $data['priority'] = $validated;
-        $request->session()->put('evaluation_data', $data);
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation->update(['priority_data' => $validated]);
 
         return redirect()->route('customer-management-evaluation.readiness');
     }
 
     public function readiness(Request $request)
     {
-        $data = $request->session()->get('evaluation_data', []);
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $data = [
+            'company_name' => $evaluation->company_name,
+            'maturity' => $evaluation->maturity_data ?? [],
+            'priority' => $evaluation->priority_data ?? [],
+            'readiness' => $evaluation->readiness_data ?? [],
+        ];
 
         return view('customer-management-evaluation.readiness', compact('data'));
     }
@@ -122,29 +188,65 @@ class CustomerManagementEvaluationController extends Controller
             'q11' => 'required|integer|min:1|max:5',
         ]);
 
-        $data = $request->session()->get('evaluation_data', []);
-        $data['readiness'] = $validated;
-        $request->session()->put('evaluation_data', $data);
+        $token = $request->session()->get('evaluation_token');
+        if (!$token) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
 
-        // Save to database
-        CustomerManagementEvaluation::create([
-            'company_name' => $data['company_name'],
-            'maturity_data' => $data['maturity'],
-            'priority_data' => $data['priority'],
-            'readiness_data' => $data['readiness'],
+        $evaluation = CustomerManagementEvaluation::where('token', $token)->first();
+        if (!$evaluation) {
+            return redirect()->route('customer-management-evaluation.welcome');
+        }
+
+        $evaluation->update([
+            'readiness_data' => $validated,
+            'completed' => true
         ]);
 
         return redirect()->route('customer-management-evaluation.dashboard');
     }
 
-    public function dashboard(Request $request)
+    public function dashboard(Request $request, $token = null)
     {
-        $data = $request->session()->get('evaluation_data', []);
+        if ($token) {
+            // Access via token
+            $evaluation = CustomerManagementEvaluation::where('token', $token)->where('completed', true)->first();
+            if (!$evaluation) {
+                abort(404);
+            }
+            $data = [
+                'company_name' => $evaluation->company_name,
+                'maturity' => $evaluation->maturity_data ?? [],
+                'priority' => $evaluation->priority_data ?? [],
+                'readiness' => $evaluation->readiness_data ?? [],
+            ];
+            $isShared = true;
+        } else {
+            // From session
+            $sessionToken = $request->session()->get('evaluation_token');
+            if (!$sessionToken) {
+                return redirect()->route('customer-management-evaluation.welcome');
+            }
+
+            $evaluation = CustomerManagementEvaluation::where('token', $sessionToken)->where('completed', true)->first();
+            if (!$evaluation) {
+                return redirect()->route('customer-management-evaluation.welcome');
+            }
+
+            $data = [
+                'company_name' => $evaluation->company_name,
+                'maturity' => $evaluation->maturity_data ?? [],
+                'priority' => $evaluation->priority_data ?? [],
+                'readiness' => $evaluation->readiness_data ?? [],
+            ];
+            $isShared = false;
+            $token = $sessionToken;
+        }
 
         // Calculate results similar to reference.tsx
         $results = $this->calculateResults($data);
 
-        return view('customer-management-evaluation.dashboard', compact('data', 'results'));
+        return view('customer-management-evaluation.dashboard', compact('data', 'results', 'token', 'isShared'));
     }
 
     private function calculateResults($data)

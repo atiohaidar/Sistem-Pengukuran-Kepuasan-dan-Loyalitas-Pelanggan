@@ -43,7 +43,7 @@ Route::prefix('customer-management-evaluation')->name('customer-management-evalu
     Route::post('/priority', [CustomerManagementEvaluationController::class, 'storePriority'])->name('store-priority');
     Route::get('/readiness', [CustomerManagementEvaluationController::class, 'readiness'])->name('readiness');
     Route::post('/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
-    Route::get('/dashboard', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/{token?}', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
 });
 
 

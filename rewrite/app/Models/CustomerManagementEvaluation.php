@@ -10,10 +10,12 @@ class CustomerManagementEvaluation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'token',
         'company_name',
         'maturity_data',
         'priority_data',
         'readiness_data',
+        'completed',
     ];
 
     protected $casts = [

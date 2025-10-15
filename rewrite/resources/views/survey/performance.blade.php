@@ -14,7 +14,7 @@
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
                 <h2 class="text-2xl font-bold text-white">III. Penilaian Persepsi</h2>
-                <p class="text-purple-100 mt-1">Berikan penilaian sesuai dengan pengalaman Anda terhadap kualitas layanan yang diberikan</p>
+                <p class="text-purple-100 mt-1">Berikan penilaian sesuai dengan pengalaman Anda terhadap kinerja kualitas layanan yang diberikan</p>
             </div>
 
             <form method="POST" action="{{ route('survey.store', ['step' => 'performance']) }}" class="p-6">
@@ -42,104 +42,63 @@
                     <div class="space-y-4">
                         @php $reliabilityData = $survey->getAnswers('performance', 'reliability') ?? []; @endphp
 
+                        @php
+    function renderPerformanceSelect($name, $data, $key, $default = null) {
+        $selected = $data[$key] ?? old($name) ?? $default ?? '';
+        $options = [
+            '' => 'Pilih tingkat kepuasan',
+            '0' => '0 - Tidak Relevan',
+            '1' => '1 - Sangat Tidak Setuju',
+            '2' => '2 - Tidak Setuju',
+            '3' => '3 - Netral',
+            '4' => '4 - Setuju',
+            '5' => '5 - Sangat Setuju'
+        ];
+
+        $html = '<select name="' . $name . '" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" required>';
+        foreach ($options as $value => $label) {
+            $selectedAttr = ($selected == $value) ? ' selected' : '';
+            $html .= '<option value="' . $value . '"' . $selectedAttr . '>' . $label . '</option>';
+        }
+        $html .= '</select>';
+        return $html;
+    }
+@endphp
+
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Kesesuaian isi post test dengan materi pelatihan yang diberikan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r1]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r1'] ?? old('reliability.r1')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
-                                <div class="text-xs text-gray-500 mt-1">1=Sangat tidak sesuai, 5=Sangat sesuai</div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Isi post test sesuai dengan materi pelatihan yang diberikan</label>
+                                {!! renderPerformanceSelect('reliability[r1]', $reliabilityData, 'r1') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r2]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r2'] ?? old('reliability.r2')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Waktu pelatihan sesuai dengan jadwal yang telah dijanjikan</label>
+                                {!! renderPerformanceSelect('reliability[r2]', $reliabilityData, 'r2') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Ketepatan waktu dalam memberikan sertifikat pelatihan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r3]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r3'] ?? old('reliability.r3')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Sertifikat pelatihan diberikan tepat waktu</label>
+                                {!! renderPerformanceSelect('reliability[r3]', $reliabilityData, 'r3') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Ketepatan trainer dalam menjawab pertanyaan peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r4]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r4'] ?? old('reliability.r4')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer menjawab pertanyaan peserta dengan baik</label>
+                                {!! renderPerformanceSelect('reliability[r4]', $reliabilityData, 'r4') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">5. Materi pelatihan mudah dimengerti</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r5]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r5'] ?? old('reliability.r5')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('reliability[r5]', $reliabilityData, 'r5') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Kemudahan dalam melakukan registrasi pelatihan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r6]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r6'] ?? old('reliability.r6')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Registrasi pelatihan mudah dilakukan</label>
+                                {!! renderPerformanceSelect('reliability[r6]', $reliabilityData, 'r6') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">7. Kemudahan dalam melakukan pembayaran pelatihan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="reliability[r7]" value="{{ $i }}"
-                                                   {{ ($reliabilityData['r7'] ?? old('reliability.r7')) == $i ? 'checked' : '' }}
-                                                   class="text-blue-600 focus:ring-blue-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">7. Pembayaran pelatihan mudah dilakukan</label>
+                                {!! renderPerformanceSelect('reliability[r7]', $reliabilityData, 'r7') !!}
                             </div>
                         </div>
                     </div>
@@ -154,58 +113,22 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer/pegawai bersikap sopan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="assurance[a1]" value="{{ $i }}"
-                                                   {{ ($assuranceData['a1'] ?? old('assurance.a1')) == $i ? 'checked' : '' }}
-                                                   class="text-green-600 focus:ring-green-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('assurance[a1]', $assuranceData, 'a1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memiliki pengetahuan yang luas mengenai materi pelatihan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="assurance[a2]" value="{{ $i }}"
-                                                   {{ ($assuranceData['a2'] ?? old('assurance.a2')) == $i ? 'checked' : '' }}
-                                                   class="text-green-600 focus:ring-green-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('assurance[a2]', $assuranceData, 'a2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="assurance[a3]" value="{{ $i }}"
-                                                   {{ ($assuranceData['a3'] ?? old('assurance.a3')) == $i ? 'checked' : '' }}
-                                                   class="text-green-600 focus:ring-green-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('assurance[a3]', $assuranceData, 'a3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service selalu dapat menyelesaikan keluhan pelanggan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="assurance[a4]" value="{{ $i }}"
-                                                   {{ ($assuranceData['a4'] ?? old('assurance.a4')) == $i ? 'checked' : '' }}
-                                                   class="text-green-600 focus:ring-green-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('assurance[a4]', $assuranceData, 'a4') !!}
                             </div>
                         </div>
                     </div>
@@ -220,86 +143,32 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Sistem aplikasi pelatihan online yang user friendly</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t1]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t1'] ?? old('tangible.t1')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t1]', $tangibleData, 't1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Website menampilkan informasi terbaru</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t2]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t2'] ?? old('tangible.t2')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t2]', $tangibleData, 't2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Perlengkapan audio visual berfungsi dengan baik</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t3]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t3'] ?? old('tangible.t3')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t3]', $tangibleData, 't3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Koneksi internet host lancar selama pelatihan berlangsung</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t4]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t4'] ?? old('tangible.t4')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t4]', $tangibleData, 't4') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">5. Tampilan modul pelatihan menarik untuk dibaca</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t5]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t5'] ?? old('tangible.t5')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t5]', $tangibleData, 't5') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">6. Trainer berpenampilan rapi</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="tangible[t6]" value="{{ $i }}"
-                                                   {{ ($tangibleData['t6'] ?? old('tangible.t6')) == $i ? 'checked' : '' }}
-                                                   class="text-purple-600 focus:ring-purple-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('tangible[t6]', $tangibleData, 't6') !!}
                             </div>
                         </div>
                     </div>
@@ -313,59 +182,28 @@
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer memberikan perhatian individual kepada peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="empathy[e1]" value="{{ $i }}"
-                                                   {{ ($empathyData['e1'] ?? old('empathy.e1')) == $i ? 'checked' : '' }}
-                                                   class="text-pink-600 focus:ring-pink-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer memberikan perhatian kepada peserta</label>
+                                {!! renderPerformanceSelect('empathy[e1]', $empathyData, 'e1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memahami kebutuhan peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="empathy[e2]" value="{{ $i }}"
-                                                   {{ ($empathyData['e2'] ?? old('empathy.e2')) == $i ? 'checked' : '' }}
-                                                   class="text-pink-600 focus:ring-pink-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('empathy[e2]', $empathyData, 'e2') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Trainer memiliki waktu yang cukup untuk melayani peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="empathy[e3]" value="{{ $i }}"
-                                                   {{ ($empathyData['e3'] ?? old('empathy.e3')) == $i ? 'checked' : '' }}
-                                                   class="text-pink-600 focus:ring-pink-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Terjalin komunikasi yang baik antara trainer dengan peserta</label>
+                                {!! renderPerformanceSelect('empathy[e3]', $empathyData, 'e3') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer memberikan pelayanan yang personal</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="empathy[e4]" value="{{ $i }}"
-                                                   {{ ($empathyData['e4'] ?? old('empathy.e4')) == $i ? 'checked' : '' }}
-                                                   class="text-pink-600 focus:ring-pink-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer berupaya membantu saat peserta mengalami kesulitan.</label>
+                                {!! renderPerformanceSelect('empathy[e4]', $empathyData, 'e4') !!}
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Waktu yang dialokasikan untuk pelatihan cukup</label>
+                                {!! renderPerformanceSelect('empathy[e5]', $empathyData, 'e5') !!}
                             </div>
                         </div>
                     </div>
@@ -379,59 +217,23 @@
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Committee service memberikan informasi yang jelas mengenai jadwal pelatihan</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="responsiveness[r1]" value="{{ $i }}"
-                                                   {{ ($responsivenessData['r1'] ?? old('responsiveness.r1')) == $i ? 'checked' : '' }}
-                                                   class="text-yellow-600 focus:ring-yellow-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Contact person Perusahaan cepat memberikan respon dalam menanggapi peserta</label>
+                                {!! renderPerformanceSelect('responsiveness[r1]', $responsivenessData, 'r1') !!}
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Committee service memberikan respon yang cepat terhadap pertanyaan peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="responsiveness[r2]" value="{{ $i }}"
-                                                   {{ ($responsivenessData['r2'] ?? old('responsiveness.r2')) == $i ? 'checked' : '' }}
-                                                   class="text-yellow-600 focus:ring-yellow-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Informasi Jadwal pelatihan diberikan dengan tepat</label>
+                                {!! renderPerformanceSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Committee service memberikan respon yang cepat terhadap keluhan peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="responsiveness[r3]" value="{{ $i }}"
-                                                   {{ ($responsivenessData['r3'] ?? old('responsiveness.r3')) == $i ? 'checked' : '' }}
-                                                   class="text-yellow-600 focus:ring-yellow-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('responsiveness[r3]', $responsivenessData, 'r3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service memberikan respon yang cepat terhadap permintaan peserta</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="responsiveness[r4]" value="{{ $i }}"
-                                                   {{ ($responsivenessData['r4'] ?? old('responsiveness.r4')) == $i ? 'checked' : '' }}
-                                                   class="text-yellow-600 focus:ring-yellow-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('responsiveness[r4]', $responsivenessData, 'r4') !!}
                             </div>
                         </div>
                     </div>
@@ -446,59 +248,15 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Materi pelatihan mudah diterapkan dalam pekerjaan sehari-hari</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="applicability[ap1]" value="{{ $i }}"
-                                                   {{ ($applicabilityData['ap1'] ?? old('applicability.ap1')) == $i ? 'checked' : '' }}
-                                                   class="text-indigo-600 focus:ring-indigo-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('applicability[ap1]', $applicabilityData, 'ap1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Materi pelatihan dapat meningkatkan produktivitas kerja</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="applicability[ap2]" value="{{ $i }}"
-                                                   {{ ($applicabilityData['ap2'] ?? old('applicability.ap2')) == $i ? 'checked' : '' }}
-                                                   class="text-indigo-600 focus:ring-indigo-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
+                                {!! renderPerformanceSelect('applicability[ap2]', $applicabilityData, 'ap2') !!}
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Materi pelatihan dapat meningkatkan kualitas kerja</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="applicability[ap3]" value="{{ $i }}"
-                                                   {{ ($applicabilityData['ap3'] ?? old('applicability.ap3')) == $i ? 'checked' : '' }}
-                                                   class="text-indigo-600 focus:ring-indigo-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
-                            </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Materi pelatihan dapat meningkatkan kompetensi pegawai</label>
-                                <div class="flex space-x-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <label class="flex items-center">
-                                            <input type="radio" name="applicability[ap4]" value="{{ $i }}"
-                                                   {{ ($applicabilityData['ap4'] ?? old('applicability.ap4')) == $i ? 'checked' : '' }}
-                                                   class="text-indigo-600 focus:ring-indigo-500" required>
-                                            <span class="ml-1 text-xs">{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

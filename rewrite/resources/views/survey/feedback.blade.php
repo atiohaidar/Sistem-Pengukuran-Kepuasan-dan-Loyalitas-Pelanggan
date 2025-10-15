@@ -14,7 +14,7 @@
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="bg-gradient-to-r from-red-600 to-pink-600 px-6 py-4">
                 <h2 class="text-2xl font-bold text-white">VI. Kritik dan Saran</h2>
-                <p class="text-red-100 mt-1">Berikan kritik dan saran untuk meningkatkan kualitas layanan pelatihan</p>
+                <p class="text-red-100 mt-1">>Dengan anda mengisi kritik dan saran ini, diharapkan kualitas layanan pelatihan ini akan semakin baik dan sesuai dengan kepentingan anda.</p>
             </div>
 
             <form method="POST" action="{{ route('survey.store', ['step' => 'feedback']) }}" class="p-6">

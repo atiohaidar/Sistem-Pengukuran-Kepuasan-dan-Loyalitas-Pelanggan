@@ -3,241 +3,203 @@
 namespace App\Http\Controllers;
 
 use App\Models\PelatihanSurveyResponse;
-use App\Services\SurveyCalculationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SurveyDashboardController extends Controller
 {
-    protected $surveyService;
-
-    public function __construct(SurveyCalculationService $surveyService)
-    {
-        $this->surveyService = $surveyService;
-    }
-
     /**
-     * Display survey dashboard with statistics and data management
+     * Display survey responses management dashboard
      */
     public function index(Request $request)
     {
-        // Get filter parameters
-        $status = $request->get('status', 'all');
-        $dateFrom = $request->get('date_from');
-        $dateTo = $request->get('date_to');
-        $surveyType = $request->get('survey_type', 'all');
+        // Get survey responses with pagination
+        $surveyResponses = PelatihanSurveyResponse::with([])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        // Build query with filters
-        $query = PelatihanSurveyResponse::query();
+        // Get survey statistics
+        $stats = [
+            'total_responses' => PelatihanSurveyResponse::count(),
+            'completed_responses' => PelatihanSurveyResponse::where('status', 'completed')->count(),
+            'draft_responses' => PelatihanSurveyResponse::where('status', 'draft')->count(),
+            'unique_sessions' => PelatihanSurveyResponse::distinct('session_token')->count(),
+        ];
 
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
-
-        if ($dateFrom) {
-            $query->whereDate('created_at', '>=', $dateFrom);
-        }
-
-        if ($dateTo) {
-            $query->whereDate('created_at', '<=', $dateTo);
-        }
-
-        if ($surveyType !== 'all') {
-            $query->where('survey_type', $surveyType);
-        }
-
-        // Get paginated results
-        $surveys = $query->orderBy('created_at', 'desc')->paginate(15);
-
-        // Get basic statistics
-        $stats = $this->getBasicStatistics($request);
-
-        return view('dashboard.surveys.index', compact('surveys', 'stats', 'status', 'dateFrom', 'dateTo', 'surveyType'));
+        return view('dashboard.survey-management', compact('surveyResponses', 'stats'));
     }
 
     /**
-     * Show the form for creating a new survey response
+     * Show detailed view of a specific survey response
      */
-    public function create()
+    public function show($id)
     {
-        return view('dashboard.surveys.create');
+        $surveyResponse = PelatihanSurveyResponse::findOrFail($id);
+
+        // Define question labels for better display
+        $questionLabels = $this->getQuestionLabels();
+
+        return view('dashboard.survey-detail', compact('surveyResponse', 'questionLabels'));
     }
 
     /**
-     * Store a newly created survey response
+     * Get question labels for display
      */
-    public function store(Request $request)
+    private function getQuestionLabels()
     {
-        $validated = $request->validate([
-            'survey_type' => 'required|string',
-            'profile_data.email' => 'required|email',
-            'profile_data.whatsapp' => 'required|string',
-            'profile_data.jenis_kelamin' => 'required|in:L,P',
-            'profile_data.usia' => 'required|integer|min:18|max:100',
-            'profile_data.pekerjaan' => 'required|string',
-            'profile_data.pekerjaan_lain' => 'nullable|string',
-            'profile_data.domisili' => 'required|string',
-            'importance_answers' => 'required|array',
-            'performance_answers' => 'required|array',
-            'satisfaction_answers' => 'required|array',
-            'loyalty_answers' => 'required|array',
-            'feedback_answers' => 'required|array',
-            'status' => 'required|in:draft,completed'
-        ]);
-
-        // Generate session token
-        $validated['session_token'] = PelatihanSurveyResponse::generateSessionToken();
-
-        // Set timestamps
-        if ($validated['status'] === 'completed') {
-            $validated['completed_at'] = now();
-        }
-        $validated['started_at'] = now();
-
-        PelatihanSurveyResponse::create($validated);
-
-        return redirect()->route('dashboard.surveys.index')
-            ->with('success', 'Data survei berhasil ditambahkan.');
-    }
-
-    /**
-     * Display the specified survey response
-     */
-    public function show(PelatihanSurveyResponse $survey)
-    {
-        // Calculate individual survey results
-        $responses = [$survey->toArray()];
-        $analysis = $this->surveyService->calculateCompleteSurveyResults($responses);
-
-        return view('dashboard.surveys.show', compact('survey', 'analysis'));
-    }
-
-    /**
-     * Show the form for editing the specified survey response
-     */
-    public function edit(PelatihanSurveyResponse $survey)
-    {
-        return view('dashboard.surveys.edit', compact('survey'));
-    }
-
-    /**
-     * Update the specified survey response
-     */
-    public function update(Request $request, PelatihanSurveyResponse $survey)
-    {
-        $validated = $request->validate([
-            'survey_type' => 'required|string',
-            'profile_data.email' => 'required|email',
-            'profile_data.whatsapp' => 'required|string',
-            'profile_data.jenis_kelamin' => 'required|in:L,P',
-            'profile_data.usia' => 'required|integer|min:18|max:100',
-            'profile_data.pekerjaan' => 'required|string',
-            'profile_data.pekerjaan_lain' => 'nullable|string',
-            'profile_data.domisili' => 'required|string',
-            'importance_answers' => 'required|array',
-            'performance_answers' => 'required|array',
-            'satisfaction_answers' => 'required|array',
-            'loyalty_answers' => 'required|array',
-            'feedback_answers' => 'required|array',
-            'status' => 'required|in:draft,completed'
-        ]);
-
-        // Update completed_at if status changed to completed
-        if ($validated['status'] === 'completed' && $survey->status !== 'completed') {
-            $validated['completed_at'] = now();
-        }
-
-        $survey->update($validated);
-
-        return redirect()->route('dashboard.surveys.index')
-            ->with('success', 'Data survei berhasil diperbarui.');
-    }
-
-    /**
-     * Remove the specified survey response
-     */
-    public function destroy(PelatihanSurveyResponse $survey)
-    {
-        $survey->delete();
-
-        return redirect()->route('dashboard.surveys.index')
-            ->with('success', 'Data survei berhasil dihapus.');
-    }
-
-    /**
-     * Get basic statistics for dashboard
-     */
-    private function getBasicStatistics(Request $request)
-    {
-        $query = PelatihanSurveyResponse::query();
-
-        // Apply same filters as main query
-        $status = $request->get('status', 'all');
-        $dateFrom = $request->get('date_from');
-        $dateTo = $request->get('date_to');
-        $surveyType = $request->get('survey_type', 'all');
-
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
-
-        if ($dateFrom) {
-            $query->whereDate('created_at', '>=', $dateFrom);
-        }
-
-        if ($dateTo) {
-            $query->whereDate('created_at', '<=', $dateTo);
-        }
-
-        if ($surveyType !== 'all') {
-            $query->where('survey_type', $surveyType);
-        }
-
-        $totalSurveys = $query->count();
-        $completedSurveys = (clone $query)->where('status', 'completed')->count();
-        $draftSurveys = (clone $query)->where('status', 'draft')->count();
-
-        // Get completion rate
-        $completionRate = $totalSurveys > 0 ? round(($completedSurveys / $totalSurveys) * 100, 1) : 0;
-
-        // Get recent surveys (last 7 days)
-        $recentSurveys = (clone $query)->where('created_at', '>=', now()->subDays(7))->count();
-
-        // Get average completion time for completed surveys
-        $avgCompletionTime = (clone $query)->where('status', 'completed')
-            ->whereNotNull('started_at')
-            ->whereNotNull('completed_at')
-            ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, started_at, completed_at)) as avg_time')
-            ->first()
-            ->avg_time ?? 0;
-
         return [
-            'total_surveys' => $totalSurveys,
-            'completed_surveys' => $completedSurveys,
-            'draft_surveys' => $draftSurveys,
-            'completion_rate' => $completionRate,
-            'recent_surveys' => $recentSurveys,
-            'avg_completion_time' => round($avgCompletionTime, 1)
+            // Importance questions
+            'importance_answers' => [
+                'reliability' => [
+                    'r1' => 'Materi pelatihan disampaikan dengan jelas dan mudah dipahami',
+                    'r2' => 'Materi pelatihan sesuai dengan kebutuhan peserta',
+                    'r3' => 'Penyampaian materi pelatihan terstruktur dan sistematis',
+                    'r4' => 'Durasi pelatihan sesuai dengan kebutuhan',
+                    'r5' => 'Waktu pelatihan tidak terlalu pagi atau terlalu malam',
+                    'r6' => 'Fasilitas pendukung pelatihan (proyektor, sound system, dll) berfungsi dengan baik',
+                    'r7' => 'Pengajar/instruktur memiliki kompetensi yang memadai',
+                ],
+                'assurance' => [
+                    'a1' => 'Pengajar/instruktur memberikan jaminan bahwa materi yang disampaikan benar dan akurat',
+                    'a2' => 'Pengajar/instruktur memberikan kesempatan bertanya dan menjawab',
+                    'a3' => 'Pengajar/instruktur memberikan motivasi kepada peserta',
+                    'a4' => 'Pengajar/instruktur bersikap ramah dan sopan',
+                ],
+                'tangible' => [
+                    't1' => 'Ruangan pelatihan bersih dan nyaman',
+                    't2' => 'Ruangan pelatihan memiliki ventilasi yang baik',
+                    't3' => 'Ruangan pelatihan memiliki pencahayaan yang cukup',
+                    't4' => 'Kursi dan meja pelatihan dalam kondisi baik',
+                    't5' => 'Sarana pendukung pelatihan (flipchart, spidol, dll) tersedia',
+                    't6' => 'Makanan dan minuman selama pelatihan sesuai dengan kebutuhan',
+                ],
+                'empathy' => [
+                    'e1' => 'Panitia pelatihan memberikan perhatian khusus kepada peserta yang membutuhkan',
+                    'e2' => 'Panitia pelatihan memahami kebutuhan peserta',
+                    'e3' => 'Panitia pelatihan memberikan pelayanan yang personal',
+                    'e4' => 'Panitia pelatihan memberikan informasi yang jelas tentang pelatihan',
+                    'e5' => 'Panitia pelatihan mudah dihubungi untuk konsultasi',
+                ],
+                'responsiveness' => [
+                    'rs1' => 'Panitia pelatihan merespons dengan cepat terhadap pertanyaan peserta',
+                    'rs2' => 'Panitia pelatihan memberikan solusi yang tepat terhadap masalah yang dihadapi peserta',
+                ],
+                'applicability' => [
+                    'ap1' => 'Materi pelatihan dapat diterapkan dalam pekerjaan sehari-hari',
+                    'ap2' => 'Materi pelatihan memberikan manfaat praktis bagi peserta',
+                ],
+            ],
+            // Performance questions (same as importance for now)
+            'performance_answers' => [
+                'reliability' => [
+                    'r1' => 'Materi pelatihan disampaikan dengan jelas dan mudah dipahami',
+                    'r2' => 'Materi pelatihan sesuai dengan kebutuhan peserta',
+                    'r3' => 'Penyampaian materi pelatihan terstruktur dan sistematis',
+                    'r4' => 'Durasi pelatihan sesuai dengan kebutuhan',
+                    'r5' => 'Waktu pelatihan tidak terlalu pagi atau terlalu malam',
+                    'r6' => 'Fasilitas pendukung pelatihan (proyektor, sound system, dll) berfungsi dengan baik',
+                    'r7' => 'Pengajar/instruktur memiliki kompetensi yang memadai',
+                ],
+                'assurance' => [
+                    'a1' => 'Pengajar/instruktur memberikan jaminan bahwa materi yang disampaikan benar dan akurat',
+                    'a2' => 'Pengajar/instruktur memberikan kesempatan bertanya dan menjawab',
+                    'a3' => 'Pengajar/instruktur memberikan motivasi kepada peserta',
+                    'a4' => 'Pengajar/instruktur bersikap ramah dan sopan',
+                ],
+                'tangible' => [
+                    't1' => 'Ruangan pelatihan bersih dan nyaman',
+                    't2' => 'Ruangan pelatihan memiliki ventilasi yang baik',
+                    't3' => 'Ruangan pelatihan memiliki pencahayaan yang cukup',
+                    't4' => 'Kursi dan meja pelatihan dalam kondisi baik',
+                    't5' => 'Sarana pendukung pelatihan (flipchart, spidol, dll) tersedia',
+                    't6' => 'Makanan dan minuman selama pelatihan sesuai dengan kebutuhan',
+                ],
+                'empathy' => [
+                    'e1' => 'Panitia pelatihan memberikan perhatian khusus kepada peserta yang membutuhkan',
+                    'e2' => 'Panitia pelatihan memahami kebutuhan peserta',
+                    'e3' => 'Panitia pelatihan memberikan pelayanan yang personal',
+                    'e4' => 'Panitia pelatihan memberikan informasi yang jelas tentang pelatihan',
+                    'e5' => 'Panitia pelatihan mudah dihubungi untuk konsultasi',
+                ],
+                'responsiveness' => [
+                    'rs1' => 'Panitia pelatihan merespons dengan cepat terhadap pertanyaan peserta',
+                    'rs2' => 'Panitia pelatihan memberikan solusi yang tepat terhadap masalah yang dihadapi peserta',
+                ],
+                'applicability' => [
+                    'ap1' => 'Materi pelatihan dapat diterapkan dalam pekerjaan sehari-hari',
+                    'ap2' => 'Materi pelatihan memberikan manfaat praktis bagi peserta',
+                ],
+            ],
+            // Satisfaction questions
+            'satisfaction_answers' => [
+                'k1' => 'Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelatihan ini?',
+                'k2' => 'Seberapa besar manfaat yang Anda peroleh dari pelatihan ini?',
+                'k3' => 'Apakah Anda akan merekomendasikan pelatihan ini kepada orang lain?',
+            ],
+            // Loyalty questions
+            'loyalty_answers' => [
+                'l1' => 'Apakah Anda akan mengikuti pelatihan serupa di masa depan?',
+                'l2' => 'Apakah Anda akan menggunakan jasa pelatihan dari institusi ini lagi?',
+                'l3' => 'Apakah Anda akan merekomendasikan institusi ini kepada orang lain?',
+            ],
         ];
     }
 
     /**
-     * Export survey data
+     * Delete a survey response
+     */
+    public function destroy($id)
+    {
+        $surveyResponse = PelatihanSurveyResponse::findOrFail($id);
+        $surveyResponse->delete();
+
+        return redirect()->route('dashboard.survey-management')
+            ->with('success', 'Data survei berhasil dihapus');
+    }
+
+    /**
+     * Export survey data to CSV
      */
     public function export(Request $request)
     {
-        // This could be expanded to export to CSV/Excel
-        $query = PelatihanSurveyResponse::query();
+        $filename = 'survey_responses_' . date('Y-m-d_H-i-s') . '.csv';
 
-        // Apply filters
-        $status = $request->get('status', 'all');
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
 
-        $surveys = $query->get();
+        $callback = function() {
+            $file = fopen('php://output', 'w');
 
-        // For now, return JSON export
-        return response()->json($surveys);
+            // CSV headers
+            fputcsv($file, [
+                'ID', 'Session Token', 'Email', 'WhatsApp', 'Jenis Kelamin', 'Usia',
+                'Pekerjaan', 'Domisili', 'Status', 'Started At', 'Completed At'
+            ]);
+
+            // Get all responses
+            PelatihanSurveyResponse::chunk(100, function($responses) use ($file) {
+                foreach ($responses as $response) {
+                    fputcsv($file, [
+                        $response->id,
+                        $response->session_token,
+                        $response->profile_data['email'] ?? '',
+                        $response->profile_data['whatsapp'] ?? '',
+                        $response->profile_data['jenis_kelamin'] ?? '',
+                        $response->profile_data['usia'] ?? '',
+                        $response->profile_data['pekerjaan'] ?? '',
+                        $response->profile_data['domisili'] ?? '',
+                        $response->status,
+                        $response->started_at,
+                        $response->completed_at,
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

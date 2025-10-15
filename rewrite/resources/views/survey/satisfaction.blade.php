@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.mylayout')
 
 @section('title', 'Kepuasan Responden - Survei Kepuasan Pelatihan')
 

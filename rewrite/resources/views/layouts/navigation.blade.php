@@ -21,9 +21,9 @@
                     <x-nav-link :href="route('customer-management-evaluation.welcome')" :active="request()->routeIs('customer-management-evaluation.*')">
                         {{ __('Evaluasi Manajemen') }}
                     </x-nav-link>
-                    <!-- <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')">
+                    <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')">
                         {{ __('Manajemen Survei') }}
-                    </x-nav-link> -->
+                    </x-nav-link>
                 </div>
             </div>
 

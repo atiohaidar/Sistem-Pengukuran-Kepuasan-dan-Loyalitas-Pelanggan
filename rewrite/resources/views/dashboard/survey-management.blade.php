@@ -1,128 +1,169 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Manajemen Data Survei') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Manajemen Data Survei')
-
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Manajemen Data Survei Pelatihan</h3>
-                    <div class="card-tools">
-                        <a href="{{ route('dashboard.survey-management.export') }}" class="btn btn-success btn-sm">
-                            <i class="fas fa-download"></i> Export CSV
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <!-- Header with Export Button -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-medium text-gray-900">Manajemen Data Survei Pelatihan</h3>
+                        <a href="{{ route('dashboard.survey-management.export') }}"
+                           class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export CSV
                         </a>
                     </div>
-                </div>
 
-                <!-- Statistics Cards -->
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-info">
-                                <div class="inner">
-                                    <h3>{{ $stats['total_responses'] }}</h3>
-                                    <p>Total Responden</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>{{ $stats['completed_responses'] }}</h3>
-                                    <p>Survei Selesai</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-check-circle"></i>
+                    <!-- Statistics Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-blue-50 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Total Responden</dt>
+                                            <dd class="text-lg font-medium text-gray-900">{{ $stats['total_responses'] }}</dd>
+                                        </dl>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-warning">
-                                <div class="inner">
-                                    <h3>{{ $stats['draft_responses'] }}</h3>
-                                    <p>Survei Draft</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-edit"></i>
+
+                        <div class="bg-green-50 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Survei Selesai</dt>
+                                            <dd class="text-lg font-medium text-gray-900">{{ $stats['completed_responses'] }}</dd>
+                                        </dl>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-primary">
-                                <div class="inner">
-                                    <h3>{{ $stats['unique_sessions'] }}</h3>
-                                    <p>Sesi Unik</p>
+
+                        <div class="bg-yellow-50 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Survei Draft</dt>
+                                            <dd class="text-lg font-medium text-gray-900">{{ $stats['draft_responses'] }}</dd>
+                                        </dl>
+                                    </div>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Sesi Unik</dt>
+                                            <dd class="text-lg font-medium text-gray-900">{{ $stats['unique_sessions'] }}</dd>
+                                        </dl>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Survey Responses Table -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Email</th>
-                                    <th>Jenis Kelamin</th>
-                                    <th>Usia</th>
-                                    <th>Pekerjaan</th>
-                                    <th>Domisili</th>
-                                    <th>Status</th>
-                                    <th>Dibuat</th>
-                                    <th>Aksi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Kelamin</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usia</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pekerjaan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domisili</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dibuat</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($surveyResponses as $response)
                                 <tr>
-                                    <td>{{ $response->id }}</td>
-                                    <td>{{ $response->profile_data['email'] ?? '-' }}</td>
-                                    <td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $response->id }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $response->profile_data['email'] ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         @if($response->profile_data['jenis_kelamin'] ?? null)
                                             {{ $response->profile_data['jenis_kelamin'] === 'L' ? 'Laki-laki' : 'Perempuan' }}
                                         @else
                                             -
                                         @endif
                                     </td>
-                                    <td>{{ $response->profile_data['usia'] ?? '-' }}</td>
-                                    <td>{{ $response->profile_data['pekerjaan'] ?? '-' }}</td>
-                                    <td>{{ $response->profile_data['domisili'] ?? '-' }}</td>
-                                    <td>
-                                        <span class="badge {{ $response->status === 'completed' ? 'badge-success' : 'badge-warning' }}">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $response->profile_data['usia'] ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $response->profile_data['pekerjaan'] ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $response->profile_data['domisili'] ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $response->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             {{ $response->status === 'completed' ? 'Selesai' : 'Draft' }}
                                         </span>
                                     </td>
-                                    <td>{{ $response->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>
-                                        <a href="{{ route('dashboard.survey-management.show', $response->id) }}"
-                                           class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye"></i> Detail
-                                        </a>
-                                        <form action="{{ route('dashboard.survey-management.destroy', $response->id) }}"
-                                              method="POST" class="d-inline"
-                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </button>
-                                        </form>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $response->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ route('dashboard.survey-management.show', $response->id) }}"
+                                               class="text-indigo-600 hover:text-indigo-900">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                            </a>
+                                            <form action="{{ route('dashboard.survey-management.destroy', $response->id) }}"
+                                                  method="POST" class="inline"
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="9" class="text-center">
-                                        <div class="alert alert-info">
-                                            <i class="fas fa-info-circle"></i> Belum ada data survei.
+                                    <td colspan="9" class="px-6 py-4 text-center text-gray-500">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            Belum ada data survei.
                                         </div>
                                     </td>
                                 </tr>
@@ -133,7 +174,7 @@
 
                     <!-- Pagination -->
                     @if($surveyResponses->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
+                    <div class="mt-6">
                         {{ $surveyResponses->links() }}
                     </div>
                     @endif
@@ -141,42 +182,4 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
-
-@push('styles')
-<style>
-.small-box {
-    border-radius: 0.25rem;
-    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-    margin-bottom: 1rem;
-}
-
-.small-box .inner {
-    padding: 10px;
-}
-
-.small-box .icon {
-    color: rgba(0,0,0,0.15);
-    z-index: 0;
-}
-
-.small-box .icon > i {
-    font-size: 70px;
-    top: 20px;
-}
-
-.table-responsive {
-    max-height: 600px;
-    overflow-y: auto;
-}
-</style>
-@endpush
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    // Initialize any additional JavaScript if needed
-});
-</script>
-@endpush
+</x-app-layout>

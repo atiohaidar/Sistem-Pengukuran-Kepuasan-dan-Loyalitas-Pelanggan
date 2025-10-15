@@ -33,5 +33,18 @@ Route::prefix('survey')->name('survey.')->group(function () {
     Route::get('/complete', [SurveyController::class, 'complete'])->name('complete');
 });
 
+// Customer Management Evaluation Routes
+use App\Http\Controllers\CustomerManagementEvaluationController;
+Route::prefix('customer-management-evaluation')->name('customer-management-evaluation.')->group(function () {
+    Route::get('/', [CustomerManagementEvaluationController::class, 'welcome'])->name('welcome');
+    Route::match(['get', 'post'], '/maturity', [CustomerManagementEvaluationController::class, 'maturity'])->name('maturity');
+    Route::post('/maturity/store', [CustomerManagementEvaluationController::class, 'storeMaturity'])->name('store-maturity');
+    Route::get('/priority', [CustomerManagementEvaluationController::class, 'priority'])->name('priority');
+    Route::post('/priority', [CustomerManagementEvaluationController::class, 'storePriority'])->name('store-priority');
+    Route::get('/readiness', [CustomerManagementEvaluationController::class, 'readiness'])->name('readiness');
+    Route::post('/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
+    Route::get('/dashboard', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
+});
+
 
 require __DIR__.'/auth.php';

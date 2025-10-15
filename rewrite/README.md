@@ -16,3 +16,6 @@ berarti yang pertama aku harus
 
 todo sementara
 rencanannya aku mau nge buat list pertanyaan nya dulu kali ya
+
+
+ok sekarang aku mau buat list pertanyaan untuk data2 nya ada aplikasi evaluasi nya. nah aku mau tulis dulu list pertanyaan nya. dan jawaban jawabannya

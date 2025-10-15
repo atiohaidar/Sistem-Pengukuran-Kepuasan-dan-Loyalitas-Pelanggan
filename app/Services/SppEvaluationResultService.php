@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\SppEvaluation;
+use App\Models\SppEvaluation;
 use Illuminate\Support\Str;
 
 class SppEvaluationResultService

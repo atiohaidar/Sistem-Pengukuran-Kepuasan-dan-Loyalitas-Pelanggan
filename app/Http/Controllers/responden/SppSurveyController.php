@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\responden;
 
 use App\Http\Controllers\Controller;
-use App\SppEvaluation;
+use App\Models\SppEvaluation;
 use App\Services\SppEvaluationResultService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

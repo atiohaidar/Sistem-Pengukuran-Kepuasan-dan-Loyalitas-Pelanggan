@@ -55,10 +55,29 @@ class GrafikService
         $this->calculator = $calculator;
     }
 
+
+
     /**
-     * Helper method untuk mendapatkan data dimensi berdasarkan kategori (persepsi/harapan)
+     * Get dimension data for perception (persepsi)
      */
-    private function getDimensionDataByCategory(string $dimensionKey, string $category): array
+    private function getDimensionData(string $dimensionKey): array
+    {
+        return $this->getDimensionDataByCategoryUltraOptimized($dimensionKey, 'persepsi');
+    }
+
+    /**
+     * Get dimension data for importance (harapan)
+     */
+    private function getDimensionImportanceData(string $dimensionKey): array
+    {
+        return $this->getDimensionDataByCategoryUltraOptimized($dimensionKey, 'harapan');
+    }
+
+    /**
+     * Ultra-optimized method menggunakan raw SQL untuk menghindari memory issues
+     * Menggunakan JSON_EXTRACT dan aggregation di database level
+     */
+    private function getDimensionDataByCategoryUltraOptimized(string $dimensionKey, string $category): array
     {
         if (!isset(self::DIMENSION_CONFIG[$dimensionKey])) {
             throw new \InvalidArgumentException("Dimension '{$dimensionKey}' not found in configuration");
@@ -67,57 +86,122 @@ class GrafikService
         $config = self::DIMENSION_CONFIG[$dimensionKey];
         $results = [];
 
+        // Build dynamic SQL untuk extract semua keys sekaligus
+        $jsonExtracts = [];
+
         foreach ($config['keys'] as $key) {
-            $count = Jawaban::getCountDimensi($config['type'], $category);
-            $sum = $this->getSumNilaiDimensiByCategory($config['type'], [$key], $category);
-            $average = $this->calculator->calculateAverage($sum, $count);
-            $results[$key . '_count'] = $count;
-            $results['rata_' . $key] = $average;
+            $jsonExtracts[] = "AVG(CAST(JSON_EXTRACT(nilai, '$." . $key . "') AS DECIMAL(10,2))) as avg_{$key}";
+            $jsonExtracts[] = "COUNT(CASE WHEN JSON_EXTRACT(nilai, '$." . $key . "') IS NOT NULL THEN 1 END) as count_{$key}";
+        }
+
+        $sql = "
+            SELECT " . implode(', ', $jsonExtracts) . "
+            FROM tbl_jawaban
+            WHERE dimensi_type = ? AND kategori = ?
+        ";
+
+        $aggregatedData = \DB::select($sql, [$config['type'], $category]);
+
+        if (empty($aggregatedData)) {
+            // Return empty results
+            foreach ($config['keys'] as $key) {
+                $results[$key . '_count'] = 0;
+                $results['rata_' . $key] = 0.0;
+            }
+            return $results;
+        }
+
+        $data = $aggregatedData[0];
+
+        foreach ($config['keys'] as $key) {
+            $results[$key . '_count'] = (int) $data->{'count_' . $key};
+            $results['rata_' . $key] = (float) $data->{'avg_' . $key};
         }
 
         return $results;
     }
 
     /**
-     * Get dimension data for perception (persepsi)
-     */
-    private function getDimensionData(string $dimensionKey): array
-    {
-        return $this->getDimensionDataByCategory($dimensionKey, 'persepsi');
-    }
-
-    /**
-     * Get dimension data for importance (harapan)
-     */
-    private function getDimensionImportanceData(string $dimensionKey): array
-    {
-        return $this->getDimensionDataByCategory($dimensionKey, 'harapan');
-    }
-
-    /**
      * Get summary data for multiple dimensions with gap and deviation calculations
+     * Ultra-optimized version using single query for all dimensions and categories
      */
     private function getMultipleDimensionsData(array $dimensionKeys): array
     {
         $results = [];
 
-        foreach ($dimensionKeys as $key) {
-            $dimensionData = $this->getDimensionData($key);
-            $config = self::DIMENSION_CONFIG[$key];
+        // Single query untuk mengambil semua data dimensi dan kategori sekaligus
+        $allData = collect();
 
-            // Calculate gap and deviation for the dimension
-            $keys = $config['keys'];
+        foreach ($dimensionKeys as $dimKey) {
+            if (!isset(self::DIMENSION_CONFIG[$dimKey])) {
+                continue;
+            }
+
+            $config = self::DIMENSION_CONFIG[$dimKey];
+
+            // Get both perception and importance data
+            $perceptionData = Jawaban::dimensi($config['type'])->kategori('persepsi')->get();
+            $importanceData = Jawaban::dimensi($config['type'])->kategori('harapan')->get();
+
+            $allData = $allData->merge($perceptionData->map(function($item) use ($dimKey, $config) {
+                $item->dimension_key = $dimKey;
+                $item->category = 'persepsi';
+                $item->dimension_config = $config;
+                return $item;
+            }));
+
+            $allData = $allData->merge($importanceData->map(function($item) use ($dimKey, $config) {
+                $item->dimension_key = $dimKey;
+                $item->category = 'harapan';
+                $item->dimension_config = $config;
+                return $item;
+            }));
+        }
+
+        // Process all data in memory
+        foreach ($dimensionKeys as $dimKey) {
+            if (!isset(self::DIMENSION_CONFIG[$dimKey])) {
+                continue;
+            }
+
+            $config = self::DIMENSION_CONFIG[$dimKey];
+            $dimData = $allData->where('dimension_key', $dimKey);
+
+            $perceptionData = $dimData->where('category', 'persepsi');
+            $importanceData = $dimData->where('category', 'harapan');
+
+            $dimensionData = [];
             $perceptionValues = [];
             $importanceValues = [];
 
-            foreach ($keys as $keyName) {
-                $perceptionValue = $dimensionData['rata_' . $keyName] ?? 0;
-                $perceptionValues[] = $perceptionValue;
+            foreach ($config['keys'] as $key) {
+                // Calculate perception averages
+                $sum = 0;
+                $count = 0;
+                foreach ($perceptionData as $item) {
+                    $nilai = $item->getNilai($key);
+                    if ($nilai !== null) {
+                        $sum += (float) $nilai;
+                        $count++;
+                    }
+                }
+                $perceptionAvg = $count > 0 ? $this->calculator->calculateAverage($sum, $count) : 0;
+                $dimensionData['rata_' . $key] = $perceptionAvg;
+                $dimensionData[$key . '_count'] = $count;
+                $perceptionValues[] = $perceptionAvg;
 
-                // Get importance (harapan) data for this dimension
-                $importanceData = $this->getDimensionImportanceData($key);
-                $importanceValue = $importanceData['rata_' . $keyName] ?? $perceptionValue; // Fallback to perception if no importance data
-                $importanceValues[] = $importanceValue;
+                // Calculate importance averages
+                $sum = 0;
+                $count = 0;
+                foreach ($importanceData as $item) {
+                    $nilai = $item->getNilai($key);
+                    if ($nilai !== null) {
+                        $sum += (float) $nilai;
+                        $count++;
+                    }
+                }
+                $importanceAvg = $count > 0 ? $this->calculator->calculateAverage($sum, $count) : $perceptionAvg; // Fallback to perception
+                $importanceValues[] = $importanceAvg;
             }
 
             $avgPerception = $this->calculator->calculateDimensionGroupAverage($perceptionValues);
@@ -125,7 +209,7 @@ class GrafikService
             $gap = $this->calculator->calculateGap($avgPerception, $avgImportance);
             $deviation = $this->calculator->calculateDeviation($gap, $avgPerception);
 
-            $results[$key] = array_merge($dimensionData, [
+            $results[$dimKey] = array_merge($dimensionData, [
                 'gap' => $gap,
                 'deviation' => $deviation,
                 'avg_perception' => $avgPerception,
@@ -135,33 +219,57 @@ class GrafikService
 
         return $results;
     }
+    /**
+     * Optimized version of getGrafikKepuasanData using single query
+     */
     public function getGrafikKepuasanData(): array
     {
-            $k1_count = Jawaban::getCountDimensi('kp');
-        $k1_sum = $this->getSumNilaiDimensi('kp', ['k1']);
-        $total_rata_k1 = $this->calculator->calculateAverage($k1_sum, $k1_count);
+        // Single query untuk mengambil semua data KP sekaligus
+        $kpData = Jawaban::dimensi('kp')->get();
 
-        $k2_count = Jawaban::getCountDimensi('kp');
-        $k2_sum = $this->getSumNilaiDimensi('kp', ['k2']);
-        $total_rata_k2 = $this->calculator->calculateAverage($k2_sum, $k2_count);
+        // Hitung untuk k1, k2, k3 dalam satu pass
+        $k1_sum = $k2_sum = $k3_sum = 0;
+        $k1_count = $k2_count = $k3_count = 0;
 
-        $k3_count = Jawaban::getCountDimensi('kp');
-        $k3_sum = $this->getSumNilaiDimensi('kp', ['k3']);
-        $total_rata_k3 = $this->calculator->calculateAverage($k3_sum, $k3_count);
+        // Hitung rating distribution untuk k1
+        $rating_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
-        // Calculate gap using calculator
+        foreach ($kpData as $item) {
+            // K1 calculations
+            $k1_val = $item->getNilai('k1');
+            if ($k1_val !== null) {
+                $k1_sum += (float) $k1_val;
+                $k1_count++;
+                $rating = (int) $k1_val;
+                if (isset($rating_counts[$rating])) {
+                    $rating_counts[$rating]++;
+                }
+            }
+
+            // K2 calculations
+            $k2_val = $item->getNilai('k2');
+            if ($k2_val !== null) {
+                $k2_sum += (float) $k2_val;
+                $k2_count++;
+            }
+
+            // K3 calculations
+            $k3_val = $item->getNilai('k3');
+            if ($k3_val !== null) {
+                $k3_sum += (float) $k3_val;
+                $k3_count++;
+            }
+        }
+
+        $total_rata_k1 = $k1_count > 0 ? $this->calculator->calculateAverage($k1_sum, $k1_count) : 0;
+        $total_rata_k2 = $k2_count > 0 ? $this->calculator->calculateAverage($k2_sum, $k2_count) : 0;
+        $total_rata_k3 = $k3_count > 0 ? $this->calculator->calculateAverage($k3_sum, $k3_count) : 0;
+
         $gap = $this->calculator->calculateGap($total_rata_k3, $total_rata_k2);
 
-        // Calculate rating counts for k1 (loyalty probability)
-        $k1_rata_count_1 = $this->getCountByRating('kp', 'k1', 1);
-        $k1_rata_count_2 = $this->getCountByRating('kp', 'k1', 2);
-        $k1_rata_count_3 = $this->getCountByRating('kp', 'k1', 3);
-        $k1_rata_count_4 = $this->getCountByRating('kp', 'k1', 4);
-        $k1_rata_count_5 = $this->getCountByRating('kp', 'k1', 5);
-
-        // Calculate loyalty probability using calculator
+        // Calculate loyalty probability
         $loyaltyData = $this->calculator->calculateLoyaltyProbability(
-            [$k1_rata_count_1, $k1_rata_count_2, $k1_rata_count_3, $k1_rata_count_4, $k1_rata_count_5],
+            array_values($rating_counts),
             $k1_count
         );
 
@@ -173,12 +281,11 @@ class GrafikService
             'k3_count' => $k3_count,
             'total_rata_k3' => $total_rata_k3,
             'gap' => $gap,
-            'k1_rata_count_1' => $k1_rata_count_1,
-            'k1_rata_count_2' => $k1_rata_count_2,
-            'k1_rata_count_3' => $k1_rata_count_3,
-            'k1_rata_count_4' => $k1_rata_count_4,
-            'k1_rata_count_5' => $k1_rata_count_5,
-            // Add loyalty probability data
+            'k1_rata_count_1' => $rating_counts[1],
+            'k1_rata_count_2' => $rating_counts[2],
+            'k1_rata_count_3' => $rating_counts[3],
+            'k1_rata_count_4' => $rating_counts[4],
+            'k1_rata_count_5' => $rating_counts[5],
             'loyalty_probability' => $loyaltyData['total_probability'],
             'loyalty_percentages' => $loyaltyData['percentages'],
             'loyalty_weighted_sums' => $loyaltyData['weighted_sums'],
@@ -269,27 +376,68 @@ class GrafikService
     /**
      * Get data untuk grafik loyalty & parasuraman (LP)
      */
+    /**
+     * Optimized version of getGrafikLoyaltyData using single query
+     */
     public function getGrafikLoyaltyData(): array
     {
-        // Calculate basic stats for L1, L2, L3
-        $l1_count = Jawaban::getCountDimensi('lp');
-        $l1_sum = $this->getSumNilaiDimensi('lp', ['l1']);
-        $rata_l1 = $this->calculator->calculateAverage($l1_sum, $l1_count);
+        // Single query untuk mengambil semua data LP sekaligus
+        $lpData = Jawaban::dimensi('lp')->get();
 
-        $l2_count = Jawaban::getCountDimensi('lp');
-        $l2_sum = $this->getSumNilaiDimensi('lp', ['l2']);
-        $rata_l2 = $this->calculator->calculateAverage($l2_sum, $l2_count);
+        // Hitung untuk l1, l2, l3 dalam satu pass
+        $l1_sum = $l2_sum = $l3_sum = 0;
+        $l1_count = $l2_count = $l3_count = 0;
 
-        $l3_count = Jawaban::getCountDimensi('lp');
-        $l3_sum = $this->getSumNilaiDimensi('lp', ['l3']);
-        $rata_l3 = $this->calculator->calculateAverage($l3_sum, $l3_count);
+        // Hitung rating distributions untuk l1, l2, l3
+        $l1_ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        $l2_ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        $l3_ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
-        // Use helper method to calculate rating distributions
-        $l1_data = $this->calculateLoyaltyRatingDistribution('l1');
-        $l2_data = $this->calculateLoyaltyRatingDistribution('l2');
-        $l3_data = $this->calculateLoyaltyRatingDistribution('l3');
+        foreach ($lpData as $item) {
+            // L1 calculations
+            $l1_val = $item->getNilai('l1');
+            if ($l1_val !== null) {
+                $l1_sum += (float) $l1_val;
+                $l1_count++;
+                $rating = (int) $l1_val;
+                if (isset($l1_ratings[$rating])) {
+                    $l1_ratings[$rating]++;
+                }
+            }
 
-        // Calculate total loyalty index using calculator
+            // L2 calculations
+            $l2_val = $item->getNilai('l2');
+            if ($l2_val !== null) {
+                $l2_sum += (float) $l2_val;
+                $l2_count++;
+                $rating = (int) $l2_val;
+                if (isset($l2_ratings[$rating])) {
+                    $l2_ratings[$rating]++;
+                }
+            }
+
+            // L3 calculations
+            $l3_val = $item->getNilai('l3');
+            if ($l3_val !== null) {
+                $l3_sum += (float) $l3_val;
+                $l3_count++;
+                $rating = (int) $l3_val;
+                if (isset($l3_ratings[$rating])) {
+                    $l3_ratings[$rating]++;
+                }
+            }
+        }
+
+        $rata_l1 = $l1_count > 0 ? $this->calculator->calculateAverage($l1_sum, $l1_count) : 0;
+        $rata_l2 = $l2_count > 0 ? $this->calculator->calculateAverage($l2_sum, $l2_count) : 0;
+        $rata_l3 = $l3_count > 0 ? $this->calculator->calculateAverage($l3_sum, $l3_count) : 0;
+
+        // Calculate loyalty probabilities
+        $l1_probability = $this->calculator->calculateLoyaltyProbability(array_values($l1_ratings), $l1_count);
+        $l2_probability = $this->calculator->calculateLoyaltyProbability(array_values($l2_ratings), $l2_count);
+        $l3_probability = $this->calculator->calculateLoyaltyProbability(array_values($l3_ratings), $l3_count);
+
+        // Calculate total loyalty index
         $total_l_rata = $this->calculator->calculateLoyaltyIndex($rata_l1, $rata_l2, $rata_l3);
 
         return [
@@ -302,94 +450,34 @@ class GrafikService
             'total_l_rata' => $total_l_rata,
 
             // L1 rating distributions and probability data
-            'l1_rata_count' => $l1_data['total_count'],
-            'l1_rata_count_1' => $l1_data['rating_counts'][0],
-            'l1_rata_count_2' => $l1_data['rating_counts'][1],
-            'l1_rata_count_3' => $l1_data['rating_counts'][2],
-            'l1_rata_count_4' => $l1_data['rating_counts'][3],
-            'l1_rata_count_5' => $l1_data['rating_counts'][4],
-            'l1_probability_data' => $l1_data['probability_data'],
+            'l1_rata_count' => $l1_count,
+            'l1_rata_count_1' => $l1_ratings[1],
+            'l1_rata_count_2' => $l1_ratings[2],
+            'l1_rata_count_3' => $l1_ratings[3],
+            'l1_rata_count_4' => $l1_ratings[4],
+            'l1_rata_count_5' => $l1_ratings[5],
+            'l1_probability_data' => $l1_probability, // Full array instead of just total_probability
+            'l1_percentages' => $l1_probability['percentages'],
 
             // L2 rating distributions and probability data
-            'l2_rata_count' => $l2_data['total_count'],
-            'l2_rata_count_1' => $l2_data['rating_counts'][0],
-            'l2_rata_count_2' => $l2_data['rating_counts'][1],
-            'l2_rata_count_3' => $l2_data['rating_counts'][2],
-            'l2_rata_count_4' => $l2_data['rating_counts'][3],
-            'l2_rata_count_5' => $l2_data['rating_counts'][4],
-            'l2_probability_data' => $l2_data['probability_data'],
+            'l2_rata_count' => $l2_count,
+            'l2_rata_count_1' => $l2_ratings[1],
+            'l2_rata_count_2' => $l2_ratings[2],
+            'l2_rata_count_3' => $l2_ratings[3],
+            'l2_rata_count_4' => $l2_ratings[4],
+            'l2_rata_count_5' => $l2_ratings[5],
+            'l2_probability_data' => $l2_probability, // Full array instead of just total_probability
+            'l2_percentages' => $l2_probability['percentages'],
 
             // L3 rating distributions and probability data
-            'l3_rata_count' => $l3_data['total_count'],
-            'l3_rata_count_1' => $l3_data['rating_counts'][0],
-            'l3_rata_count_2' => $l3_data['rating_counts'][1],
-            'l3_rata_count_3' => $l3_data['rating_counts'][2],
-            'l3_rata_count_4' => $l3_data['rating_counts'][3],
-            'l3_rata_count_5' => $l3_data['rating_counts'][4],
-            'l3_probability_data' => $l3_data['probability_data'],
-        ];
-    }
-
-    /**
-     * Helper method untuk mendapatkan sum nilai dari dimensi tertentu
-     */
-    private function getSumNilaiDimensi(string $dimensiType, array $keys): float
-    {
-        $data = Jawaban::dimensi($dimensiType)->get();
-        $total = 0;
-
-        foreach ($data as $item) {
-            foreach ($keys as $key) {
-                $nilai = $item->getNilai($key);
-                if ($nilai !== null) {
-                    $total += (float) $nilai;
-                }
-            }
-        }
-
-        return $total;
-    }
-
-    /**
-     * Helper method untuk mendapatkan count berdasarkan rating untuk dimensi tertentu
-     */
-    private function getCountByRating(string $dimensiType, string $key, int $rating): int
-    {
-        $data = Jawaban::dimensi($dimensiType)->get();
-        $count = 0;
-
-        foreach ($data as $item) {
-            $nilai = $item->getNilai($key);
-            if ($nilai !== null && (int) $nilai === $rating) {
-                $count++;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Helper method untuk menghitung rating distribution untuk loyalty data
-     */
-    private function calculateLoyaltyRatingDistribution(string $key): array
-    {
-        $count = Jawaban::getCountDimensi('lp');
-        $ratingCounts = [];
-        $totalCount = 0;
-
-        for ($rating = 1; $rating <= 5; $rating++) {
-            $ratingCount = $this->getCountByRating('lp', $key, $rating);
-            $ratingCounts[] = $ratingCount;
-            $totalCount += $ratingCount;
-        }
-
-        $probabilityData = $this->calculator->calculateLoyaltyProbability($ratingCounts, $totalCount);
-
-        return [
-            'count' => $count,
-            'total_count' => $totalCount,
-            'rating_counts' => $ratingCounts,
-            'probability_data' => $probabilityData
+            'l3_rata_count' => $l3_count,
+            'l3_rata_count_1' => $l3_ratings[1],
+            'l3_rata_count_2' => $l3_ratings[2],
+            'l3_rata_count_3' => $l3_ratings[3],
+            'l3_rata_count_4' => $l3_ratings[4],
+            'l3_rata_count_5' => $l3_ratings[5],
+            'l3_probability_data' => $l3_probability, // Full array instead of just total_probability
+            'l3_percentages' => $l3_probability['percentages'],
         ];
     }
 
@@ -480,43 +568,101 @@ class GrafikService
 
     public function getGrafikEmpathyData(): array
     {
-        // Hitung total responden
-        $totalresponden = Responden::count('id_responden');
+        // Single query untuk mengambil semua data responden sekaligus
+        $respondents = Responden::select('usia', 'jk', 'pekerjaan', 'domisili')->get();
 
-        // Hitung jumlah responden berdasarkan usia dan jenis kelamin
-        // Usia <25
-        $total_usia25_lk = Responden::whereRaw('CAST(usia AS INTEGER) < 25')->where('jk','=','L')->count('id_responden');
-        $total_usia25_pr = Responden::whereRaw('CAST(usia AS INTEGER) < 25')->where('jk','=','P')->count('id_responden');
+        // Initialize counters
+        $usia_gender_counts = [
+            '<25' => ['L' => 0, 'P' => 0],
+            '25-34' => ['L' => 0, 'P' => 0],
+            '35-44' => ['L' => 0, 'P' => 0],
+            '45-54' => ['L' => 0, 'P' => 0],
+            '55-64' => ['L' => 0, 'P' => 0],
+            '>64' => ['L' => 0, 'P' => 0],
+        ];
 
-        // Usia 25-34
-        $total_usia25_34_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 25 AND 34')->where('jk','=','L')->count('id_responden');
-        $total_usia25_34_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 25 AND 34')->where('jk','=','P')->count('id_responden');
+        $pekerjaan_counts = [
+            'Pegawai Swasta' => 0,
+            'Wiraswasta' => 0,
+            'PNS' => 0,
+            'Pelajar' => 0,
+            'Lainnya' => 0,
+        ];
 
-        // Usia 35-44
-        $total_usia35_44_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 35 AND 44')->where('jk','=','L')->count('id_responden');
-        $total_usia35_44_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 35 AND 44')->where('jk','=','P')->count('id_responden');
+        $domisili_counts = [
+            1 => 0, // Jawa
+            2 => 0, // Sulawesi
+            3 => 0, // Sumatera
+            4 => 0, // Kalimantan
+            5 => 0, // Papua
+            6 => 0, // Bali
+            7 => 0, // NTB
+            8 => 0, // Maluku
+        ];
 
-        // Usia 45-54
-        $total_usia45_54_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 45 AND 54')->where('jk','=','L')->count('id_responden');
-        $total_usia45_54_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 45 AND 54')->where('jk','=','P')->count('id_responden');
+        // Process all respondents in single pass
+        foreach ($respondents as $respondent) {
+            $usia = (int) $respondent->usia;
+            $jk = $respondent->jk;
+            $pekerjaan = $respondent->pekerjaan;
+            $domisili = $respondent->domisili;
 
-        // Usia 55-64
-        $total_usia55_64_lk = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 55 AND 64')->where('jk','=','L')->count('id_responden');
-        $total_usia55_64_pr = Responden::whereRaw('CAST(usia AS INTEGER) BETWEEN 55 AND 64')->where('jk','=','P')->count('id_responden');
+            // Categorize by age and gender
+            if ($usia < 25) {
+                $age_group = '<25';
+            } elseif ($usia <= 34) {
+                $age_group = '25-34';
+            } elseif ($usia <= 44) {
+                $age_group = '35-44';
+            } elseif ($usia <= 54) {
+                $age_group = '45-54';
+            } elseif ($usia <= 64) {
+                $age_group = '55-64';
+            } else {
+                $age_group = '>64';
+            }
 
-        // Usia >64
-        $total_usia64_lk = Responden::whereRaw('CAST(usia AS INTEGER) > 64')->where('jk','=','L')->count('id_responden');
-        $total_usia64_pr = Responden::whereRaw('CAST(usia AS INTEGER) > 64')->where('jk','=','P')->count('id_responden');
+            if (isset($usia_gender_counts[$age_group][$jk])) {
+                $usia_gender_counts[$age_group][$jk]++;
+            }
 
-        // Hitung total per kelompok usia
-        $total_usia25 = $total_usia25_lk + $total_usia25_pr;
-        $total_usia25_34 = $total_usia25_34_lk + $total_usia25_34_pr;
-        $total_usia35_44 = $total_usia35_44_lk + $total_usia35_44_pr;
-        $total_usia45_54 = $total_usia45_54_lk + $total_usia45_54_pr;
-        $total_usia55_64 = $total_usia55_64_lk + $total_usia55_64_pr;
-        $total_usia64 = $total_usia64_lk + $total_usia64_pr;
+            // Count by pekerjaan
+            if (isset($pekerjaan_counts[$pekerjaan])) {
+                $pekerjaan_counts[$pekerjaan]++;
+            }
 
-        // Hitung persentase usia laki-laki
+            // Count by domisili
+            if (isset($domisili_counts[$domisili])) {
+                $domisili_counts[$domisili]++;
+            }
+        }
+
+        // Calculate totals and percentages
+        $totalresponden = $respondents->count();
+
+        // Age group totals
+        $total_usia25 = $usia_gender_counts['<25']['L'] + $usia_gender_counts['<25']['P'];
+        $total_usia25_34 = $usia_gender_counts['25-34']['L'] + $usia_gender_counts['25-34']['P'];
+        $total_usia35_44 = $usia_gender_counts['35-44']['L'] + $usia_gender_counts['35-44']['P'];
+        $total_usia45_54 = $usia_gender_counts['45-54']['L'] + $usia_gender_counts['45-54']['P'];
+        $total_usia55_64 = $usia_gender_counts['55-64']['L'] + $usia_gender_counts['55-64']['P'];
+        $total_usia64 = $usia_gender_counts['>64']['L'] + $usia_gender_counts['>64']['P'];
+
+        // Age group gender breakdowns
+        $total_usia25_lk = $usia_gender_counts['<25']['L'];
+        $total_usia25_pr = $usia_gender_counts['<25']['P'];
+        $total_usia25_34_lk = $usia_gender_counts['25-34']['L'];
+        $total_usia25_34_pr = $usia_gender_counts['25-34']['P'];
+        $total_usia35_44_lk = $usia_gender_counts['35-44']['L'];
+        $total_usia35_44_pr = $usia_gender_counts['35-44']['P'];
+        $total_usia45_54_lk = $usia_gender_counts['45-54']['L'];
+        $total_usia45_54_pr = $usia_gender_counts['45-54']['P'];
+        $total_usia55_64_lk = $usia_gender_counts['55-64']['L'];
+        $total_usia55_64_pr = $usia_gender_counts['55-64']['P'];
+        $total_usia64_lk = $usia_gender_counts['>64']['L'];
+        $total_usia64_pr = $usia_gender_counts['>64']['P'];
+
+        // Calculate percentages
         $persentase_usia25_lk = $this->calculator->calculatePercentage($total_usia25_lk, $total_usia25);
         $persentase_usia25_34_lk = $this->calculator->calculatePercentage($total_usia25_34_lk, $total_usia25_34);
         $persentase_usia35_44_lk = $this->calculator->calculatePercentage($total_usia35_44_lk, $total_usia35_44);
@@ -524,7 +670,6 @@ class GrafikService
         $persentase_usia55_64_lk = $this->calculator->calculatePercentage($total_usia55_64_lk, $total_usia55_64);
         $persentase_usia64_lk = $this->calculator->calculatePercentage($total_usia64_lk, $total_usia64);
 
-        // Hitung persentase usia perempuan
         $persentase_usia25_pr = $this->calculator->calculatePercentage($total_usia25_pr, $total_usia25);
         $persentase_usia25_34_pr = $this->calculator->calculatePercentage($total_usia25_34_pr, $total_usia25_34);
         $persentase_usia35_44_pr = $this->calculator->calculatePercentage($total_usia35_44_pr, $total_usia35_44);
@@ -532,22 +677,22 @@ class GrafikService
         $persentase_usia55_64_pr = $this->calculator->calculatePercentage($total_usia55_64_pr, $total_usia55_64);
         $persentase_usia64_pr = $this->calculator->calculatePercentage($total_usia64_pr, $total_usia64);
 
-        // Hitung jumlah responden sesuai pekerjaan
-        $total_swasta = Responden::where('pekerjaan', '=', 'Pegawai Swasta')->count('id_responden');
-        $total_wiraswasta = Responden::where('pekerjaan', '=', 'Wiraswasta')->count('id_responden');
-        $total_pns = Responden::where('pekerjaan', '=', 'PNS')->count('id_responden');
-        $total_pelajar = Responden::where('pekerjaan', '=', 'Pelajar')->count('id_responden');
-        $total_lain = Responden::where('pekerjaan', '=', 'Lainnya')->count('id_responden');
+        // Job counts
+        $total_swasta = $pekerjaan_counts['Pegawai Swasta'];
+        $total_wiraswasta = $pekerjaan_counts['Wiraswasta'];
+        $total_pns = $pekerjaan_counts['PNS'];
+        $total_pelajar = $pekerjaan_counts['Pelajar'];
+        $total_lain = $pekerjaan_counts['Lainnya'];
 
-        // Hitung jumlah responden sesuai domisili (provinsi)
-        $total_jawa = Responden::where('domisili', '=', 1)->count('id_responden');
-        $total_sulawesi = Responden::where('domisili', '=', 2)->count('id_responden');
-        $total_sumatera = Responden::where('domisili', '=', 3)->count('id_responden');
-        $total_kalimantan = Responden::where('domisili', '=', 4)->count('id_responden');
-        $total_papua = Responden::where('domisili', '=', 5)->count('id_responden');
-        $total_bali = Responden::where('domisili', '=', 6)->count('id_responden');
-        $total_ntb = Responden::where('domisili', '=', 7)->count('id_responden');
-        $total_maluku = Responden::where('domisili', '=', 8)->count('id_responden');
+        // Location counts
+        $total_jawa = $domisili_counts[1];
+        $total_sulawesi = $domisili_counts[2];
+        $total_sumatera = $domisili_counts[3];
+        $total_kalimantan = $domisili_counts[4];
+        $total_papua = $domisili_counts[5];
+        $total_bali = $domisili_counts[6];
+        $total_ntb = $domisili_counts[7];
+        $total_maluku = $domisili_counts[8];
 
         return [
             // Total per kelompok usia
@@ -591,61 +736,64 @@ class GrafikService
 
         /**
      * Get data untuk grafik comparison of multiple dimensions (index3)
-     * Shows reliability, tangible, responsiveness, assurance, empathy, and applicability data
+     * Ultra-optimized version using single query for all dimensions
      */
     public function getGrafikReliabilityTangibleData(): array
     {
-        // Get detailed data for reliability, tangible, responsiveness, assurance, empathy, and applicability dimensions
-        $reliabilityData = $this->getDimensionData('reliability');
-        $tangibleData = $this->getDimensionData('tangible');
-        $responsivenessData = $this->getDimensionData('responsiveness');
-        $assuranceData = $this->getDimensionData('assurance');
-        $empathyData = $this->getDimensionData('empathy');
-        $applicabilityData = $this->getDimensionData('applicability');
+        // Define all dimensions we need
+        $dimensions = [
+            'reliability' => ['type' => 'realibility', 'keys' => ['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7']],
+            'tangible' => ['type' => 'tangible', 'keys' => ['t1', 't2', 't3', 't4', 't5', 't6']],
+            'responsiveness' => ['type' => 'responsiveness', 'keys' => ['rs1', 'rs2']],
+            'assurance' => ['type' => 'assurance', 'keys' => ['a1', 'a2', 'a3', 'a4']],
+            'empathy' => ['type' => 'empathy', 'keys' => ['e1', 'e2', 'e3', 'e4', 'e5']],
+            'applicability' => ['type' => 'applicability', 'keys' => ['ap1', 'ap2', 'ap3']]
+        ];
 
         $result = [];
 
-        // Add reliability perception and importance data
-        // In this simplified model, importance = perception
-        $reliabilityKeys = self::DIMENSION_CONFIG['reliability']['keys'];
-        foreach ($reliabilityKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $reliabilityData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $reliabilityData['rata_' . $key] ?? 0; // Same as perception in simplified model
+        // Single query untuk mengambil semua data dimensi sekaligus
+        $allData = collect();
+
+        foreach ($dimensions as $dimName => $config) {
+            $data = Jawaban::dimensi($config['type'])->get();
+            $allData = $allData->merge($data->map(function($item) use ($dimName, $config) {
+                $item->dimension_name = $dimName;
+                $item->dimension_config = $config;
+                return $item;
+            }));
         }
 
-        // Add tangible perception and importance data
-        $tangibleKeys = self::DIMENSION_CONFIG['tangible']['keys'];
-        foreach ($tangibleKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $tangibleData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $tangibleData['rata_' . $key] ?? 0; // Same as perception in simplified model
+        // Process all data in memory
+        $dimensionResults = [];
+
+        foreach ($dimensions as $dimName => $config) {
+            $dimensionResults[$dimName] = [];
+            $dimData = $allData->where('dimension_name', $dimName);
+
+            foreach ($config['keys'] as $key) {
+                $sum = 0;
+                $count = 0;
+
+                foreach ($dimData as $item) {
+                    $nilai = $item->getNilai($key);
+                    if ($nilai !== null) {
+                        $sum += (float) $nilai;
+                        $count++;
+                    }
+                }
+
+                $average = $count > 0 ? $this->calculator->calculateAverage($sum, $count) : 0;
+                $dimensionResults[$dimName][$key] = $average;
+            }
         }
 
-        // Add responsiveness perception and importance data
-        $responsivenessKeys = self::DIMENSION_CONFIG['responsiveness']['keys'];
-        foreach ($responsivenessKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $responsivenessData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $responsivenessData['rata_' . $key] ?? 0; // Same as perception in simplified model
-        }
-
-        // Add assurance perception and importance data
-        $assuranceKeys = self::DIMENSION_CONFIG['assurance']['keys'];
-        foreach ($assuranceKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $assuranceData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $assuranceData['rata_' . $key] ?? 0; // Same as perception in simplified model
-        }
-
-        // Add empathy perception and importance data
-        $empathyKeys = self::DIMENSION_CONFIG['empathy']['keys'];
-        foreach ($empathyKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $empathyData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $empathyData['rata_' . $key] ?? 0; // Same as perception in simplified model
-        }
-
-        // Add applicability perception and importance data
-        $applicabilityKeys = self::DIMENSION_CONFIG['applicability']['keys'];
-        foreach ($applicabilityKeys as $key) {
-            $result[$key . '_ratapersepsi_rata'] = $applicabilityData['rata_' . $key] ?? 0;
-            $result[$key . '_ratakepentingan_rata'] = $applicabilityData['rata_' . $key] ?? 0; // Same as perception in simplified model
+        // Build result array with backward compatibility
+        foreach ($dimensions as $dimName => $config) {
+            foreach ($config['keys'] as $key) {
+                $result[$key . '_ratapersepsi_rata'] = $dimensionResults[$dimName][$key];
+                $result[$key . '_ratakepentingan_rata'] = $dimensionResults[$dimName][$key]; // Same as perception in simplified model
+            }
         }
 
         return $result;
@@ -673,25 +821,5 @@ class GrafikService
 
         // Add backward compatibility variables for existing views
         return $data;
-    }
-
-    /**
-     * Get sum nilai dimensi berdasarkan kategori (persepsi/harapan)
-     */
-    private function getSumNilaiDimensiByCategory(string $dimensiType, array $keys, string $category): float
-    {
-        $data = Jawaban::dimensi($dimensiType)->kategori($category)->get();
-        $total = 0;
-
-        foreach ($data as $item) {
-            foreach ($keys as $key) {
-                $nilai = $item->getNilai($key);
-                if ($nilai !== null) {
-                    $total += (float) $nilai;
-                }
-            }
-        }
-
-        return $total;
     }
 }

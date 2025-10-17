@@ -1,9 +1,6 @@
 <!-- Sidebar -->
-<div x-data="{ sidebarOpen: window.innerWidth >= 768 }" 
-     @toggle-sidebar.window="sidebarOpen = !sidebarOpen; console.log('Sidebar state changed in sidebar component:', sidebarOpen)" 
-     x-init="console.log('Sidebar component initialized:', sidebarOpen)"
-     class="bg-white shadow-lg transform transition-all duration-300 ease-in-out fixed overflow-hidden"
-     :class="{ 'w-0': !sidebarOpen, 'w-64': sidebarOpen, '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }" style="position: fixed; height: 100%; left: 0; bottom: 0; z-index: 0;">
+<div x-data="{ sidebarOpen: window.innerWidth >= 768 }" @toggle-sidebar.window="sidebarOpen = !sidebarOpen" class="bg-white shadow-lg transform transition-all duration-300 ease-in-out fixed overflow-hidden"
+     :class="{ 'w-0': !sidebarOpen, 'w-64': sidebarOpen, '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }" style="position: fixed; height: 100%; left: 0; bottom: 0; z-index: 10;">
     <!-- Sidebar Header -->
     <div class="flex items-center justify-between h-16 px-4 bg-gray-50 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-800">Menu</h2>
@@ -45,9 +42,7 @@
                     </svg>
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Buat Evaluasi Baru</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Lihat Semua Evaluasi</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Laporan Evaluasi</a>
+ 
                     <a href="{{ route('dashboard.customer-evaluation-management.index') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Kelola Data Evaluasi</a>
                 </div>
             </div>

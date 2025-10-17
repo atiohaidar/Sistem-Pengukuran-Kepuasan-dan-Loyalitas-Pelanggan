@@ -15,20 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ 
-                 sidebarOpen: window.innerWidth >= 768,
-                 logSidebarState() {
-                     console.log('📊 [GANTI] Sidebar State:', {
-                         open: this.sidebarOpen,
-                         timestamp: new Date().toISOString(),
-                         screenWidth: window.innerWidth,
-                         layout: 'push'
-                     });
-                 }
-             }" 
-             @toggle-sidebar.window="sidebarOpen = !sidebarOpen; logSidebarState()" 
-             x-init="console.log('🚀 [GANTI] App initialized with sidebar:', sidebarOpen); logSidebarState()"
-             class="min-h-screen bg-gray-100 flex">
+        <div x-data="{ sidebarOpen: window.innerWidth >= 768 }" @toggle-sidebar.window="sidebarOpen = !sidebarOpen" class="min-h-screen bg-gray-100 flex">
             @auth
                 @include('layouts.sidebar')
             @endauth

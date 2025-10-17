@@ -172,9 +172,9 @@
                 <div class="mt-8 flex justify-between">
                     <div></div> <!-- Spacer for left side -->
                     <div class="flex space-x-4">
-                        <button type="submit" name="action" value="save" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md font-medium transition duration-200">
+                        <!-- <button type="submit" name="action" value="save" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md font-medium transition duration-200">
                             <i class="fas fa-save mr-2"></i>Simpan
-                        </button>
+                        </button> -->
                         <button type="submit" name="action" value="next" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition duration-200">
                             Lanjut <i class="fas fa-arrow-right ml-2"></i>
                         </button>

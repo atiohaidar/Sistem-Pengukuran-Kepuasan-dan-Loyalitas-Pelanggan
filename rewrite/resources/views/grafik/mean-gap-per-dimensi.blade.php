@@ -483,6 +483,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Debounce utility function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Async rendering wrapper
+    function renderChartAsync(data, categories, containerId, title, questionsData) {
+        requestAnimationFrame(() => {
+            createGroupedBarChart(data, categories, containerId, title, questionsData);
+        });
+    }
+
     // Initialize chart if data is available
     const dimensionsData = @json($dimensions);
     
@@ -495,11 +515,47 @@ document.addEventListener('DOMContentLoaded', function() {
         title: `{{ __('Dimensi') }} ${dim.name}`
     }));
     
-    // Initialize all charts
+    // Lazy loading with IntersectionObserver
+    const observerOptions = {
+        root: null,
+        rootMargin: '50px',
+        threshold: 0.1
+    };
+
+    const chartObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const chartId = entry.target.id;
+                const dim = dimensions.find(d => d.chartId === chartId);
+                if (dim && dim.data && Object.keys(dim.data).length > 0) {
+                    try {
+                        renderChartAsync(dim.data, dim.categories, dim.chartId, dim.title, dim.questions);
+                        chartObserver.unobserve(entry.target); // Stop observing once rendered
+                    } catch (error) {
+                        console.error(`Error rendering chart ${chartId}:`, error);
+                        d3.select(`#${chartId}`)
+                            .html('<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik</div>');
+                    }
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe all chart containers
     dimensions.forEach(dim => {
-        if (dim.data && Object.keys(dim.data).length > 0) {
-            createGroupedBarChart(dim.data, dim.categories, dim.chartId, dim.title, dim.questions);
+        const container = document.getElementById(dim.chartId);
+        if (container) {
+            chartObserver.observe(container);
         }
     });
+
+    // Add debounced click handler for tooltips globally
+    const debouncedTooltipHandler = debounce((event) => {
+        if (!d3.select(event.target).classed('bar')) {
+            d3.selectAll('.tooltip').style('opacity', 0);
+        }
+    }, 300);
+
+    d3.select('body').on('click', debouncedTooltipHandler);
 });
 </script>

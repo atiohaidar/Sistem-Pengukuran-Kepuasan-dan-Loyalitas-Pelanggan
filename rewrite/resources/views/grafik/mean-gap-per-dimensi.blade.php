@@ -192,19 +192,13 @@
 
 /* Responsive improvements */
 @media (max-width: 768px) {
-    #reliability-chart {
+    .chart-container {
         height: 300px !important;
     }
     
     .tooltip {
         max-width: 200px;
         font-size: 11px;
-    }
-    
-    .table-enhanced th,
-    .table-enhanced td {
-        padding: 8px 4px;
-        font-size: 12px;
     }
 }
 
@@ -222,10 +216,6 @@
 
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-pulse-slow {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>
 <script>

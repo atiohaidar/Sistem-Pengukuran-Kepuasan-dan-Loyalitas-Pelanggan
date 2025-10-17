@@ -15,11 +15,7 @@ class GrafikController extends Controller
     {
         $this->surveyService = $surveyService;
     }
-    public function testCalculateAverages()
-    {
-        return $this->calculateAverages();
-    }
-
+   
     public function mean_gap_per_dimensi()
     {
         // Ambil responses dari database
@@ -158,28 +154,5 @@ class GrafikController extends Controller
         return view('grafik.mean-gap-per-dimensi', compact('dimensions'));
     }
 
-    private function calculateAverages()
-    {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
-
-        // Gunakan SurveyCalculationService untuk menghitung rata-rata
-        $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
-
-        // Ekstrak item averages dan map ke format yang diharapkan view
-        $itemAverages = $ikpResults['item_averages'] ?? [];
-        $harapanAverages = $itemAverages['harapan'] ?? [];
-        $persepsiAverages = $itemAverages['persepsi'] ?? [];
-
-        // Map ke format lama untuk kompatibilitas view
-        $averages = [];
-        foreach ($harapanAverages as $item => $harapanAvg) {
-            $averages[$item . '_ratakepentingan_rata'] = $harapanAvg;
-        }
-        foreach ($persepsiAverages as $item => $persepsiAvg) {
-            $averages[$item . '_ratapersepsi_rata'] = $persepsiAvg;
-        }
-
-        return $averages;
-    }
+   
 }

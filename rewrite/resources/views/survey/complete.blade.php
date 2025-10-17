@@ -1,4 +1,4 @@
-<x-mylayout title="Survei Selesai - Terima Kasih">
+<x-guest-layout title="Survei Selesai - Terima Kasih">
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         <!-- Success Message -->

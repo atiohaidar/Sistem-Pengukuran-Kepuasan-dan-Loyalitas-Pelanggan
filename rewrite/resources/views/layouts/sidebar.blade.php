@@ -19,12 +19,36 @@
             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
                 {{ __('Dashboard') }}
             </x-nav-link>
-            <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                {{ __('Manajemen Survei') }}
-            </x-nav-link>
-            <x-nav-link :href="route('dashboard.customer-evaluation-management.index')" :active="request()->routeIs('dashboard.customer-evaluation-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                {{ __('Manajemen Evaluasi') }}
-            </x-nav-link>
+            <!-- Manajemen Survei with Submenu -->
+            <div x-data="{ subOpen: false }">
+                <button @click="subOpen = !subOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md focus:outline-none">
+                    {{ __('Manajemen Survei') }}
+                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': subOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="subOpen" x-transition class="ml-4 space-y-1">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Buat Survei Baru</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Lihat Semua Survei</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Analisis Survei</a>
+                    <a href="{{ route('dashboard.survey-management.index') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Kelola Data Survei</a>
+                </div>
+            </div>
+            <!-- Manajemen Evaluasi with Submenu -->
+            <div x-data="{ subOpen: false }">
+                <button @click="subOpen = !subOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md focus:outline-none">
+                    {{ __('Manajemen Evaluasi') }}
+                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': subOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="subOpen" x-transition class="ml-4 space-y-1">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Buat Evaluasi Baru</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Lihat Semua Evaluasi</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Laporan Evaluasi</a>
+                    <a href="{{ route('dashboard.customer-evaluation-management.index') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Kelola Data Evaluasi</a>
+                </div>
+            </div>
         </div>
     </nav>
 </div>

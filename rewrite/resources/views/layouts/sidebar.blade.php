@@ -1,12 +1,12 @@
 <!-- Sidebar -->
-<div x-data="{ sidebarOpen: window.innerWidth >= 768 }" @toggle-sidebar.window="sidebarOpen = !sidebarOpen" class="bg-white shadow-lg transform transition-all duration-300 ease-in-out relative overflow-hidden"
+<div x-data="{ sidebarOpen: window.innerWidth >= 768 }" @toggle-sidebar.window="sidebarOpen = !sidebarOpen" class="sidebar fixed inset-y-0 left-0 z-40 bg-white shadow-lg transform transition-all duration-300 ease-in-out overflow-hidden"
      :class="{ 'w-0': !sidebarOpen, 'w-64': sidebarOpen, '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
 
     <!-- Sidebar Header -->
     <div class="flex items-center justify-between h-16 px-4 bg-gray-50 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-800">Menu</h2>
-        <!-- Close Button for Desktop -->
-        <button @click="sidebarOpen = false" class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
+        <!-- Close Button -->
+        <button @click="sidebarOpen = false" class="text-gray-500 hover:text-gray-700 focus:outline-none">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -28,3 +28,6 @@
         </div>
     </nav>
 </div>
+
+<!-- Invisible overlay for click outside -->
+<div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-30" x-cloak></div>

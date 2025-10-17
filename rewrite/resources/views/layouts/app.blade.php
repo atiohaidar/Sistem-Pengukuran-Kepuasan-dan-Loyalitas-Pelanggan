@@ -20,7 +20,7 @@
                 @include('layouts.sidebar')
             @endauth
 
-            <div class="flex-1 transition-all duration-300 ease-in-out" :class="{ 'md:ml-64': sidebarOpen }">
+            <div class="flex-1 transition-all duration-300 ease-in-out">
                 @include('layouts.navigation')
 
                 <!-- Page Heading -->

@@ -1,8 +1,14 @@
 <x-guest-layout title="Login">
-    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md mx-auto">
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Login</h2>
+            <div class="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-4 shadow-lg">
+                        <i class="fas fa-sign-in-alt text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Login</h2>
+                    <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full"></div>
+                </div>
 
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -11,14 +17,14 @@
                     @csrf
 
                     <!-- Email Address -->
-                    <div>
+                    <div class="mb-4">
                         <x-input-label for="email" :value="__('Email')" />
                         <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
                     <!-- Password -->
-                    <div class="mt-4">
+                    <div class="mb-4">
                         <x-input-label for="password" :value="__('Password')" />
 
                         <x-text-input id="password" class="block mt-1 w-full"
@@ -30,14 +36,14 @@
                     </div>
 
                     <!-- Remember Me -->
-                    <div class="block mt-4">
+                    <div class="block mb-4">
                         <label for="remember_me" class="inline-flex items-center">
                             <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
                             <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-end mt-4">
+                    <div class="flex items-center justify-end">
                         @if (Route::has('password.request'))
                             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                                 {{ __('Forgot your password?') }}

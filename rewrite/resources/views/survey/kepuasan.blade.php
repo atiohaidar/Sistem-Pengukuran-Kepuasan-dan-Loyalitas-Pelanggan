@@ -1,5 +1,5 @@
 <x-guest-layout title="Kepuasan Responden - Survei Kepuasan Pelatihan">
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Progress Bar -->
         <div class="mb-8">

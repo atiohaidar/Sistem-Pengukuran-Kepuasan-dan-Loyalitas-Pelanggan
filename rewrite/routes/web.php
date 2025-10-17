@@ -2,10 +2,14 @@
 use App\Http\Controllers\PelatihanSurveyController;
     use App\Http\Controllers\SurveyDashboardController;
 
+use App\Http\Controllers\GrafikController;
+
+
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerManagementEvaluationController;
 use App\Http\Controllers\CustomerManagementEvaluationDashboardController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,6 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Grafik Routes
+    Route::get('/grafik/index3', [GrafikController::class, 'index3'])->name('grafik.index3');
+    Route::get('/grafik/mean-gap-per-dimensi', [GrafikController::class, 'mean_gap_per_dimensi'])->name('grafik.mean-gap-per-dimensi');
 
     // Survey Management Dashboard Routes
     Route::prefix('dashboard/survey-management')->name('dashboard.survey-management.')->group(function () {

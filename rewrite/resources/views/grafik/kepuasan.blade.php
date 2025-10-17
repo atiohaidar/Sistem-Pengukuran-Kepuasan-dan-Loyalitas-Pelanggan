@@ -1,7 +1,7 @@
 <x-app-layout>
      <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Rekomendasi Berdasarkan Analisis Gap dan Standar Deviasi') }}
+            {{ __('Analisis Kepuasan dan Potensi Loyalitas') }}
         </h2>
     </x-slot>
 
@@ -15,7 +15,7 @@
 
                 <div class="relative bg-white sm:rounded-2xl p-8">
             @php
-            function renderGapChartSection($gapData, $dimensionsConfig) {
+            function renderGapIdealDiharapkanChart($dimensionGaps, $avgK1, $avgK2) {
                 $output = '';
 
                 // Section container start
@@ -31,64 +31,40 @@
                 $output .= '</div>';
                 $output .= '<div>';
                 $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">';
-                $output .= __('Analisis Gap Per Dimensi');
+                $output .= __('Gap Ideal vs Diharapkan');
                 $output .= '</h2>';
-                $output .= '<p class="text-gray-600 text-sm mt-1">Gap = Persepsi - Harapan. Nilai negatif menunjukkan area yang perlu diperbaiki</p>';
+                $output .= '<p class="text-gray-600 text-sm mt-1">Analisis gap per dimensi dan rata-rata kepuasan</p>';
                 $output .= '</div>';
                 $output .= '</div>';
 
                 // Chart container
                 $output .= '<div class="flex justify-center mb-6">';
-                $output .= '<div id="gap-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
-                $output .= '<div id="gap-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
+                $output .= '<div id="gap-ideal-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
+                $output .= '<div id="gap-ideal-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
                 $output .= '<div class="text-center">';
                 $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-600 mx-auto mb-4"></div>';
                 $output .= '<p class="text-gray-600 font-medium">Memuat grafik gap...</p>';
-                $output .= '<p class="text-gray-400 text-sm animate-pulse">Menganalisis data gap per dimensi</p>';
+                $output .= '<p class="text-gray-400 text-sm animate-pulse">Menganalisis data gap</p>';
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
 
-                // Section container end
-                $output .= '</div>';
-                $output .= '</div>';
-                $output .= '</div>';
-
-                return $output;
-            }
-
-            function renderStdDevChartSection($stdDevData, $dimensionsConfig) {
-                $output = '';
-
-                // Section container start
-                $output .= '<div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mt-8">';
-                $output .= '<div class="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 rounded-2xl opacity-10"></div>';
-                $output .= '<div class="relative bg-white sm:rounded-2xl p-8">';
-                $output .= '<div class="mb-8">';
-
-                // Header
-                $output .= '<div class="flex items-center justify-center mb-8 animate-fade-in">';
-                $output .= '<div class="bg-gradient-to-r from-purple-500 to-blue-600 p-3 rounded-full mr-4 shadow-lg">';
-                $output .= '<i class="fas fa-chart-bar text-white text-xl"></i>';
-                $output .= '</div>';
-                $output .= '<div>';
-                $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">';
-                $output .= __('Standar Deviasi Gap Per Dimensi');
-                $output .= '</h2>';
-                $output .= '<p class="text-gray-600 text-sm mt-1">Variabilitas gap menunjukkan konsistensi performa</p>';
-                $output .= '</div>';
-                $output .= '</div>';
-
-                // Chart container
-                $output .= '<div class="flex justify-center mb-6">';
-                $output .= '<div id="stddev-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
-                $output .= '<div id="stddev-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
+                // Summary cards for K1 and K2 averages
+                $output .= '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">';
+                $output .= '<div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">';
                 $output .= '<div class="text-center">';
-                $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto mb-4"></div>';
-                $output .= '<p class="text-gray-600 font-medium">Memuat grafik standar deviasi...</p>';
-                $output .= '<p class="text-gray-400 text-sm animate-pulse">Menganalisis variabilitas data</p>';
+                $output .= '<div class="text-3xl font-bold text-blue-600 mb-2">' . number_format($avgK1, 2) . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Rata-rata K1</div>';
+                $output .= '<div class="text-sm text-gray-600">Pertanyaan Kepuasan 1</div>';
                 $output .= '</div>';
+                $output .= '</div>';
+
+                $output .= '<div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-3xl font-bold text-green-600 mb-2">' . number_format($avgK2, 2) . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Rata-rata K2</div>';
+                $output .= '<div class="text-sm text-gray-600">Pertanyaan Kepuasan 2</div>';
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
@@ -101,7 +77,7 @@
                 return $output;
             }
 
-            function renderIKPTable($ikpPercentage, $ikpInterpretation) {
+            function renderKepuasanChart($kepuasanDistribution) {
                 $output = '';
 
                 // Section container start
@@ -113,69 +89,109 @@
                 // Header
                 $output .= '<div class="flex items-center justify-center mb-8 animate-fade-in">';
                 $output .= '<div class="bg-gradient-to-r from-green-500 to-teal-600 p-3 rounded-full mr-4 shadow-lg">';
-                $output .= '<i class="fas fa-trophy text-white text-xl"></i>';
+                $output .= '<i class="fas fa-chart-bar text-white text-xl"></i>';
                 $output .= '</div>';
                 $output .= '<div>';
                 $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">';
-                $output .= __('Indeks Kepuasan Pelanggan (IKP)');
+                $output .= __('Distribusi Kepuasan');
                 $output .= '</h2>';
-                $output .= '<p class="text-gray-600 text-sm mt-1">Ringkasan tingkat kepuasan pelanggan secara keseluruhan</p>';
+                $output .= '<p class="text-gray-600 text-sm mt-1">Sebaran tingkat kepuasan responden</p>';
                 $output .= '</div>';
                 $output .= '</div>';
 
-                // IKP Summary Card
-                $output .= '<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 mb-6 border border-green-200">';
+                // Chart container
+                $output .= '<div class="flex justify-center mb-6">';
+                $output .= '<div id="kepuasan-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
+                $output .= '<div id="kepuasan-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
                 $output .= '<div class="text-center">';
-                $output .= '<div class="text-6xl font-bold text-green-600 mb-2">' . number_format($ikpPercentage, 1) . '%</div>';
-                $output .= '<div class="text-xl font-semibold text-gray-800 mb-1">' . $ikpInterpretation . '</div>';
-                $output .= '<div class="text-sm text-gray-600">Indeks Kepuasan Pelanggan</div>';
+                $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mx-auto mb-4"></div>';
+                $output .= '<p class="text-gray-600 font-medium">Memuat grafik kepuasan...</p>';
+                $output .= '<p class="text-gray-400 text-sm animate-pulse">Menganalisis distribusi kepuasan</p>';
+                $output .= '</div>';
+                $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
 
-                // IKP Scale Table
-                $output .= '<div class="overflow-x-auto animate-fade-in">';
-                $output .= '<table class="min-w-full divide-y divide-gray-200 bg-white border-0 overflow-hidden rounded-xl shadow-md">';
-                $output .= '<thead class="bg-gradient-to-r from-green-500 to-teal-600">';
-                $output .= '<tr>';
-                $output .= '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Rentang Skor</th>';
-                $output .= '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Kategori</th>';
-                $output .= '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Interpretasi</th>';
-                $output .= '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>';
-                $output .= '</tr>';
-                $output .= '</thead>';
-                $output .= '<tbody class="bg-white divide-y divide-gray-200">';
+                // Section container end
+                $output .= '</div>';
+                $output .= '</div>';
+                $output .= '</div>';
 
-                $scales = [
-                    ['range' => '81-100', 'category' => 'Sangat Puas', 'interpretation' => 'Kinerja sangat baik, melebihi ekspektasi', 'color' => 'green'],
-                    ['range' => '66-80', 'category' => 'Puas', 'interpretation' => 'Kinerja baik, memenuhi ekspektasi', 'color' => 'blue'],
-                    ['range' => '51-65', 'category' => 'Cukup Puas', 'interpretation' => 'Kinerja cukup, perlu sedikit perbaikan', 'color' => 'yellow'],
-                    ['range' => '35-50', 'category' => 'Kurang Puas', 'interpretation' => 'Kinerja kurang, perlu perbaikan signifikan', 'color' => 'orange'],
-                    ['range' => '0-34', 'category' => 'Tidak Puas', 'interpretation' => 'Kinerja buruk, perlu perbaikan total', 'color' => 'red']
-                ];
+                return $output;
+            }
 
-                foreach ($scales as $scale) {
-                    $isCurrent = false;
-                    if (($ikpPercentage >= 81 && $scale['range'] === '81-100') ||
-                        ($ikpPercentage >= 66 && $ikpPercentage <= 80 && $scale['range'] === '66-80') ||
-                        ($ikpPercentage >= 51 && $ikpPercentage <= 65 && $scale['range'] === '51-65') ||
-                        ($ikpPercentage >= 35 && $ikpPercentage <= 50 && $scale['range'] === '35-50') ||
-                        ($ikpPercentage >= 0 && $ikpPercentage <= 34 && $scale['range'] === '0-34')) {
-                        $isCurrent = true;
-                    }
+            function renderKesimpulan($totalRespondents, $potensiLoyal, $ikpPercentage, $ilpPercentage) {
+                $output = '';
 
-                    $rowClass = $isCurrent ? 'bg-' . $scale['color'] . '-50 border-l-4 border-' . $scale['color'] . '-500' : 'hover:bg-gray-50';
-                    $statusIcon = $isCurrent ? '<i class="fas fa-check-circle text-' . $scale['color'] . '-600"></i>' : '<i class="fas fa-circle text-gray-300"></i>';
+                // Section container start
+                $output .= '<div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mt-8">';
+                $output .= '<div class="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 rounded-2xl opacity-10"></div>';
+                $output .= '<div class="relative bg-white sm:rounded-2xl p-8">';
+                $output .= '<div class="mb-8">';
 
-                    $output .= '<tr class="' . $rowClass . ' hover:transform hover:translate-y-[-1px] transition-all duration-200">';
-                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">' . $scale['range'] . '</td>';
-                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">' . $scale['category'] . '</td>';
-                    $output .= '<td class="px-6 py-4 text-sm text-gray-700">' . $scale['interpretation'] . '</td>';
-                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm text-center">' . $statusIcon . '</td>';
-                    $output .= '</tr>';
-                }
+                // Header
+                $output .= '<div class="flex items-center justify-center mb-8 animate-fade-in">';
+                $output .= '<div class="bg-gradient-to-r from-purple-500 to-blue-600 p-3 rounded-full mr-4 shadow-lg">';
+                $output .= '<i class="fas fa-trophy text-white text-xl"></i>';
+                $output .= '</div>';
+                $output .= '<div>';
+                $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">';
+                $output .= __('Kesimpulan dan Potensi Loyalitas');
+                $output .= '</h2>';
+                $output .= '<p class="text-gray-600 text-sm mt-1">Ringkasan hasil survey dan analisis loyalitas</p>';
+                $output .= '</div>';
+                $output .= '</div>';
 
-                $output .= '</tbody>';
-                $output .= '</table>';
+                // Summary cards
+                $output .= '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">';
+
+                // Total Respondents
+                $output .= '<div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-4xl font-bold text-blue-600 mb-2">' . $totalRespondents . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Total Responden</div>';
+                $output .= '<div class="text-sm text-gray-600">Jumlah responden survey</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
+                // Potensi Loyal
+                $output .= '<div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-4xl font-bold text-green-600 mb-2">' . $potensiLoyal . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Potensi Loyal</div>';
+                $output .= '<div class="text-sm text-gray-600">Responden berpotensi loyal</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
+                // IKP Percentage
+                $output .= '<div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-4xl font-bold text-purple-600 mb-2">' . number_format($ikpPercentage, 1) . '%</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Indeks Kepuasan</div>';
+                $output .= '<div class="text-sm text-gray-600">IKP rata-rata</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
+                // ILP Percentage
+                $output .= '<div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-4xl font-bold text-orange-600 mb-2">' . number_format($ilpPercentage, 1) . '%</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Indeks Loyalitas</div>';
+                $output .= '<div class="text-sm text-gray-600">ILP rata-rata</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
+                $output .= '</div>';
+
+                // Detailed analysis
+                $loyalPercentage = $totalRespondents > 0 ? ($potensiLoyal / $totalRespondents) * 100 : 0;
+                $output .= '<div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">';
+                $output .= '<h3 class="text-xl font-bold text-gray-800 mb-4">Analisis Detail</h3>';
+                $output .= '<div class="space-y-3">';
+                $output .= '<p class="text-gray-700"><strong>Persentase Potensi Loyal:</strong> ' . number_format($loyalPercentage, 1) . '% dari total responden</p>';
+                $output .= '<p class="text-gray-700"><strong>Status Kepuasan:</strong> ' . ($ikpPercentage >= 80 ? 'Sangat Baik' : ($ikpPercentage >= 60 ? 'Baik' : 'Perlu Perbaikan')) . '</p>';
+                $output .= '<p class="text-gray-700"><strong>Status Loyalitas:</strong> ' . ($ilpPercentage >= 80 ? 'Sangat Loyal' : ($ilpPercentage >= 60 ? 'Loyal' : 'Perlu Perbaikan')) . '</p>';
+                $output .= '</div>';
                 $output .= '</div>';
 
                 // Section container end
@@ -187,9 +203,9 @@
             }
             @endphp
 
-            {!! renderGapChartSection($gapData, $dimensionsConfig) !!}
-            {!! renderStdDevChartSection($stdDevData, $dimensionsConfig) !!}
-            {!! renderIKPTable($ikpPercentage, $ikpInterpretation) !!}
+            {!! renderGapIdealDiharapkanChart($dimensionGaps, $avgK1, $avgK2) !!}
+            {!! renderKepuasanChart($kepuasanDistribution) !!}
+            {!! renderKesimpulan(count($responses), $potensiLoyal, $ikpPercentage, $ilpPercentage) !!}
         </div>
     </div>
 </x-app-layout>
@@ -270,14 +286,14 @@ document.addEventListener('DOMContentLoaded', function() {
         height: 400,
         colors: {
             gap: '#DC2626',
-            stddev: '#7C3AED',
+            kepuasan: '#10B981',
             positive: '#10B981',
             negative: '#EF4444'
         }
     };
 
-    // Function to create gap chart
-    function createGapChart(data, containerId) {
+    // Function to create gap ideal vs diharapkan chart
+    function createGapIdealChart(data, containerId, avgK1, avgK2) {
         try {
             const margin = chartConfig.margin;
             const width = chartConfig.width - margin.left - margin.right;
@@ -308,44 +324,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 .style('opacity', 0)
                 .style('z-index', 1000);
 
-            // Prepare data
+            // Prepare data - combine dimensions and K1/K2 averages
             const dimensions = Object.keys(data);
             const gapValues = dimensions.map(dim => data[dim]);
 
+            // Add K1 and K2 as special categories
+            const allCategories = [...dimensions, 'K1_Avg', 'K2_Avg'];
+            const allValues = [...gapValues, avgK1, avgK2];
+
             // Scales
             const x = d3.scaleBand()
-                .domain(dimensions)
+                .domain(allCategories)
                 .range([0, width])
                 .padding(0.1);
 
             const y = d3.scaleLinear()
-                .domain([d3.min(gapValues) - 0.5, d3.max(gapValues) + 0.5])
+                .domain([d3.min(allValues) - 0.5, d3.max(allValues) + 0.5])
                 .nice()
                 .range([height, 0]);
 
             // Create bars
             svg.selectAll('.bar')
-                .data(dimensions)
+                .data(allCategories)
                 .enter().append('rect')
                 .attr('class', 'bar')
                 .attr('x', d => x(d))
-                .attr('y', d => y(Math.max(0, data[d])))
+                .attr('y', d => {
+                    if (d === 'K1_Avg') return y(Math.max(0, avgK1));
+                    if (d === 'K2_Avg') return y(Math.max(0, avgK2));
+                    return y(Math.max(0, data[d]));
+                })
                 .attr('width', x.bandwidth())
-                .attr('height', d => Math.abs(y(data[d]) - y(0)))
-                .attr('fill', d => data[d] >= 0 ? chartConfig.colors.positive : chartConfig.colors.negative)
+                .attr('height', d => {
+                    if (d === 'K1_Avg') return Math.abs(y(avgK1) - y(0));
+                    if (d === 'K2_Avg') return Math.abs(y(avgK2) - y(0));
+                    return Math.abs(y(data[d]) - y(0));
+                })
+                .attr('fill', d => {
+                    if (d === 'K1_Avg' || d === 'K2_Avg') return chartConfig.colors.kepuasan;
+                    return data[d] >= 0 ? chartConfig.colors.positive : chartConfig.colors.negative;
+                })
                 .attr('opacity', 0.8)
                 .style('cursor', 'pointer')
                 .on('mouseover', function(event, d) {
-                    const value = data[d];
-                    const recommendation = value < -1 ? 'Perlu perbaikan prioritas tinggi' :
-                                         value < 0 ? 'Perlu perbaikan' :
-                                         'Kinerja baik';
+                    let value, label, desc;
+                    if (d === 'K1_Avg') {
+                        value = avgK1;
+                        label = 'Rata-rata K1';
+                        desc = 'Rata-rata pertanyaan kepuasan pertama';
+                    } else if (d === 'K2_Avg') {
+                        value = avgK2;
+                        label = 'Rata-rata K2';
+                        desc = 'Rata-rata pertanyaan kepuasan kedua';
+                    } else {
+                        value = data[d];
+                        label = d.charAt(0).toUpperCase() + d.slice(1);
+                        desc = value >= 0 ? 'Gap positif - performa baik' : 'Gap negatif - perlu perbaikan';
+                    }
 
                     tooltip
                         .style('opacity', 1)
-                        .html(`<div class="font-semibold">${d.charAt(0).toUpperCase() + d.slice(1)}</div>
-                               <div>Gap Score: ${value.toFixed(2)}</div>
-                               <div class="text-xs mt-1">${recommendation}</div>`);
+                        .html(`<div class="font-semibold">${label}</div>
+                               <div>Nilai: ${value.toFixed(2)}</div>
+                               <div class="text-xs mt-1">${desc}</div>`);
 
                     d3.select(this).attr('opacity', 1);
                 })
@@ -377,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('font-weight', 'bold')
-                .text('Gap Analysis Per Dimensi');
+                .text('Gap Ideal vs Diharapkan & Rata-rata Kepuasan');
 
             // Add zero line
             svg.append('line')
@@ -393,14 +434,14 @@ document.addEventListener('DOMContentLoaded', function() {
             d3.select(`#${containerId}-loading`).style('display', 'none');
 
         } catch (error) {
-            console.error('Error creating gap chart:', error);
+            console.error('Error creating gap ideal chart:', error);
             d3.select(`#${containerId}`)
                 .html('<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik gap</div>');
         }
     }
 
-    // Function to create standard deviation chart
-    function createStdDevChart(data, containerId) {
+    // Function to create kepuasan distribution chart
+    function createKepuasanChart(data, containerId) {
         try {
             const margin = chartConfig.margin;
             const width = chartConfig.width - margin.left - margin.right;
@@ -432,43 +473,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 .style('z-index', 1000);
 
             // Prepare data
-            const dimensions = Object.keys(data);
-            const stdDevValues = dimensions.map(dim => data[dim]);
+            const categories = Object.keys(data);
+            const values = categories.map(cat => data[cat]);
+            const colors = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#10B981']; // Red to Green
 
             // Scales
             const x = d3.scaleBand()
-                .domain(dimensions)
+                .domain(categories)
                 .range([0, width])
                 .padding(0.1);
 
             const y = d3.scaleLinear()
-                .domain([0, d3.max(stdDevValues) + 0.2])
+                .domain([0, d3.max(values) + 5])
                 .nice()
                 .range([height, 0]);
 
             // Create bars
             svg.selectAll('.bar')
-                .data(dimensions)
+                .data(categories)
                 .enter().append('rect')
                 .attr('class', 'bar')
                 .attr('x', d => x(d))
                 .attr('y', d => y(data[d]))
                 .attr('width', x.bandwidth())
                 .attr('height', d => height - y(data[d]))
-                .attr('fill', chartConfig.colors.stddev)
+                .attr('fill', (d, i) => colors[i])
                 .attr('opacity', 0.8)
                 .style('cursor', 'pointer')
                 .on('mouseover', function(event, d) {
                     const value = data[d];
-                    const variability = value > 1 ? 'Variabilitas tinggi' :
-                                      value > 0.5 ? 'Variabilitas sedang' :
-                                      'Variabilitas rendah';
+                    const labels = {
+                        'sangat_puas': 'Sangat Puas',
+                        'puas': 'Puas',
+                        'cukup_puas': 'Cukup Puas',
+                        'kurang_puas': 'Kurang Puas',
+                        'tidak_puas': 'Tidak Puas'
+                    };
 
                     tooltip
                         .style('opacity', 1)
-                        .html(`<div class="font-semibold">${d.charAt(0).toUpperCase() + d.slice(1)}</div>
-                               <div>Std Dev: ${value.toFixed(2)}</div>
-                               <div class="text-xs mt-1">${variability}</div>`);
+                        .html(`<div class="font-semibold">${labels[d] || d}</div>
+                               <div>Jumlah: ${value} responden</div>`);
 
                     d3.select(this).attr('opacity', 1);
                 })
@@ -481,6 +526,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     tooltip.style('opacity', 0);
                     d3.select(this).attr('opacity', 0.8);
                 });
+
+            // Add data labels
+            svg.selectAll('.label')
+                .data(categories)
+                .enter().append('text')
+                .attr('class', 'label')
+                .attr('x', d => x(d) + x.bandwidth() / 2)
+                .attr('y', d => y(data[d]) - 5)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '12px')
+                .attr('fill', '#333')
+                .text(d => data[d]);
 
             // Add axes
             svg.append('g')
@@ -500,15 +557,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('font-weight', 'bold')
-                .text('Standar Deviasi Gap Per Dimensi');
+                .text('Distribusi Tingkat Kepuasan');
 
             // Hide loading overlay
             d3.select(`#${containerId}-loading`).style('display', 'none');
 
         } catch (error) {
-            console.error('Error creating std dev chart:', error);
+            console.error('Error creating kepuasan chart:', error);
             d3.select(`#${containerId}`)
-                .html('<div class="text-center py-8 text-purple-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik standar deviasi</div>');
+                .html('<div class="text-center py-8 text-green-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik kepuasan</div>');
         }
     }
 
@@ -526,28 +583,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Async rendering wrapper
-    function renderChartAsync(chartFunction, data, containerId) {
+    function renderChartAsync(chartFunction, ...args) {
         requestAnimationFrame(() => {
-            chartFunction(data, containerId);
+            chartFunction(...args);
         });
     }
 
     // Initialize charts
-    const gapData = @json($gapData);
-    const stdDevData = @json($stdDevData);
-
-    // For debugging - load charts immediately instead of lazy loading
-    console.log('Loading charts immediately for debugging...');
-    console.log('Gap data:', gapData);
-    console.log('StdDev data:', stdDevData);
+    const dimensionGaps = @json($dimensionGaps);
+    const avgK1 = @json($avgK1);
+    const avgK2 = @json($avgK2);
+    const kepuasanDistribution = @json($kepuasanDistribution);
 
     // Load charts immediately for testing
     setTimeout(() => {
-        console.log('Loading gap chart...');
-        renderChartAsync(createGapChart, gapData, 'gap-chart-container');
-        
-        console.log('Loading std dev chart...');
-        renderChartAsync(createStdDevChart, stdDevData, 'stddev-chart-container');
+        console.log('Loading gap ideal chart...');
+        renderChartAsync(createGapIdealChart, dimensionGaps, 'gap-ideal-chart-container', avgK1, avgK2);
+
+        console.log('Loading kepuasan chart...');
+        renderChartAsync(createKepuasanChart, kepuasanDistribution, 'kepuasan-chart-container');
     }, 1000);
 
     // Add debounced click handler for tooltips globally

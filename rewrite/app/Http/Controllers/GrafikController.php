@@ -366,5 +366,155 @@ class GrafikController extends Controller
         return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation'));
     }
 
+    public function kepuasan()
+    {
+        // Ambil responses dari database
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+
+        // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
+        $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+        $gapResults = $this->surveyService->calculateGapAnalysis($responses->toArray());
+        $ilpResults = $this->surveyService->calculateILP($responses->toArray());
+
+        // Ekstrak data dari service
+        $dimensionGaps = $gapResults['dimension_gaps'] ?? [];
+        $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
+        $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+
+        // Hitung rata-rata kepuasan untuk pertanyaan k1 dan k2
+        $kepuasanK1 = [];
+        $kepuasanK2 = [];
+
+        foreach ($responses as $response) {
+            if (isset($response['kepuasan_answers']['k1'])) {
+                $kepuasanK1[] = $response['kepuasan_answers']['k1'];
+            }
+            if (isset($response['kepuasan_answers']['k2'])) {
+                $kepuasanK2[] = $response['kepuasan_answers']['k2'];
+            }
+        }
+
+        $avgK1 = count($kepuasanK1) > 0 ? array_sum($kepuasanK1) / count($kepuasanK1) : 0;
+        $avgK2 = count($kepuasanK2) > 0 ? array_sum($kepuasanK2) / count($kepuasanK2) : 0;
+
+        // Hitung distribusi kepuasan
+        $kepuasanDistribution = [
+            'sangat_puas' => 0,
+            'puas' => 0,
+            'cukup_puas' => 0,
+            'kurang_puas' => 0,
+            'tidak_puas' => 0
+        ];
+
+        foreach ($kepuasanK1 as $score) {
+            if ($score >= 4.5) $kepuasanDistribution['sangat_puas']++;
+            elseif ($score >= 3.5) $kepuasanDistribution['puas']++;
+            elseif ($score >= 2.5) $kepuasanDistribution['cukup_puas']++;
+            elseif ($score >= 1.5) $kepuasanDistribution['kurang_puas']++;
+            else $kepuasanDistribution['tidak_puas']++;
+        }
+
+        // Hitung potensi loyalitas
+        $loyalitasScores = [];
+        foreach ($responses as $response) {
+            if (isset($response['loyalitas_answers'])) {
+                $loyalitas = $response['loyalitas_answers'];
+                $avgLoyalitas = 0;
+                $count = 0;
+                if (isset($loyalitas['l1'])) { $avgLoyalitas += $loyalitas['l1']; $count++; }
+                if (isset($loyalitas['l2'])) { $avgLoyalitas += $loyalitas['l2']; $count++; }
+                if (isset($loyalitas['l3'])) { $avgLoyalitas += $loyalitas['l3']; $count++; }
+                if ($count > 0) {
+                    $loyalitasScores[] = $avgLoyalitas / $count;
+                }
+            }
+        }
+
+        $potensiLoyal = 0;
+        foreach ($loyalitasScores as $score) {
+            if ($score >= 4.0) $potensiLoyal++; // Berpotensi loyal jika skor >= 4
+        }
+
+        return view('grafik.kepuasan', compact(
+            'dimensionGaps', 
+            'avgK1', 
+            'avgK2', 
+            'kepuasanDistribution', 
+            'ikpPercentage', 
+            'ilpPercentage', 
+            'potensiLoyal',
+            'responses'
+        ));
+    }
+
+    public function loyalitas()
+    {
+        // Ambil responses dari database
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+
+        // Gunakan SurveyCalculationService untuk menghitung ILP
+        $ilpResults = $this->surveyService->calculateILP($responses->toArray());
+
+        // Hitung rata-rata per pertanyaan loyalitas
+        $l1Scores = [];
+        $l2Scores = [];
+        $l3Scores = [];
+
+        foreach ($responses as $response) {
+            if (isset($response['loyalitas_answers'])) {
+                $loyalitas = $response['loyalitas_answers'];
+                if (isset($loyalitas['l1'])) $l1Scores[] = $loyalitas['l1'];
+                if (isset($loyalitas['l2'])) $l2Scores[] = $loyalitas['l2'];
+                if (isset($loyalitas['l3'])) $l3Scores[] = $loyalitas['l3'];
+            }
+        }
+
+        $avgL1 = count($l1Scores) > 0 ? array_sum($l1Scores) / count($l1Scores) : 0;
+        $avgL2 = count($l2Scores) > 0 ? array_sum($l2Scores) / count($l2Scores) : 0;
+        $avgL3 = count($l3Scores) > 0 ? array_sum($l3Scores) / count($l3Scores) : 0;
+
+        // Hitung distribusi untuk setiap pertanyaan
+        $l1Distribution = $this->calculateDistribution($l1Scores);
+        $l2Distribution = $this->calculateDistribution($l2Scores);
+        $l3Distribution = $this->calculateDistribution($l3Scores);
+
+        // Data ILP
+        $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+        $ilpInterpretation = $ilpResults['ilp_interpretation'] ?? '';
+
+        return view('grafik.loyalitas', compact(
+            'avgL1',
+            'avgL2', 
+            'avgL3',
+            'l1Distribution',
+            'l2Distribution',
+            'l3Distribution',
+            'ilpPercentage',
+            'ilpInterpretation',
+            'responses'
+        ));
+    }
+
+    private function calculateDistribution($scores)
+    {
+        $distribution = [
+            'sangat_setuju' => 0,
+            'setuju' => 0,
+            'netral' => 0,
+            'tidak_setuju' => 0,
+            'sangat_tidak_setuju' => 0
+        ];
+
+        foreach ($scores as $score) {
+            if ($score >= 4.5) $distribution['sangat_setuju']++;
+            elseif ($score >= 3.5) $distribution['setuju']++;
+            elseif ($score >= 2.5) $distribution['netral']++;
+            elseif ($score >= 1.5) $distribution['tidak_setuju']++;
+            else $distribution['sangat_tidak_setuju']++;
+        }
+
+        return $distribution;
+    }
+
    
 }

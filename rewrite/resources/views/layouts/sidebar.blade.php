@@ -51,6 +51,39 @@
             </div>
         </div>
     </nav>
+
+    <!-- User Section -->
+    <div class="absolute bottom-0 left-0 right-0 pb-3 border-t border-gray-200 bg-white">
+        <div x-data="{ userMenuOpen: false }" class="px-4 pt-4">
+            <button @click="userMenuOpen = !userMenuOpen" class="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md focus:outline-none">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-700">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                        </div>
+                    </div>
+                    <div class="ml-3 text-left">
+                        <div class="text-sm font-medium text-gray-900">{{ Auth::user()->name }}</div>
+                        <div class="text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                    </div>
+                </div>
+                <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': userMenuOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div x-show="userMenuOpen" x-transition class="mt-2 space-y-1">
+                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
+                    {{ __('Edit Profile') }}
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
+                        {{ __('Log Out') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Invisible overlay for click outside -->

@@ -15,17 +15,30 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: window.innerWidth >= 768 }" @toggle-sidebar.window="sidebarOpen = !sidebarOpen" class="min-h-screen bg-gray-100 flex">
+        <div x-data="{ 
+                 sidebarOpen: window.innerWidth >= 768,
+                 logSidebarState() {
+                     console.log('📊 Sidebar State:', {
+                         open: this.sidebarOpen,
+                         timestamp: new Date().toISOString(),
+                         screenWidth: window.innerWidth,
+                         layout: 'push (from ganti)'
+                     });
+                 }
+             }" 
+             @toggle-sidebar.window="sidebarOpen = !sidebarOpen; logSidebarState()" 
+             x-init="console.log('🚀 App initialized with sidebar:', sidebarOpen); logSidebarState()"
+             class="min-h-screen bg-gray-100 flex">
             @auth
                 @include('layouts.sidebar')
             @endauth
 
-            <div class="flex-1 transition-all duration-300 ease-in-out" >
-                @include('layouts.navigation')
+            @include('layouts.navigation')
+                        <div class="flex-1 transition-all duration-300 ease-in-out mt-8 py-8" :class="{ 'md:ml-64': sidebarOpen }">
 
                 <!-- Page Heading -->
                 @isset($header)
-                    <header class="bg-white shadow">
+                    <header class="bg-white shadow ">
                         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                             {{ $header }}
                         </div>

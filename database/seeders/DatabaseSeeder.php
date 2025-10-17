@@ -1,27 +1,30 @@
 <?php
 
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    use WithoutModelEvents;
+
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
     public function run(): void
     {
-        $this->call(\Database\Seeders\ProvinsiSeeder::class);
-        $this->call(\Database\Seeders\DimensiSeeder::class);
-        $this->call(\Database\Seeders\BisnisSeeder::class);
+        // User::factory(10)->create();
 
-        // Only seed users if none exist
-        if (\App\Models\User::count() === 0) {
-            $this->call(\Database\Seeders\UserSeeder::class);
-        }
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+        ]);
 
-        $this->call(\Database\Seeders\RespondenSeeder::class);
-        $this->call(\Database\Seeders\JawabanSeeder::class);
-
+        $this->call([
+            PelatihanSurveyResponseSeeder::class,
+        ]);
     }
 }

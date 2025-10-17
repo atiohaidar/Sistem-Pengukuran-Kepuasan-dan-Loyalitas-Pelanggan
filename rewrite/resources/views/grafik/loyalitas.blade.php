@@ -18,6 +18,13 @@
             function renderLoyalitasQuestionChart($distribution, $questionNumber, $avgScore) {
                 $output = '';
 
+                // Define loyalty questions
+                $loyaltyQuestions = [
+                    1 => 'Saya akan terus menggunakan produk/jasa ini di masa depan',
+                    2 => 'Saya akan merekomendasikan produk/jasa ini kepada orang lain',
+                    3 => 'Saya akan membela produk/jasa ini jika ada orang yang mengkritiknya'
+                ];
+
                 // Section container start
                 $output .= '<div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mt-8">';
                 $output .= '<div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-10"></div>';
@@ -37,9 +44,20 @@
                 $output .= '</div>';
                 $output .= '</div>';
 
+                // Question Text Card
+                $output .= '<div class="bg-gradient-to-r from-indigo-50 to-purple-100 rounded-xl p-6 mb-6 border border-indigo-200">';
+                $output .= '<div class="flex items-start">';
+                $output .= '<div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">L' . $questionNumber . '</div>';
+                $output .= '<div>';
+                $output .= '<h3 class="text-lg font-semibold text-gray-800 mb-2">Pertanyaan:</h3>';
+                $output .= '<p class="text-gray-700 leading-relaxed">' . $loyaltyQuestions[$questionNumber] . '</p>';
+                $output .= '</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
                 // Chart container
                 $output .= '<div class="flex justify-center mb-6">';
-                $output .= '<div id="loyalitas-l' . $questionNumber . '-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
+                $output .= '<div id="loyalitas-l' . $questionNumber . '-chart-container" class="w-full max-w-4xl h-[32rem] chart-container relative overflow-hidden">';
                 $output .= '<div id="loyalitas-l' . $questionNumber . '-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
                 $output .= '<div class="text-center">';
                 $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-4"></div>';
@@ -236,9 +254,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Configuration for charts
     const chartConfig = {
-        margin: {top: 20, right: 30, bottom: 60, left: 60},
-        width: 800,
-        height: 400,
+        margin: {top: 20, right: 30, bottom: 80, left: 60},
+        width: 1000,
+        height: 500,
         colors: {
             sangat_setuju: '#10B981',
             setuju: '#22C55E',
@@ -280,6 +298,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 .style('opacity', 0)
                 .style('z-index', 1000);
 
+            // Hide tooltip when clicking outside
+            d3.select('body').on('click', function(event) {
+                if (!d3.select(event.target).classed('bar')) {
+                    tooltip.style('opacity', 0);
+                }
+            });
+
             // Prepare data
             const categories = Object.keys(data);
             const values = categories.map(cat => data[cat]);
@@ -302,47 +327,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 .nice()
                 .range([height, 0]);
 
-            // Create bars
-            svg.selectAll('.bar')
+            // Create bars with animation
+            const bars = svg.selectAll('.bar')
                 .data(categories)
                 .enter().append('rect')
                 .attr('class', 'bar')
                 .attr('x', d => x(d))
-                .attr('y', d => y(data[d]))
+                .attr('y', height) // Start from bottom
                 .attr('width', x.bandwidth())
-                .attr('height', d => height - y(data[d]))
+                .attr('height', 0) // Start with height 0
                 .attr('fill', (d, i) => colors[i])
                 .attr('opacity', 0.8)
-                .style('cursor', 'pointer')
-                .on('mouseover', function(event, d) {
-                    const value = data[d];
-                    const labels = {
-                        'sangat_setuju': 'Sangat Setuju',
-                        'setuju': 'Setuju',
-                        'netral': 'Netral',
-                        'tidak_setuju': 'Tidak Setuju',
-                        'sangat_tidak_setuju': 'Sangat Tidak Setuju'
-                    };
+                .style('cursor', 'pointer');
 
-                    tooltip
-                        .style('opacity', 1)
-                        .html(`<div class="font-semibold">${labels[d] || d}</div>
-                               <div>Jumlah: ${value} responden</div>
-                               <div class="text-xs mt-1">Pertanyaan L${questionNumber}</div>`);
+            // Animate bars
+            bars.transition()
+                .duration(800)
+                .attr('y', d => y(data[d]))
+                .attr('height', d => height - y(data[d]))
+                .delay((d, i) => i * 100) // Stagger animation
+                .ease(d3.easeBounce);
 
-                    d3.select(this).attr('opacity', 1);
-                })
-                .on('mousemove', function(event) {
-                    tooltip
-                        .style('left', (event.pageX + 10) + 'px')
-                        .style('top', (event.pageY - 10) + 'px');
-                })
-                .on('mouseout', function() {
-                    tooltip.style('opacity', 0);
-                    d3.select(this).attr('opacity', 0.8);
-                });
+            // Add hover effects and tooltips
+            bars.on('click', function(event, d) {
+                const value = data[d];
+                const labels = {
+                    'sangat_setuju': 'Sangat Setuju',
+                    'setuju': 'Setuju',
+                    'netral': 'Netral',
+                    'tidak_setuju': 'Tidak Setuju',
+                    'sangat_tidak_setuju': 'Sangat Tidak Setuju'
+                };
 
-            // Add data labels
+                let tooltipContent = `<div class="font-semibold">${labels[d] || d}</div>
+                                   <div>Jumlah: ${value} responden</div>
+                                   <div class="text-xs mt-1">Pertanyaan L${questionNumber}</div>`;
+
+                // Position tooltip above the bar
+                const barX = parseFloat(d3.select(this).attr('x')) + x.bandwidth() / 2;
+                const barY = parseFloat(d3.select(this).attr('y'));
+                const containerRect = container.node().getBoundingClientRect();
+                const svgRect = svg.node().getBoundingClientRect();
+                const tooltipX = svgRect.left - containerRect.left + margin.left + barX;
+                const tooltipY = svgRect.top - containerRect.top + margin.top + barY - 8;
+
+                tooltip
+                    .style('opacity', 1)
+                    .html(tooltipContent)
+                    .style('left', tooltipX + 'px')
+                    .style('top', tooltipY + 'px');
+            });
+
+            // Add data labels with animation
             svg.selectAll('.label')
                 .data(categories)
                 .enter().append('text')
@@ -352,7 +388,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '12px')
                 .attr('fill', '#333')
-                .text(d => data[d]);
+                .style('opacity', 0)
+                .text(d => data[d])
+                .transition()
+                .duration(500)
+                .delay((d, i) => 1000 + i * 100)
+                .style('opacity', 1);
 
             // Add axes
             svg.append('g')
@@ -374,6 +415,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 .attr('font-weight', 'bold')
                 .text(`Distribusi Jawaban L${questionNumber}`);
 
+            // Add legend with animation
+            const legendWidth = 400;
+            const legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(${(width - legendWidth) / 2}, ${height + 50})`)
+                .style('opacity', 0);
+
+            const legendItems = [
+                { label: 'Sangat Setuju', color: chartConfig.colors.sangat_setuju },
+                { label: 'Setuju', color: chartConfig.colors.setuju },
+                { label: 'Netral', color: chartConfig.colors.netral },
+                { label: 'Tidak Setuju', color: chartConfig.colors.tidak_setuju },
+                { label: 'Sangat Tidak Setuju', color: chartConfig.colors.sangat_tidak_setuju }
+            ];
+
+            legendItems.forEach((item, i) => {
+                const legendRow = legend.append('g')
+                    .attr('transform', `translate(${i * 80}, 0)`)
+                    .style('opacity', 0);
+
+                legendRow.append('rect')
+                    .attr('width', 12)
+                    .attr('height', 12)
+                    .attr('fill', item.color)
+                    .attr('opacity', 0.8);
+
+                legendRow.append('text')
+                    .attr('x', 18)
+                    .attr('y', 9)
+                    .attr('text-anchor', 'start')
+                    .attr('font-size', '10px')
+                    .attr('fill', '#333')
+                    .text(item.label);
+
+                legendRow.transition()
+                    .duration(500)
+                    .delay(1200 + i * 100)
+                    .style('opacity', 1);
+            });
+
+            legend.transition()
+                .duration(500)
+                .delay(1000)
+                .style('opacity', 1);
+
             // Hide loading overlay
             d3.select(`#${containerId}-loading`).style('display', 'none');
 
@@ -382,19 +468,6 @@ document.addEventListener('DOMContentLoaded', function() {
             d3.select(`#${containerId}`)
                 .html('<div class="text-center py-8 text-indigo-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik L' + questionNumber + '</div>');
         }
-    }
-
-    // Debounce utility function
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
     }
 
     // Async rendering wrapper
@@ -420,14 +493,5 @@ document.addEventListener('DOMContentLoaded', function() {
         renderChartAsync(createLoyalitasChart, l2Distribution, 'loyalitas-l2-chart-container', 2);
         renderChartAsync(createLoyalitasChart, l3Distribution, 'loyalitas-l3-chart-container', 3);
     }, 1000);
-
-    // Add debounced click handler for tooltips globally
-    const debouncedTooltipHandler = debounce((event) => {
-        if (!d3.select(event.target).classed('bar')) {
-            d3.selectAll('.tooltip').style('opacity', 0);
-        }
-    }, 300);
-
-    d3.select('body').on('click', debouncedTooltipHandler);
 });
 </script>

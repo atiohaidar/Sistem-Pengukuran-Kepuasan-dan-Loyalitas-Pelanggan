@@ -25,7 +25,7 @@
                     </svg>
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
-                    <a href="{{ route('dashboard.survey-management.index') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Profil Responden</a>
+                    <a href="{{ route('grafik.profil-responden') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Profil Responden</a>
                     <a href="{{ route('grafik.mean-gap-per-dimensi') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Rata-rata Gap per Indikator</a>
                     <a href="{{ route('grafik.mean-persepsi-harapan-gap-per-dimensi') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Rata-rata Gap per Dimensi</a>
                     <a href="{{ route('grafik.rekomendasi') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">Rekomendasi</a>

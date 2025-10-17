@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     // Grafik Routes
     Route::get('/grafik/mean-gap-per-dimensi', [GrafikController::class, 'mean_gap_per_dimensi'])->name('grafik.mean-gap-per-dimensi');
     Route::get('/grafik/mean-persepsi-harapan-gap-per-dimensi', [GrafikController::class, 'mean_persepsi_harapan_gap_per_dimensi'])->name('grafik.mean-persepsi-harapan-gap-per-dimensi');
+    Route::get('/grafik/profil-responden', [GrafikController::class, 'profilResponden'])->name('grafik.profil-responden');
     Route::get('/grafik/rekomendasi', [GrafikController::class, 'rekomendasi'])->name('grafik.rekomendasi');
     Route::get('/grafik/kepuasan', [GrafikController::class, 'kepuasan'])->name('grafik.kepuasan');
     Route::get('/grafik/loyalitas', [GrafikController::class, 'loyalitas'])->name('grafik.loyalitas');

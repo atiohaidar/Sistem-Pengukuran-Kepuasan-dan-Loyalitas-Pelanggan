@@ -154,6 +154,66 @@ class GrafikController extends Controller
         return view('grafik.mean-gap-per-dimensi', compact('dimensions'));
     }
 
+    public function profilResponden()
+    {
+        // Ambil data profil responden
+        $responses = PelatihanSurveyResponse::completed()->get();
+
+        // Data untuk chart batang usia berdasarkan gender
+        $ageGroups = ['18-25', '26-35', '36-45', '46-55', '56+'];
+        $ageData = [];
+        foreach ($ageGroups as $group) {
+            $ageData[] = [
+                'age_group' => $group,
+                'male' => $responses->filter(function ($response) use ($group) {
+                    $jenisKelamin = $response->profile_data['jenis_kelamin'] ?? '';
+                    $usia = $response->profile_data['usia'] ?? 0;
+                    return $jenisKelamin === 'L' && $this->getAgeGroup($usia) === $group;
+                })->count(),
+                'female' => $responses->filter(function ($response) use ($group) {
+                    $jenisKelamin = $response->profile_data['jenis_kelamin'] ?? '';
+                    $usia = $response->profile_data['usia'] ?? 0;
+                    return $jenisKelamin === 'P' && $this->getAgeGroup($usia) === $group;
+                })->count(),
+            ];
+        }
+
+        // Data untuk pie chart jenis kelamin
+        $genderData = [
+            ['label' => 'Laki-laki', 'value' => $responses->filter(function ($response) {
+                return ($response->profile_data['jenis_kelamin'] ?? '') === 'L';
+            })->count()],
+            ['label' => 'Perempuan', 'value' => $responses->filter(function ($response) {
+                return ($response->profile_data['jenis_kelamin'] ?? '') === 'P';
+            })->count()],
+        ];
+
+        // Data untuk pie chart pekerjaan
+        $occupationData = $responses->groupBy(function ($response) {
+            return $response->profile_data['pekerjaan'] ?? 'Tidak Diketahui';
+        })->map(function ($group) {
+            return ['label' => $group->first()->profile_data['pekerjaan'] ?? 'Tidak Diketahui', 'value' => $group->count()];
+        })->values()->toArray();
+
+        // Data untuk pie chart domisili
+        $domicileData = $responses->groupBy(function ($response) {
+            return $response->profile_data['domisili'] ?? 'Tidak Diketahui';
+        })->map(function ($group) {
+            return ['label' => $group->first()->profile_data['domisili'] ?? 'Tidak Diketahui', 'value' => $group->count()];
+        })->values()->toArray();
+
+        return view('grafik.profil-responden', compact('ageData', 'genderData', 'occupationData', 'domicileData'));
+    }
+
+    private function getAgeGroup($usia)
+    {
+        if ($usia >= 18 && $usia <= 25) return '18-25';
+        if ($usia >= 26 && $usia <= 35) return '26-35';
+        if ($usia >= 36 && $usia <= 45) return '36-45';
+        if ($usia >= 46 && $usia <= 55) return '46-55';
+        return '56+';
+    }
+
     public function mean_persepsi_harapan_gap_per_dimensi()
     {
         // Ambil responses dari database
@@ -397,22 +457,34 @@ class GrafikController extends Controller
         $avgK1 = count($kepuasanK1) > 0 ? array_sum($kepuasanK1) / count($kepuasanK1) : 0;
         $avgK2 = count($kepuasanK2) > 0 ? array_sum($kepuasanK2) / count($kepuasanK2) : 0;
 
+        // Hitung total rata-rata K3 (layanan ideal) dan K2 (harapan)
+        $total_rata_k3 = $avgK1; // K3 adalah pertanyaan kepuasan pertama (layanan ideal)
+        $total_rata_k2 = $avgK2; // K2 adalah pertanyaan kepuasan kedua (harapan)
+        $gap = $total_rata_k3 - $total_rata_k2; // Gap antara ideal dan harapan
+
         // Hitung distribusi kepuasan
-        $kepuasanDistribution = [
-            'sangat_puas' => 0,
-            'puas' => 0,
-            'cukup_puas' => 0,
-            'kurang_puas' => 0,
-            'tidak_puas' => 0
-        ];
+        $k1_count = count($kepuasanK1);
+        $k1_rata_count_1 = 0; // Tidak puas
+        $k1_rata_count_2 = 0; // Kurang puas
+        $k1_rata_count_3 = 0; // Cukup puas
+        $k1_rata_count_4 = 0; // Puas
+        $k1_rata_count_5 = 0; // Sangat puas
 
         foreach ($kepuasanK1 as $score) {
-            if ($score >= 4.5) $kepuasanDistribution['sangat_puas']++;
-            elseif ($score >= 3.5) $kepuasanDistribution['puas']++;
-            elseif ($score >= 2.5) $kepuasanDistribution['cukup_puas']++;
-            elseif ($score >= 1.5) $kepuasanDistribution['kurang_puas']++;
-            else $kepuasanDistribution['tidak_puas']++;
+            if ($score >= 4.5) $k1_rata_count_5++;
+            elseif ($score >= 3.5) $k1_rata_count_4++;
+            elseif ($score >= 2.5) $k1_rata_count_3++;
+            elseif ($score >= 1.5) $k1_rata_count_2++;
+            else $k1_rata_count_1++;
         }
+
+        $kepuasanDistribution = [
+            'sangat_puas' => $k1_rata_count_5,
+            'puas' => $k1_rata_count_4,
+            'cukup_puas' => $k1_rata_count_3,
+            'kurang_puas' => $k1_rata_count_2,
+            'tidak_puas' => $k1_rata_count_1
+        ];
 
         // Hitung potensi loyalitas
         $loyalitasScores = [];
@@ -436,12 +508,20 @@ class GrafikController extends Controller
         }
 
         return view('grafik.kepuasan', compact(
-            'dimensionGaps', 
-            'avgK1', 
-            'avgK2', 
-            'kepuasanDistribution', 
-            'ikpPercentage', 
-            'ilpPercentage', 
+            'gap',
+            'total_rata_k3',
+            'total_rata_k2',
+            'avgK1',
+            'avgK2',
+            'k1_count',
+            'k1_rata_count_1',
+            'k1_rata_count_2',
+            'k1_rata_count_3',
+            'k1_rata_count_4',
+            'k1_rata_count_5',
+            'kepuasanDistribution',
+            'ikpPercentage',
+            'ilpPercentage',
             'potensiLoyal',
             'responses'
         ));

@@ -8,6 +8,60 @@
     <div class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            <!-- Pertanyaan Kepuasan Section -->
+            <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mb-8">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10"></div>
+                <div class="relative bg-white sm:rounded-2xl p-8">
+                    <div class="mb-8">
+                        <div class="flex items-center justify-center mb-8 animate-fade-in">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-full mr-4 shadow-lg">
+                                <i class="fas fa-question-circle text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                    Pertanyaan Kepuasan
+                                </h2>
+                                <p class="text-gray-600 text-sm mt-1">Pertanyaan yang diajukan kepada responden</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- K1 Question -->
+                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600 mb-3">K1</div>
+                                    <div class="text-lg font-semibold text-gray-800 mb-3">Kepuasan Keseluruhan</div>
+                                    <div class="text-sm text-gray-600 leading-relaxed">
+                                        "Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelatihan ini?"
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- K2 Question -->
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600 mb-3">K2</div>
+                                    <div class="text-lg font-semibold text-gray-800 mb-3">Manfaat Praktis</div>
+                                    <div class="text-sm text-gray-600 leading-relaxed">
+                                        "Seberapa besar manfaat yang Anda peroleh dari pelatihan ini?"
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- K3 Question -->
+                            <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-purple-600 mb-3">K3</div>
+                                    <div class="text-lg font-semibold text-gray-800 mb-3">Willingness to Recommend</div>
+                                    <div class="text-sm text-gray-600 leading-relaxed">
+                                        "Apakah Anda akan merekomendasikan pelatihan ini kepada orang lain?"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in">
                 <!-- Gradient border effect -->
@@ -15,7 +69,7 @@
 
                 <div class="relative bg-white sm:rounded-2xl p-8">
             @php
-            function renderGapIdealDiharapkanChart($dimensionGaps, $avgK1, $avgK2) {
+            function renderGapIdealDiharapkanChart($gap, $total_rata_k3, $total_rata_k2, $avgK1, $avgK2) {
                 $output = '';
 
                 // Section container start
@@ -31,15 +85,15 @@
                 $output .= '</div>';
                 $output .= '<div>';
                 $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">';
-                $output .= __('Gap Ideal vs Diharapkan');
+                $output .= __('Gap antara layanan yang ideal dan yang diharapkan');
                 $output .= '</h2>';
-                $output .= '<p class="text-gray-600 text-sm mt-1">Analisis gap per dimensi dan rata-rata kepuasan</p>';
+                $output .= '<p class="text-gray-600 text-sm mt-1">Analisis gap dan rata-rata kepuasan</p>';
                 $output .= '</div>';
                 $output .= '</div>';
 
                 // Chart container
                 $output .= '<div class="flex justify-center mb-6">';
-                $output .= '<div id="gap-ideal-chart-container" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
+                $output .= '<div id="gap-ideal-chart-container" class="w-full max-w-4xl h-[32rem] chart-container relative overflow-hidden">';
                 $output .= '<div id="gap-ideal-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
                 $output .= '<div class="text-center">';
                 $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-600 mx-auto mb-4"></div>';
@@ -50,21 +104,29 @@
                 $output .= '</div>';
                 $output .= '</div>';
 
-                // Summary cards for K1 and K2 averages
-                $output .= '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">';
+                // Summary cards for averages
+                $output .= '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">';
                 $output .= '<div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">';
                 $output .= '<div class="text-center">';
-                $output .= '<div class="text-3xl font-bold text-blue-600 mb-2">' . number_format($avgK1, 2) . '</div>';
-                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Rata-rata K1</div>';
-                $output .= '<div class="text-sm text-gray-600">Pertanyaan Kepuasan 1</div>';
+                $output .= '<div class="text-3xl font-bold text-blue-600 mb-2">' . number_format($gap, 2) . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Gap</div>';
+                $output .= '<div class="text-sm text-gray-600">Selisih ideal vs harapan</div>';
                 $output .= '</div>';
                 $output .= '</div>';
 
                 $output .= '<div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">';
                 $output .= '<div class="text-center">';
-                $output .= '<div class="text-3xl font-bold text-green-600 mb-2">' . number_format($avgK2, 2) . '</div>';
+                $output .= '<div class="text-3xl font-bold text-green-600 mb-2">' . number_format($total_rata_k3, 2) . '</div>';
+                $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Rata-rata K3</div>';
+                $output .= '<div class="text-sm text-gray-600">Layanan ideal</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+
+                $output .= '<div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">';
+                $output .= '<div class="text-center">';
+                $output .= '<div class="text-3xl font-bold text-purple-600 mb-2">' . number_format($total_rata_k2, 2) . '</div>';
                 $output .= '<div class="text-lg font-semibold text-gray-800 mb-1">Rata-rata K2</div>';
-                $output .= '<div class="text-sm text-gray-600">Pertanyaan Kepuasan 2</div>';
+                $output .= '<div class="text-sm text-gray-600">Harapan pelanggan</div>';
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
@@ -77,7 +139,7 @@
                 return $output;
             }
 
-            function renderKepuasanChart($kepuasanDistribution) {
+            function renderKepuasanChart($kepuasanDistribution, $k1_count, $k1_rata_count_1, $k1_rata_count_2, $k1_rata_count_3, $k1_rata_count_4, $k1_rata_count_5) {
                 $output = '';
 
                 // Section container start
@@ -110,6 +172,31 @@
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
+                $output .= '</div>';
+
+                // Summary cards for satisfaction distribution
+                $output .= '<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">';
+
+                // Satisfaction levels
+                $levels = [
+                    ['label' => 'Sangat Puas', 'count' => $k1_rata_count_5, 'color' => 'green'],
+                    ['label' => 'Puas', 'count' => $k1_rata_count_4, 'color' => 'blue'],
+                    ['label' => 'Cukup Puas', 'count' => $k1_rata_count_3, 'color' => 'yellow'],
+                    ['label' => 'Kurang Puas', 'count' => $k1_rata_count_2, 'color' => 'orange'],
+                    ['label' => 'Tidak Puas', 'count' => $k1_rata_count_1, 'color' => 'red']
+                ];
+
+                foreach ($levels as $level) {
+                    $percentage = $k1_count > 0 ? ($level['count'] / $k1_count) * 100 : 0;
+                    $output .= '<div class="bg-gradient-to-r from-' . $level['color'] . '-50 to-' . $level['color'] . '-100 rounded-xl p-4 border border-' . $level['color'] . '-200">';
+                    $output .= '<div class="text-center">';
+                    $output .= '<div class="text-2xl font-bold text-' . $level['color'] . '-600 mb-1">' . $level['count'] . '</div>';
+                    $output .= '<div class="text-sm font-semibold text-gray-800 mb-1">' . $level['label'] . '</div>';
+                    $output .= '<div class="text-xs text-gray-600">' . number_format($percentage, 1) . '%</div>';
+                    $output .= '</div>';
+                    $output .= '</div>';
+                }
+
                 $output .= '</div>';
 
                 // Section container end
@@ -203,8 +290,8 @@
             }
             @endphp
 
-            {!! renderGapIdealDiharapkanChart($dimensionGaps, $avgK1, $avgK2) !!}
-            {!! renderKepuasanChart($kepuasanDistribution) !!}
+            {!! renderGapIdealDiharapkanChart($gap, $total_rata_k3, $total_rata_k2, $avgK1, $avgK2) !!}
+            {!! renderKepuasanChart($kepuasanDistribution, $k1_count, $k1_rata_count_1, $k1_rata_count_2, $k1_rata_count_3, $k1_rata_count_4, $k1_rata_count_5) !!}
             {!! renderKesimpulan(count($responses), $potensiLoyal, $ikpPercentage, $ilpPercentage) !!}
         </div>
     </div>
@@ -291,154 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
             negative: '#EF4444'
         }
     };
-
-    // Function to create gap ideal vs diharapkan chart
-    function createGapIdealChart(data, containerId, avgK1, avgK2) {
-        try {
-            const margin = chartConfig.margin;
-            const width = chartConfig.width - margin.left - margin.right;
-            const height = chartConfig.height - margin.top - margin.bottom;
-
-            // Clear existing chart
-            const container = d3.select(`#${containerId}`);
-            container.selectAll('*').remove();
-
-            const svg = container
-                .append('svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            // Create tooltip
-            const tooltip = d3.select(`#${containerId}`)
-                .append('div')
-                .attr('class', 'tooltip')
-                .style('position', 'absolute')
-                .style('background', 'rgba(0, 0, 0, 0.8)')
-                .style('color', 'white')
-                .style('padding', '8px 12px')
-                .style('border-radius', '4px')
-                .style('font-size', '12px')
-                .style('pointer-events', 'none')
-                .style('opacity', 0)
-                .style('z-index', 1000);
-
-            // Prepare data - combine dimensions and K1/K2 averages
-            const dimensions = Object.keys(data);
-            const gapValues = dimensions.map(dim => data[dim]);
-
-            // Add K1 and K2 as special categories
-            const allCategories = [...dimensions, 'K1_Avg', 'K2_Avg'];
-            const allValues = [...gapValues, avgK1, avgK2];
-
-            // Scales
-            const x = d3.scaleBand()
-                .domain(allCategories)
-                .range([0, width])
-                .padding(0.1);
-
-            const y = d3.scaleLinear()
-                .domain([d3.min(allValues) - 0.5, d3.max(allValues) + 0.5])
-                .nice()
-                .range([height, 0]);
-
-            // Create bars
-            svg.selectAll('.bar')
-                .data(allCategories)
-                .enter().append('rect')
-                .attr('class', 'bar')
-                .attr('x', d => x(d))
-                .attr('y', d => {
-                    if (d === 'K1_Avg') return y(Math.max(0, avgK1));
-                    if (d === 'K2_Avg') return y(Math.max(0, avgK2));
-                    return y(Math.max(0, data[d]));
-                })
-                .attr('width', x.bandwidth())
-                .attr('height', d => {
-                    if (d === 'K1_Avg') return Math.abs(y(avgK1) - y(0));
-                    if (d === 'K2_Avg') return Math.abs(y(avgK2) - y(0));
-                    return Math.abs(y(data[d]) - y(0));
-                })
-                .attr('fill', d => {
-                    if (d === 'K1_Avg' || d === 'K2_Avg') return chartConfig.colors.kepuasan;
-                    return data[d] >= 0 ? chartConfig.colors.positive : chartConfig.colors.negative;
-                })
-                .attr('opacity', 0.8)
-                .style('cursor', 'pointer')
-                .on('mouseover', function(event, d) {
-                    let value, label, desc;
-                    if (d === 'K1_Avg') {
-                        value = avgK1;
-                        label = 'Rata-rata K1';
-                        desc = 'Rata-rata pertanyaan kepuasan pertama';
-                    } else if (d === 'K2_Avg') {
-                        value = avgK2;
-                        label = 'Rata-rata K2';
-                        desc = 'Rata-rata pertanyaan kepuasan kedua';
-                    } else {
-                        value = data[d];
-                        label = d.charAt(0).toUpperCase() + d.slice(1);
-                        desc = value >= 0 ? 'Gap positif - performa baik' : 'Gap negatif - perlu perbaikan';
-                    }
-
-                    tooltip
-                        .style('opacity', 1)
-                        .html(`<div class="font-semibold">${label}</div>
-                               <div>Nilai: ${value.toFixed(2)}</div>
-                               <div class="text-xs mt-1">${desc}</div>`);
-
-                    d3.select(this).attr('opacity', 1);
-                })
-                .on('mousemove', function(event) {
-                    tooltip
-                        .style('left', (event.pageX + 10) + 'px')
-                        .style('top', (event.pageY - 10) + 'px');
-                })
-                .on('mouseout', function() {
-                    tooltip.style('opacity', 0);
-                    d3.select(this).attr('opacity', 0.8);
-                });
-
-            // Add axes
-            svg.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .attr('transform', 'rotate(-45)')
-                .style('text-anchor', 'end');
-
-            svg.append('g')
-                .call(d3.axisLeft(y));
-
-            // Add title
-            svg.append('text')
-                .attr('x', width / 2)
-                .attr('y', -10)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '16px')
-                .attr('font-weight', 'bold')
-                .text('Gap Ideal vs Diharapkan & Rata-rata Kepuasan');
-
-            // Add zero line
-            svg.append('line')
-                .attr('x1', 0)
-                .attr('x2', width)
-                .attr('y1', y(0))
-                .attr('y2', y(0))
-                .attr('stroke', '#666')
-                .attr('stroke-width', 1)
-                .attr('stroke-dasharray', '5,5');
-
-            // Hide loading overlay
-            d3.select(`#${containerId}-loading`).style('display', 'none');
-
-        } catch (error) {
-            console.error('Error creating gap ideal chart:', error);
-            d3.select(`#${containerId}`)
-                .html('<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik gap</div>');
-        }
-    }
 
     // Function to create kepuasan distribution chart
     function createKepuasanChart(data, containerId) {
@@ -590,18 +529,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize charts
-    const dimensionGaps = @json($dimensionGaps);
     const avgK1 = @json($avgK1);
     const avgK2 = @json($avgK2);
     const kepuasanDistribution = @json($kepuasanDistribution);
+    const k1_count = @json($k1_count);
+    const k1_rata_count_1 = @json($k1_rata_count_1);
+    const k1_rata_count_2 = @json($k1_rata_count_2);
+    const k1_rata_count_3 = @json($k1_rata_count_3);
+    const k1_rata_count_4 = @json($k1_rata_count_4);
+    const k1_rata_count_5 = @json($k1_rata_count_5);
 
     // Load charts immediately for testing
     setTimeout(() => {
-        console.log('Loading gap ideal chart...');
-        renderChartAsync(createGapIdealChart, dimensionGaps, 'gap-ideal-chart-container', avgK1, avgK2);
-
         console.log('Loading kepuasan chart...');
-        renderChartAsync(createKepuasanChart, kepuasanDistribution, 'kepuasan-chart-container');
+        // Use the satisfaction distribution data for the chart
+        const satisfactionData = {
+            'tidak_puas': k1_rata_count_1,
+            'kurang_puas': k1_rata_count_2,
+            'cukup_puas': k1_rata_count_3,
+            'puas': k1_rata_count_4,
+            'sangat_puas': k1_rata_count_5
+        };
+        renderChartAsync(createKepuasanChart, satisfactionData, 'kepuasan-chart-container');
     }, 1000);
 
     // Add debounced click handler for tooltips globally

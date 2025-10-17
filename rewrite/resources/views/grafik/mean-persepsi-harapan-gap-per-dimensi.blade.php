@@ -1,7 +1,7 @@
 <x-app-layout>
      <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Rata-rata Persepsi, Harapan & Gap Per Dimensi') }}
+            {{ __('Rata-rata Persepsi, Harapan dan Gap Per Dimensi') }}
         </h2>
     </x-slot>
 
@@ -88,7 +88,7 @@
                 $output .= '</div>';
                 $output .= '<div>';
                 $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">';
-                $output .= __('Rata-rata Persepsi, Harapan & Gap Per Dimensi');
+                $output .= __('Rata-rata Persepsi, Harapan dan Gap Per Dimensi');
                 $output .= '</h2>';
                 $output .= '<p class="text-gray-600 text-sm mt-1">Analisis rata-rata per dimensi pelayanan</p>';
                 $output .= '</div>';
@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dimensionsData = @json($dimensions);
     
     if (dimensionsData && dimensionsData.length > 0) {
-        createDimensionsChart(dimensionsData, 'dimensions-chart', '{{ __("Rata-rata Persepsi, Harapan & Gap Per Dimensi") }}');
+        createDimensionsChart(dimensionsData, 'dimensions-chart', '{{ __("Rata-rata Persepsi, Harapan dan Gap Per Dimensi") }}');
     }
 });
 </script>

@@ -19,17 +19,17 @@ return new class extends Migration
             // Data Profil (JSON)
             $table->json('profile_data')->nullable();
             
-            // Jawaban Pertanyaan 1 (Harapan/Importance) - JSON
-            $table->json('importance_answers')->nullable();
+            // Jawaban Pertanyaan 1 (Harapan/Harapan) - JSON
+            $table->json('harapan_answers')->nullable();
             
-            // Jawaban Pertanyaan 2 (Persepsi/Performance) - JSON  
-            $table->json('performance_answers')->nullable();
+            // Jawaban Pertanyaan 2 (Persepsi/Persepsi) - JSON  
+            $table->json('persepsi_answers')->nullable();
             
             // Jawaban Pertanyaan 3 (Kepuasan) - JSON
-            $table->json('satisfaction_answers')->nullable();
+            $table->json('kepuasan_answers')->nullable();
             
             // Jawaban Pertanyaan 4 (Loyalitas) - JSON
-            $table->json('loyalty_answers')->nullable();
+            $table->json('loyalitas_answers')->nullable();
             
             // Jawaban Pertanyaan 5 (Kritik & Saran) - JSON
             $table->json('feedback_answers')->nullable();

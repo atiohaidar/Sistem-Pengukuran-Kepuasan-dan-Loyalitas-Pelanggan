@@ -85,18 +85,18 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($results['performanceData'] as $item)
+                            @foreach($results['persepsiData'] as $item)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item['label'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['importance'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item['performance'], 0) }}%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['harapan'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item['persepsi'], 0) }}%</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
                 <div>
-                    <h4 class="text-lg font-medium text-gray-900 mb-4">Importance - Performance Analysis</h4>
+                    <h4 class="text-lg font-medium text-gray-900 mb-4">Harapan - Persepsi Analysis</h4>
                     <div class="bg-white p-4 rounded-lg border">
                         <svg width="450" height="300" viewBox="0 0 450 300" class="w-full h-auto">
                             @php
@@ -157,16 +157,16 @@
                             @endforeach
 
                             <!-- Axis labels -->
-                            <text x="{{ $width / 2 }}" y="{{ $height - 10 }}" text-anchor="middle" font-size="12" fill="#374151">Importance</text>
-                            <text x="15" y="{{ $height / 2 }}" text-anchor="middle" transform="rotate(-90 15 {{ $height / 2 }})" font-size="12" fill="#374151">Performance (%)</text>
+                            <text x="{{ $width / 2 }}" y="{{ $height - 10 }}" text-anchor="middle" font-size="12" fill="#374151">Harapan</text>
+                            <text x="15" y="{{ $height / 2 }}" text-anchor="middle" transform="rotate(-90 15 {{ $height / 2 }})" font-size="12" fill="#374151">Persepsi (%)</text>
 
                             <!-- Data points -->
-                            @foreach($results['performanceData'] as $index => $item)
+                            @foreach($results['persepsiData'] as $index => $item)
                                 @php
-                                    $importance = $item['importance'] * 5; // Scale 1-5 to 5-25
-                                    $performance = $item['performance'];
-                                    $x = $scaleX($importance);
-                                    $y = $scaleY($performance);
+                                    $harapan = $item['harapan'] * 5; // Scale 1-5 to 5-25
+                                    $persepsi = $item['persepsi'];
+                                    $x = $scaleX($harapan);
+                                    $y = $scaleY($persepsi);
                                     $colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280', '#374151', '#f59e0b', '#10b981'];
                                     $color = $colors[$index % count($colors)];
                                     // Use 4 directions to avoid overlap: right-top, left-top, right-bottom, left-bottom
@@ -192,9 +192,9 @@
             </div>
         </div>
 
-        <!-- Performance Assessment -->
+        <!-- Persepsi Assessment -->
         <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Performance Assessment</h3>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Persepsi Assessment</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <table class="min-w-full divide-y divide-gray-200">
@@ -208,7 +208,7 @@
                             @foreach($results['processGroupResults'] as $group)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group['name'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group['performance'] }}%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group['persepsi'] }}%</td>
                                 </tr>
                             @endforeach
                         </tbody>

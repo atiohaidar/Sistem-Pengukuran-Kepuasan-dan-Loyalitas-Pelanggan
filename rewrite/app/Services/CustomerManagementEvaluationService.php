@@ -86,7 +86,7 @@ class CustomerManagementEvaluationService
         ];
         $maturityInsightData = $maturityInsights[$insightIndex];
 
-        // Readiness & Performance
+        // Readiness & Persepsi
         $priorityItems = [
             ['id' => 'kepemimpinanStrategis', 'label' => 'Kepemimpinan Strategis'],
             ['id' => 'posisiKompetitif', 'label' => 'Posisi Kompetitif'],
@@ -115,49 +115,49 @@ class CustomerManagementEvaluationService
             ['id' => 'q11', 'target' => 'pelaporanKinerja'],
         ];
 
-        $performanceData = [];
+        $persepsiData = [];
         foreach ($priorityItems as $item) {
             $readinessQuestion = collect($readinessQuestions)->firstWhere('target', $item['id']);
             $score = $readinessQuestion ? ($data['readiness'][$readinessQuestion['id']] ?? 3) : 3;
-            $performance = ($score / 5) * 100;
-            $performanceData[] = [
+            $persepsi = ($score / 5) * 100;
+            $persepsiData[] = [
                 'id' => $item['id'],
                 'label' => $item['label'],
-                'importance' => $data['priority'][$item['id']] ?? 0,
-                'performance' => $performance,
+                'harapan' => $data['priority'][$item['id']] ?? 0,
+                'persepsi' => $persepsi,
             ];
         }
 
         // Process Groups
         $processGroups = [
-            'Strategy development' => ['name' => 'Pengembangan Strategi', 'items' => ['kepemimpinanStrategis', 'posisiKompetitif'], 'performance' => 0],
-            'Value creation' => ['name' => 'Pengembangan Nilai', 'items' => ['kepuasanPelanggan', 'nilaiUmurPelanggan'], 'performance' => 0],
-            'Multi-channel integration' => ['name' => 'Manajemen Hubungan Pelanggan', 'items' => ['aksesPelanggan'], 'performance' => 0],
-            'Information management' => ['name' => 'Manajemen Informasi', 'items' => ['informasiPelanggan', 'solusiAplikasiPelanggan'], 'performance' => 0],
-            'Performance assessment' => ['name' => 'Manajemen Kinerja', 'items' => ['prosesPelanggan', 'standarSDM', 'pelaporanKinerja', 'efisiensiBiaya'], 'performance' => 0],
+            'Strategy development' => ['name' => 'Pengembangan Strategi', 'items' => ['kepemimpinanStrategis', 'posisiKompetitif'], 'persepsi' => 0],
+            'Value creation' => ['name' => 'Pengembangan Nilai', 'items' => ['kepuasanPelanggan', 'nilaiUmurPelanggan'], 'persepsi' => 0],
+            'Multi-channel integration' => ['name' => 'Manajemen Hubungan Pelanggan', 'items' => ['aksesPelanggan'], 'persepsi' => 0],
+            'Information management' => ['name' => 'Manajemen Informasi', 'items' => ['informasiPelanggan', 'solusiAplikasiPelanggan'], 'persepsi' => 0],
+            'Persepsi assessment' => ['name' => 'Manajemen Kinerja', 'items' => ['prosesPelanggan', 'standarSDM', 'pelaporanKinerja', 'efisiensiBiaya'], 'persepsi' => 0],
         ];
 
         foreach ($processGroups as $key => &$group) {
             $groupItems = $group['items'];
             $totalPerf = 0;
             foreach ($groupItems as $itemId) {
-                $itemPerf = collect($performanceData)->firstWhere('id', $itemId)['performance'] ?? 0;
+                $itemPerf = collect($persepsiData)->firstWhere('id', $itemId)['persepsi'] ?? 0;
                 $totalPerf += $itemPerf;
             }
-            $group['performance'] = count($groupItems) > 0 ? round($totalPerf / count($groupItems)) : 0;
+            $group['persepsi'] = count($groupItems) > 0 ? round($totalPerf / count($groupItems)) : 0;
         }
 
         // Overall Score
-        $totalWeightedPerformance = collect($performanceData)->sum(function ($item) {
-            return $item['performance'] * $item['importance'];
+        $totalWeightedPersepsi = collect($persepsiData)->sum(function ($item) {
+            return $item['persepsi'] * $item['harapan'];
         });
-        $totalWeight = collect($performanceData)->sum('importance');
-        $overallScore = $totalWeight > 0 ? round($totalWeightedPerformance / $totalWeight) : 0;
+        $totalWeight = collect($persepsiData)->sum('harapan');
+        $overallScore = $totalWeight > 0 ? round($totalWeightedPersepsi / $totalWeight) : 0;
 
         // Debug log
         \Log::info('Customer Evaluation Debug', [
-            'performanceData' => $performanceData,
-            'totalWeightedPerformance' => $totalWeightedPerformance,
+            'persepsiData' => $persepsiData,
+            'totalWeightedPersepsi' => $totalWeightedPersepsi,
             'totalWeight' => $totalWeight,
             'overallScore' => $overallScore,
         ]);
@@ -168,27 +168,27 @@ class CustomerManagementEvaluationService
             'Value creation' => "Dalam rangka mengembangkan sistem pengelolaan pelanggan, perusahaan perlu berfokus pada proses pengembangan nilai. Bagi pelanggan, nilai tidak hanya datang dari produk atau jasa, tetapi dari keseluruhan pengalaman. Untuk itu, UMKM dapat menambah nilai perusahaan melalui hal-hal sederhana, seperti layanan yang ramah, respon cepat dalam menanggapi layanan atau keluhan, diskon bagi pelanggan setia, atau edukasi bermanfaat terkait produk. Penambahan nilai ini tidak hanya memenuhi kebutuhan utama pelanggan atas produk, tapi bisa juga melebihi ekspektasi atau menyadarkan pelanggan akan kebutuhan fitur tersebut. Perusahaan dapat melakukan hal ini untuk meningkatkan hubungan dengan pelanggan agar nantinya pelanggan dapat memberikan rekomendasi kepada orang lain secara mouth-to-mouth dan mengehemat biaya pemasaran.\n\nDi sisi lain, nilai yang diciptakan juga harus memberi keuntungan balik bagi usaha. Nilai itu bisa berupa peningkatan jumlah pelanggan yang datang kembali (retensi), penjualan produk tambahan (cross-selling), atau semakin banyak pelanggan baru (akusisi) melalui rekomendasi.",
             'Multi-channel integration' => "Dalam rangka mengembangkan sistem pengelolaan pelanggan, perusahaan perlu berfokus pada proses manajemen hubungan dengan pelanggan. Interaksi dengan pelanggan perlu dilakukan melalui berbagai saluran komunikasi yang konsisten dan mudah diakses. Saluran ini bisa berupa komunikasi langsung, telepon, media sosial, atau aplikasi pesan. Tidak harus menggunakan semua saluran sekaligus, yang lebih penting adalah memilih saluran yang paling sesuai dengan kebutuhan pelanggan dan memastikan setiap saluran tersebut dikelola dengan baik.\nKecepatan dan konsistensi dalam merespons pelanggan juga menjadi faktor yan penting dalam pengelolaan pelanggan. Ketika saluran komunikasi sudah ditentukan, usaha perlu menjaga agar pelanggan merasa mudah terhubung dan selalu mendapatkan jawaban yang jelas. Dengan begitu, saluran yang digunakan tidak hanya menjadi media komunikasi, tetapi juga sarana untuk membangun hubungan yang lebih kuat dengan pelanggan.",
             'Information management' => "Dalam rangka mengembangkan sistem pengelolaan pelanggan, perusahaan perlu berfokus pada proses manajemen informasi. Informasi tentang pelanggan merupakan aset penting yang harus dimilikki dan dikelola dengan baik. Untuk itu perusahaan dapat memperhatikan mengenai proses pengumpulan, penyimpanan, dan pengintegrasian informasi perusahaan agar perusahaan dapat memahami pelanggan lebih jauh. Proses ini dapat dilakukan dengan cara sederhana menggunakan dokumen digital atau aplikasi pendukung yang sesuai kemampuan usaha. Data-data yang sudah dikumpulkan dapat diolah dan di analisis menggunakan data mining, clustering, atau metode lainnya untuk mendapatkan insights dari informasi mengenai pelanggan.\nSelain pengumpulan dan pengolahan data, perusahaan juga harus mempertimbangkan komponen yang terkait dengan sistem teknologi informasi seperti, perangkat keras, perangkat lunak, dan middleware yang digunakan perusahaan untuk mengelola pelanggan. Perangkat keras terdiri atas alat fisik seperti komputer, laptop, server, keyboard. Perangkat lunak merupakan program komputer yang digunakan untuk mengelola data pelanggan. Sedangkan middleware, merupakan program antara keinginan pelanggan dan server sehingga pelanggan dan sistem dapat berinteraksi dari tempat yang berbeda.\nTerakhir, perusahaan perlu mempertimbangkan aplikasi front-office dan back-office untuk mendukung aktivitas baik langsung dengan pelanggan, maupun dengan administrasi internal dan pemasok. Informasi yang rapi akan memudahkan perusahaan untuk mengenali pola perilaku pelangganya dan melihat potensi kebutuhan dari pelanggan.",
-            'Performance assessment' => "Dalam rangka mengembangkan sistem pengelolaan pelanggan, perusahaan perlu berfokus pada proses manajemen kinerja. Proses manajemen kinerja merupakan proses untuk memastikan bahwa strategi perusahaan terkait sistem pengelolaan pelanggan dijalankan dan memenuhi kebutuhan yang sudah ditentukan. Evaluasi kinerja dapat dilakukan dengan menetapkan indikator sederhana, seperti tingkat kepuasan pelanggan, jumlah pelanggan kembali, atau frekuensi pembelian pelanggan. Jika perusahaan sudah semakin maju, maka pengukuran kinerja dapat dilakukan dengan membangun balanced scorecard, service-profit chain, atau membangun key performance indicatior untuk perusahaan agar dapat melihat ketercapiannya.\n\nEvaluasi tidak harus rumit, yang penting dilakukan secara rutin dan hasilnya dicatat untuk menjadi bahan perbaikan. Dengan adanya catatan evaluasi, usaha dapat melihat perkembangan dari waktu ke waktu dan mengetahui area mana yang sudah berjalan baik serta area mana yang masih membutuhkan perhatian lebih. Hal ini membuat pengelolaan pelanggan tidak hanya bersifat reaktif, tetapi juga dapat diarahkan untuk terus berkembang."
+            'Persepsi assessment' => "Dalam rangka mengembangkan sistem pengelolaan pelanggan, perusahaan perlu berfokus pada proses manajemen kinerja. Proses manajemen kinerja merupakan proses untuk memastikan bahwa strategi perusahaan terkait sistem pengelolaan pelanggan dijalankan dan memenuhi kebutuhan yang sudah ditentukan. Evaluasi kinerja dapat dilakukan dengan menetapkan indikator sederhana, seperti tingkat kepuasan pelanggan, jumlah pelanggan kembali, atau frekuensi pembelian pelanggan. Jika perusahaan sudah semakin maju, maka pengukuran kinerja dapat dilakukan dengan membangun balanced scorecard, service-profit chain, atau membangun key persepsi indicatior untuk perusahaan agar dapat melihat ketercapiannya.\n\nEvaluasi tidak harus rumit, yang penting dilakukan secara rutin dan hasilnya dicatat untuk menjadi bahan perbaikan. Dengan adanya catatan evaluasi, usaha dapat melihat perkembangan dari waktu ke waktu dan mengetahui area mana yang sudah berjalan baik serta area mana yang masih membutuhkan perhatian lebih. Hal ini membuat pengelolaan pelanggan tidak hanya bersifat reaktif, tetapi juga dapat diarahkan untuk terus berkembang."
         ];
 
-        $processGroupPerformances = [];
+        $processGroupPersepsis = [];
         foreach ($processGroups as $key => $group) {
-            $processGroupPerformances[] = [
+            $processGroupPersepsis[] = [
                 'key' => $key,
-                'performance' => $group['performance']
+                'persepsi' => $group['persepsi']
             ];
         }
 
-        $lowestPerfGroup = collect($processGroupPerformances)->reduce(function ($min, $current) {
-            return $current['performance'] < $min['performance'] ? $current : $min;
-        }, ['key' => 'Strategy development', 'performance' => 100]);
+        $lowestPerfGroup = collect($processGroupPersepsis)->reduce(function ($min, $current) {
+            return $current['persepsi'] < $min['persepsi'] ? $current : $min;
+        }, ['key' => 'Strategy development', 'persepsi' => 100]);
 
         $recommendation = $recommendations[$lowestPerfGroup['key']];
 
         return [
             'maturityAverage' => $maturityAverage,
             'maturityInsightData' => $maturityInsightData,
-            'performanceData' => $performanceData,
+            'persepsiData' => $persepsiData,
             'processGroupResults' => $processGroups,
             'overallScore' => $overallScore,
             'recommendation' => $recommendation,

@@ -32,14 +32,14 @@ class PelatihanSurveyResponseFactory extends Factory
                     'DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Jawa Tengah', 'Banten'
                 ]),
             ],
-            'importance_answers' => $this->generateImportanceAnswers(),
-            'performance_answers' => $this->generatePerformanceAnswers(),
-            'satisfaction_answers' => [
+            'harapan_answers' => $this->generateHarapanAnswers(),
+            'persepsi_answers' => $this->generatePersepsiAnswers(),
+            'kepuasan_answers' => [
                 'k1' => $this->faker->numberBetween(1, 5),
                 'k2' => $this->faker->numberBetween(1, 5),
                 'k3' => $this->faker->numberBetween(1, 5),
             ],
-            'loyalty_answers' => [
+            'loyalitas_answers' => [
                 'l1' => $this->faker->numberBetween(1, 5),
                 'l2' => $this->faker->numberBetween(1, 5),
                 'l3' => $this->faker->numberBetween(1, 5),
@@ -64,7 +64,7 @@ class PelatihanSurveyResponseFactory extends Factory
         ];
     }
 
-    private function generateImportanceAnswers(): array
+    private function generateHarapanAnswers(): array
     {
         return [
             'reliability' => [
@@ -108,9 +108,9 @@ class PelatihanSurveyResponseFactory extends Factory
         ];
     }
 
-    private function generatePerformanceAnswers(): array
+    private function generatePersepsiAnswers(): array
     {
-        // Same structure as importance but different values
-        return $this->generateImportanceAnswers();
+        // Same structure as harapan but different values
+        return $this->generateHarapanAnswers();
     }
 }

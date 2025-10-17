@@ -10,10 +10,10 @@ class SurveyController extends Controller
 {
     private const STEPS = [
         'profile' => 1,
-        'importance' => 2,
-        'performance' => 3,
-        'satisfaction' => 4,
-        'loyalty' => 5,
+        'harapan' => 2,
+        'persepsi' => 3,
+        'kepuasan' => 4,
+        'loyalitas' => 5,
         'feedback' => 6,
     ];
 
@@ -113,17 +113,17 @@ class SurveyController extends Controller
             case 'profile':
                 $survey->setProfileData($validatedData);
                 break;
-            case 'importance':
-                $survey->setAnswers('importance', $validatedData);
+            case 'harapan':
+                $survey->setAnswers('harapan', $validatedData);
                 break;
-            case 'performance':
-                $survey->setAnswers('performance', $validatedData);
+            case 'persepsi':
+                $survey->setAnswers('persepsi', $validatedData);
                 break;
-            case 'satisfaction':
-                $survey->setAnswers('satisfaction', $validatedData);
+            case 'kepuasan':
+                $survey->setAnswers('kepuasan', $validatedData);
                 break;
-            case 'loyalty':
-                $survey->setAnswers('loyalty', $validatedData);
+            case 'loyalitas':
+                $survey->setAnswers('loyalitas', $validatedData);
                 break;
             case 'feedback':
                 $survey->setAnswers('feedback', $validatedData);
@@ -188,7 +188,7 @@ class SurveyController extends Controller
                 'pekerjaan_lain' => 'nullable|string|max:255',
                 'domisili' => 'required|string',
             ]),
-            'importance', 'performance' => $request->validate([
+            'harapan', 'persepsi' => $request->validate([
                 'reliability' => 'required|array',
                 'reliability.*' => 'required|integer|min:0|max:5',
                 'assurance' => 'required|array',
@@ -202,12 +202,12 @@ class SurveyController extends Controller
                 'applicability' => 'required|array',
                 'applicability.*' => 'required|integer|min:0|max:5',
             ]),
-            'satisfaction' => $request->validate([
+            'kepuasan' => $request->validate([
                 'k1' => 'required|integer|min:1|max:5',
                 'k2' => 'required|integer|min:1|max:5',
                 'k3' => 'required|integer|min:1|max:5',
             ]),
-            'loyalty' => $request->validate([
+            'loyalitas' => $request->validate([
                 'l1' => 'required|integer|min:1|max:5',
                 'l2' => 'required|integer|min:1|max:5',
                 'l3' => 'required|integer|min:1|max:5',
@@ -231,7 +231,7 @@ class SurveyController extends Controller
     private function getCompletedSteps(PelatihanSurveyResponse $survey): int
     {
         $completed = 0;
-        $sections = ['profile_data', 'importance_answers', 'performance_answers', 'satisfaction_answers', 'loyalty_answers', 'feedback_answers'];
+        $sections = ['profile_data', 'harapan_answers', 'persepsi_answers', 'kepuasan_answers', 'loyalitas_answers', 'feedback_answers'];
 
         foreach ($sections as $section) {
             if (!empty($survey->{$section})) {

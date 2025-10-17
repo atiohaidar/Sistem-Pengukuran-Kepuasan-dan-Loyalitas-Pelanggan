@@ -13,15 +13,15 @@ class SurveyCalculationService
     public function calculateSurveyResults($responses)
     {
         // Assuming responses is an array of survey answers
-        // Structure: ['importance' => [...], 'performance' => [...], 'satisfaction' => [...], 'loyalty' => [...], 'demographics' => [...]]
+        // Structure: ['harapan' => [...], 'persepsi' => [...], 'kepuasan' => [...], 'loyalitas' => [...], 'demographics' => [...]]
 
         $results = [
             'total_respondents' => count($responses),
-            'importance_scores' => [],
-            'performance_scores' => [],
+            'harapan_scores' => [],
+            'persepsi_scores' => [],
             'gap_scores' => [],
-            'satisfaction_score' => 0,
-            'loyalty_score' => 0,
+            'kepuasan_score' => 0,
+            'loyalitas_score' => 0,
             'recommendations' => []
         ];
 
@@ -29,41 +29,41 @@ class SurveyCalculationService
             return $results;
         }
 
-        // Calculate importance and performance averages
-        $importanceQuestions = ['imp1', 'imp2', 'imp3', 'imp4', 'imp5', 'imp6']; // Adjust based on actual questions
-        $performanceQuestions = ['perf1', 'perf2', 'perf3', 'perf4', 'perf5', 'perf6'];
+        // Calculate harapan and persepsi averages
+        $harapanQuestions = ['imp1', 'imp2', 'imp3', 'imp4', 'imp5', 'imp6']; // Adjust based on actual questions
+        $persepsiQuestions = ['perf1', 'perf2', 'perf3', 'perf4', 'perf5', 'perf6'];
 
-        foreach ($importanceQuestions as $q) {
+        foreach ($harapanQuestions as $q) {
             $scores = array_column($responses, $q);
-            $results['importance_scores'][$q] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+            $results['harapan_scores'][$q] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
         }
 
-        foreach ($performanceQuestions as $q) {
+        foreach ($persepsiQuestions as $q) {
             $scores = array_column($responses, $q);
-            $results['performance_scores'][$q] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+            $results['persepsi_scores'][$q] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
         }
 
-        // Calculate gaps (Performance - Importance, negative gap indicates problem area)
-        foreach ($importanceQuestions as $index => $impQ) {
-            $perfQ = $performanceQuestions[$index];
-            $gap = $results['performance_scores'][$perfQ] - $results['importance_scores'][$impQ];
+        // Calculate gaps (Persepsi - Harapan, negative gap indicates problem area)
+        foreach ($harapanQuestions as $index => $impQ) {
+            $perfQ = $persepsiQuestions[$index];
+            $gap = $results['persepsi_scores'][$perfQ] - $results['harapan_scores'][$impQ];
             $results['gap_scores'][$impQ] = $gap;
         }
 
-        // Overall satisfaction score (average of performance scores)
-        $results['satisfaction_score'] = array_sum($results['performance_scores']) / count($results['performance_scores']);
+        // Overall kepuasan score (average of persepsi scores)
+        $results['kepuasan_score'] = array_sum($results['persepsi_scores']) / count($results['persepsi_scores']);
 
-        // Loyalty score calculation (based on loyalty questions if available)
-        // Assuming loyalty questions exist in responses
-        $loyaltyQuestions = ['loyalty1', 'loyalty2', 'loyalty3'];
-        $loyaltyScores = [];
-        foreach ($loyaltyQuestions as $q) {
+        // Loyalitas score calculation (based on loyalitas questions if available)
+        // Assuming loyalitas questions exist in responses
+        $loyalitasQuestions = ['loyalitas1', 'loyalitas2', 'loyalitas3'];
+        $loyalitasScores = [];
+        foreach ($loyalitasQuestions as $q) {
             if (isset($responses[0][$q])) {
                 $scores = array_column($responses, $q);
-                $loyaltyScores[] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+                $loyalitasScores[] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
             }
         }
-        $results['loyalty_score'] = count($loyaltyScores) > 0 ? array_sum($loyaltyScores) / count($loyaltyScores) : 0;
+        $results['loyalitas_score'] = count($loyalitasScores) > 0 ? array_sum($loyalitasScores) / count($loyalitasScores) : 0;
 
         // Generate recommendations based on gaps
         $results['recommendations'] = $this->generateRecommendations($results['gap_scores']);
@@ -101,35 +101,35 @@ class SurveyCalculationService
             'applicability' => ['ap1', 'ap2'] // 2 items
         ];
 
-        // 1. Calculate average per item for importance and performance
-        $importanceAverages = [];
-        $performanceAverages = [];
-        $totalImportance = 0;
+        // 1. Calculate average per item for harapan and persepsi
+        $harapanAverages = [];
+        $persepsiAverages = [];
+        $totalHarapan = 0;
 
         foreach ($dimensions as $dim => $items) {
             foreach ($items as $item) {
-                // Access nested structure: importance_answers[reliability][r1]
+                // Access nested structure: harapan_answers[reliability][r1]
                 $impScores = [];
                 $perfScores = [];
                 
                 foreach ($responses as $response) {
-                    if (isset($response['importance_answers'][$dim][$item])) {
-                        $impScores[] = $response['importance_answers'][$dim][$item];
+                    if (isset($response['harapan_answers'][$dim][$item])) {
+                        $impScores[] = $response['harapan_answers'][$dim][$item];
                     }
-                    if (isset($response['performance_answers'][$dim][$item])) {
-                        $perfScores[] = $response['performance_answers'][$dim][$item];
+                    if (isset($response['persepsi_answers'][$dim][$item])) {
+                        $perfScores[] = $response['persepsi_answers'][$dim][$item];
                     }
                 }
                 
-                $importanceAverages[$item] = count($impScores) > 0 ? array_sum($impScores) / count($impScores) : 0;
-                $totalImportance += $importanceAverages[$item];
-                $performanceAverages[$item] = count($perfScores) > 0 ? array_sum($perfScores) / count($perfScores) : 0;
+                $harapanAverages[$item] = count($impScores) > 0 ? array_sum($impScores) / count($impScores) : 0;
+                $totalHarapan += $harapanAverages[$item];
+                $persepsiAverages[$item] = count($perfScores) > 0 ? array_sum($perfScores) / count($perfScores) : 0;
             }
         }
 
         $results['item_averages'] = [
-            'importance' => $importanceAverages,
-            'performance' => $performanceAverages
+            'harapan' => $harapanAverages,
+            'persepsi' => $persepsiAverages
         ];
 
         // 2. Calculate total average per dimension
@@ -139,28 +139,28 @@ class SurveyCalculationService
             $count = 0;
 
             foreach ($items as $item) {
-                if (isset($importanceAverages[$item])) {
-                    $impSum += $importanceAverages[$item];
+                if (isset($harapanAverages[$item])) {
+                    $impSum += $harapanAverages[$item];
                     $count++;
                 }
-                if (isset($performanceAverages[$item])) {
-                    $perfSum += $performanceAverages[$item];
+                if (isset($persepsiAverages[$item])) {
+                    $perfSum += $persepsiAverages[$item];
                 }
             }
 
             $results['dimension_averages'][$dim] = [
-                'importance' => $count > 0 ? $impSum / $count : 0,
-                'performance' => $count > 0 ? $perfSum / $count : 0
+                'harapan' => $count > 0 ? $impSum / $count : 0,
+                'persepsi' => $count > 0 ? $perfSum / $count : 0
             ];
         }
 
         // 3. Calculate Weighting Factor (WF) for each item
-        foreach ($importanceAverages as $item => $avg) {
-            $results['weighting_factors'][$item] = $totalImportance > 0 ? $avg / $totalImportance : 0;
+        foreach ($harapanAverages as $item => $avg) {
+            $results['weighting_factors'][$item] = $totalHarapan > 0 ? $avg / $totalHarapan : 0;
         }
 
         // 4. Calculate Weighted Score (WS) for each item
-        foreach ($performanceAverages as $item => $perfAvg) {
+        foreach ($persepsiAverages as $item => $perfAvg) {
             $wf = $results['weighting_factors'][$item] ?? 0;
             $results['weighted_scores'][$item] = $perfAvg * $wf;
         }
@@ -195,7 +195,7 @@ class SurveyCalculationService
     {
         $results = [
             'total_respondents' => count($responses),
-            'loyalty_item_averages' => [],
+            'loyalitas_item_averages' => [],
             'cli_scores' => [],
             'ilp_percentage' => 0,
             'ilp_interpretation' => ''
@@ -205,21 +205,21 @@ class SurveyCalculationService
             return $results;
         }
 
-        $loyaltyItems = ['l1', 'l2', 'l3']; // L1: repeat purchase, L2: retention, L3: recommendation
+        $loyalitasItems = ['l1', 'l2', 'l3']; // L1: repeat purchase, L2: retention, L3: recommendation
 
-        // 1. Calculate average per loyalty item
-        foreach ($loyaltyItems as $item) {
+        // 1. Calculate average per loyalitas item
+        foreach ($loyalitasItems as $item) {
             $scores = [];
             foreach ($responses as $response) {
-                if (isset($response['loyalty_answers'][$item])) {
-                    $scores[] = $response['loyalty_answers'][$item];
+                if (isset($response['loyalitas_answers'][$item])) {
+                    $scores[] = $response['loyalitas_answers'][$item];
                 }
             }
-            $results['loyalty_item_averages'][$item] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
+            $results['loyalitas_item_averages'][$item] = count($scores) > 0 ? array_sum($scores) / count($scores) : 0;
         }
 
-        // 2. Calculate CLI (Customer Loyalty Index) per item
-        foreach ($results['loyalty_item_averages'] as $item => $avg) {
+        // 2. Calculate CLI (Customer Loyalitas Index) per item
+        foreach ($results['loyalitas_item_averages'] as $item => $avg) {
             $results['cli_scores'][$item] = ($avg / 5) * (100/100) * 100;
         }
 
@@ -272,10 +272,10 @@ class SurveyCalculationService
         // Calculate item gaps
         foreach ($dimensions as $dim => $items) {
             foreach ($items as $item) {
-                // Access nested structure: importance_answers.reliability.r1 and performance_answers.reliability.r1
-                if (isset($responses[0]["importance_answers"][$dim][$item]) && isset($responses[0]["performance_answers"][$dim][$item])) {
-                    $impScores = array_column($responses, "importance_answers.{$dim}.{$item}");
-                    $perfScores = array_column($responses, "performance_answers.{$dim}.{$item}");
+                // Access nested structure: harapan_answers.reliability.r1 and persepsi_answers.reliability.r1
+                if (isset($responses[0]["harapan_answers"][$dim][$item]) && isset($responses[0]["persepsi_answers"][$dim][$item])) {
+                    $impScores = array_column($responses, "harapan_answers.{$dim}.{$item}");
+                    $perfScores = array_column($responses, "persepsi_answers.{$dim}.{$item}");
 
                     $impAvg = count($impScores) > 0 ? array_sum($impScores) / count($impScores) : 0;
                     $perfAvg = count($perfScores) > 0 ? array_sum($perfScores) / count($perfScores) : 0;
@@ -354,8 +354,8 @@ class SurveyCalculationService
         $servqualResults = [];
 
         foreach ($dimensions as $dimension => $questions) {
-            $importanceSum = 0;
-            $performanceSum = 0;
+            $harapanSum = 0;
+            $persepsiSum = 0;
             $count = 0;
 
             foreach ($questions as $q) {
@@ -363,17 +363,17 @@ class SurveyCalculationService
                 $perfQ = 'perf_' . $q;
 
                 if (isset($responses[0][$impQ]) && isset($responses[0][$perfQ])) {
-                    $importanceSum += array_sum(array_column($responses, $impQ)) / count($responses);
-                    $performanceSum += array_sum(array_column($responses, $perfQ)) / count($responses);
+                    $harapanSum += array_sum(array_column($responses, $impQ)) / count($responses);
+                    $persepsiSum += array_sum(array_column($responses, $perfQ)) / count($responses);
                     $count++;
                 }
             }
 
             if ($count > 0) {
                 $servqualResults[$dimension] = [
-                    'importance' => $importanceSum / $count,
-                    'performance' => $performanceSum / $count,
-                    'gap' => ($performanceSum / $count) - ($importanceSum / $count)
+                    'harapan' => $harapanSum / $count,
+                    'persepsi' => $persepsiSum / $count,
+                    'gap' => ($persepsiSum / $count) - ($harapanSum / $count)
                 ];
             }
         }
@@ -382,9 +382,9 @@ class SurveyCalculationService
     }
 
     /**
-     * Calculate loyalty probabilities and predictions
+     * Calculate loyalitas probabilities and predictions
      */
-    public function calculateLoyaltyProbabilities($responses)
+    public function calculateLoyalitasProbabilities($responses)
     {
         $results = [
             'total_respondents' => count($responses),
@@ -402,15 +402,15 @@ class SurveyCalculationService
             return $results;
         }
 
-        // Questions to analyze: K1 (satisfaction), L1, L2, L3 (loyalty)
+        // Questions to analyze: K1 (kepuasan), L1, L2, L3 (loyalitas)
         $questions = ['k1', 'l1', 'l2', 'l3'];
 
         foreach ($questions as $question) {
-            if (!isset($responses[0][$question === 'k1' ? 'satisfaction_answers' : 'loyalty_answers'][$question])) {
+            if (!isset($responses[0][$question === 'k1' ? 'kepuasan_answers' : 'loyalitas_answers'][$question])) {
                 continue;
             }
 
-            $scores = array_column($responses, ($question === 'k1' ? 'satisfaction_answers' : 'loyalty_answers') . ".{$question}");
+            $scores = array_column($responses, ($question === 'k1' ? 'kepuasan_answers' : 'loyalitas_answers') . ".{$question}");
             $totalRespondents = count($scores);
 
             // Count frequency per scale
@@ -435,7 +435,7 @@ class SurveyCalculationService
                 'percentage_probabilities' => $percentageProbabilities,
                 'frequency_probabilities' => $frequencyProbabilities,
                 'total_predicted_loyal' => $totalPredictedLoyal,
-                'loyalty_percentage' => $totalRespondents > 0 ? ($totalPredictedLoyal / $totalRespondents) * 100 : 0
+                'loyalitas_percentage' => $totalRespondents > 0 ? ($totalPredictedLoyal / $totalRespondents) * 100 : 0
             ];
         }
 
@@ -452,7 +452,7 @@ class SurveyCalculationService
             'ikp_analysis' => $this->calculateIKP($responses),
             'ilp_analysis' => $this->calculateILP($responses),
             'gap_analysis' => $this->calculateGapAnalysis($responses),
-            'loyalty_probabilities' => $this->calculateLoyaltyProbabilities($responses),
+            'loyalitas_probabilities' => $this->calculateLoyalitasProbabilities($responses),
             'demographic_statistics' => $this->calculateDemographicStatistics($responses),
             'scale_frequency_analysis' => $this->calculateScaleFrequencyAnalysis($responses)
         ];
@@ -599,68 +599,68 @@ class SurveyCalculationService
 
         // Define all survey questions with their paths
         $questionMappings = [
-            // Importance questions
-            'reliability.r1' => ['path' => ['importance_answers', 'reliability', 'r1'], 'key' => 'r1'],
-            'reliability.r2' => ['path' => ['importance_answers', 'reliability', 'r2'], 'key' => 'r2'],
-            'reliability.r3' => ['path' => ['importance_answers', 'reliability', 'r3'], 'key' => 'r3'],
-            'reliability.r4' => ['path' => ['importance_answers', 'reliability', 'r4'], 'key' => 'r4'],
-            'reliability.r5' => ['path' => ['importance_answers', 'reliability', 'r5'], 'key' => 'r5'],
-            'reliability.r6' => ['path' => ['importance_answers', 'reliability', 'r6'], 'key' => 'r6'],
-            'reliability.r7' => ['path' => ['importance_answers', 'reliability', 'r7'], 'key' => 'r7'],
-            'assurance.a1' => ['path' => ['importance_answers', 'assurance', 'a1'], 'key' => 'a1'],
-            'assurance.a2' => ['path' => ['importance_answers', 'assurance', 'a2'], 'key' => 'a2'],
-            'assurance.a3' => ['path' => ['importance_answers', 'assurance', 'a3'], 'key' => 'a3'],
-            'assurance.a4' => ['path' => ['importance_answers', 'assurance', 'a4'], 'key' => 'a4'],
-            'tangible.t1' => ['path' => ['importance_answers', 'tangible', 't1'], 'key' => 't1'],
-            'tangible.t2' => ['path' => ['importance_answers', 'tangible', 't2'], 'key' => 't2'],
-            'tangible.t3' => ['path' => ['importance_answers', 'tangible', 't3'], 'key' => 't3'],
-            'tangible.t4' => ['path' => ['importance_answers', 'tangible', 't4'], 'key' => 't4'],
-            'tangible.t5' => ['path' => ['importance_answers', 'tangible', 't5'], 'key' => 't5'],
-            'tangible.t6' => ['path' => ['importance_answers', 'tangible', 't6'], 'key' => 't6'],
-            'empathy.e1' => ['path' => ['importance_answers', 'empathy', 'e1'], 'key' => 'e1'],
-            'empathy.e2' => ['path' => ['importance_answers', 'empathy', 'e2'], 'key' => 'e2'],
-            'empathy.e3' => ['path' => ['importance_answers', 'empathy', 'e3'], 'key' => 'e3'],
-            'empathy.e4' => ['path' => ['importance_answers', 'empathy', 'e4'], 'key' => 'e4'],
-            'empathy.e5' => ['path' => ['importance_answers', 'empathy', 'e5'], 'key' => 'e5'],
-            'responsiveness.rs1' => ['path' => ['importance_answers', 'responsiveness', 'rs1'], 'key' => 'rs1'],
-            'responsiveness.rs2' => ['path' => ['importance_answers', 'responsiveness', 'rs2'], 'key' => 'rs2'],
-            'applicability.ap1' => ['path' => ['importance_answers', 'applicability', 'ap1'], 'key' => 'ap1'],
-            'applicability.ap2' => ['path' => ['importance_answers', 'applicability', 'ap2'], 'key' => 'ap2'],
-            // Performance questions
-            'performance.reliability.r1' => ['path' => ['performance_answers', 'reliability', 'r1'], 'key' => 'r1'],
-            'performance.reliability.r2' => ['path' => ['performance_answers', 'reliability', 'r2'], 'key' => 'r2'],
-            'performance.reliability.r3' => ['path' => ['performance_answers', 'reliability', 'r3'], 'key' => 'r3'],
-            'performance.reliability.r4' => ['path' => ['performance_answers', 'reliability', 'r4'], 'key' => 'r4'],
-            'performance.reliability.r5' => ['path' => ['performance_answers', 'reliability', 'r5'], 'key' => 'r5'],
-            'performance.reliability.r6' => ['path' => ['performance_answers', 'reliability', 'r6'], 'key' => 'r6'],
-            'performance.reliability.r7' => ['path' => ['performance_answers', 'reliability', 'r7'], 'key' => 'r7'],
-            'performance.assurance.a1' => ['path' => ['performance_answers', 'assurance', 'a1'], 'key' => 'a1'],
-            'performance.assurance.a2' => ['path' => ['performance_answers', 'assurance', 'a2'], 'key' => 'a2'],
-            'performance.assurance.a3' => ['path' => ['performance_answers', 'assurance', 'a3'], 'key' => 'a3'],
-            'performance.assurance.a4' => ['path' => ['performance_answers', 'assurance', 'a4'], 'key' => 'a4'],
-            'performance.tangible.t1' => ['path' => ['performance_answers', 'tangible', 't1'], 'key' => 't1'],
-            'performance.tangible.t2' => ['path' => ['performance_answers', 'tangible', 't2'], 'key' => 't2'],
-            'performance.tangible.t3' => ['path' => ['performance_answers', 'tangible', 't3'], 'key' => 't3'],
-            'performance.tangible.t4' => ['path' => ['performance_answers', 'tangible', 't4'], 'key' => 't4'],
-            'performance.tangible.t5' => ['path' => ['performance_answers', 'tangible', 't5'], 'key' => 't5'],
-            'performance.tangible.t6' => ['path' => ['performance_answers', 'tangible', 't6'], 'key' => 't6'],
-            'performance.empathy.e1' => ['path' => ['performance_answers', 'empathy', 'e1'], 'key' => 'e1'],
-            'performance.empathy.e2' => ['path' => ['performance_answers', 'empathy', 'e2'], 'key' => 'e2'],
-            'performance.empathy.e3' => ['path' => ['performance_answers', 'empathy', 'e3'], 'key' => 'e3'],
-            'performance.empathy.e4' => ['path' => ['performance_answers', 'empathy', 'e4'], 'key' => 'e4'],
-            'performance.empathy.e5' => ['path' => ['performance_answers', 'empathy', 'e5'], 'key' => 'e5'],
-            'performance.responsiveness.rs1' => ['path' => ['performance_answers', 'responsiveness', 'rs1'], 'key' => 'rs1'],
-            'performance.responsiveness.rs2' => ['path' => ['performance_answers', 'responsiveness', 'rs2'], 'key' => 'rs2'],
-            'performance.applicability.ap1' => ['path' => ['performance_answers', 'applicability', 'ap1'], 'key' => 'ap1'],
-            'performance.applicability.ap2' => ['path' => ['performance_answers', 'applicability', 'ap2'], 'key' => 'ap2'],
-            // Satisfaction questions
-            'satisfaction.k1' => ['path' => ['satisfaction_answers', 'k1'], 'key' => 'k1'],
-            'satisfaction.k2' => ['path' => ['satisfaction_answers', 'k2'], 'key' => 'k2'],
-            'satisfaction.k3' => ['path' => ['satisfaction_answers', 'k3'], 'key' => 'k3'],
-            // Loyalty questions
-            'loyalty.l1' => ['path' => ['loyalty_answers', 'l1'], 'key' => 'l1'],
-            'loyalty.l2' => ['path' => ['loyalty_answers', 'l2'], 'key' => 'l2'],
-            'loyalty.l3' => ['path' => ['loyalty_answers', 'l3'], 'key' => 'l3']
+            // Harapan questions
+            'reliability.r1' => ['path' => ['harapan_answers', 'reliability', 'r1'], 'key' => 'r1'],
+            'reliability.r2' => ['path' => ['harapan_answers', 'reliability', 'r2'], 'key' => 'r2'],
+            'reliability.r3' => ['path' => ['harapan_answers', 'reliability', 'r3'], 'key' => 'r3'],
+            'reliability.r4' => ['path' => ['harapan_answers', 'reliability', 'r4'], 'key' => 'r4'],
+            'reliability.r5' => ['path' => ['harapan_answers', 'reliability', 'r5'], 'key' => 'r5'],
+            'reliability.r6' => ['path' => ['harapan_answers', 'reliability', 'r6'], 'key' => 'r6'],
+            'reliability.r7' => ['path' => ['harapan_answers', 'reliability', 'r7'], 'key' => 'r7'],
+            'assurance.a1' => ['path' => ['harapan_answers', 'assurance', 'a1'], 'key' => 'a1'],
+            'assurance.a2' => ['path' => ['harapan_answers', 'assurance', 'a2'], 'key' => 'a2'],
+            'assurance.a3' => ['path' => ['harapan_answers', 'assurance', 'a3'], 'key' => 'a3'],
+            'assurance.a4' => ['path' => ['harapan_answers', 'assurance', 'a4'], 'key' => 'a4'],
+            'tangible.t1' => ['path' => ['harapan_answers', 'tangible', 't1'], 'key' => 't1'],
+            'tangible.t2' => ['path' => ['harapan_answers', 'tangible', 't2'], 'key' => 't2'],
+            'tangible.t3' => ['path' => ['harapan_answers', 'tangible', 't3'], 'key' => 't3'],
+            'tangible.t4' => ['path' => ['harapan_answers', 'tangible', 't4'], 'key' => 't4'],
+            'tangible.t5' => ['path' => ['harapan_answers', 'tangible', 't5'], 'key' => 't5'],
+            'tangible.t6' => ['path' => ['harapan_answers', 'tangible', 't6'], 'key' => 't6'],
+            'empathy.e1' => ['path' => ['harapan_answers', 'empathy', 'e1'], 'key' => 'e1'],
+            'empathy.e2' => ['path' => ['harapan_answers', 'empathy', 'e2'], 'key' => 'e2'],
+            'empathy.e3' => ['path' => ['harapan_answers', 'empathy', 'e3'], 'key' => 'e3'],
+            'empathy.e4' => ['path' => ['harapan_answers', 'empathy', 'e4'], 'key' => 'e4'],
+            'empathy.e5' => ['path' => ['harapan_answers', 'empathy', 'e5'], 'key' => 'e5'],
+            'responsiveness.rs1' => ['path' => ['harapan_answers', 'responsiveness', 'rs1'], 'key' => 'rs1'],
+            'responsiveness.rs2' => ['path' => ['harapan_answers', 'responsiveness', 'rs2'], 'key' => 'rs2'],
+            'applicability.ap1' => ['path' => ['harapan_answers', 'applicability', 'ap1'], 'key' => 'ap1'],
+            'applicability.ap2' => ['path' => ['harapan_answers', 'applicability', 'ap2'], 'key' => 'ap2'],
+            // Persepsi questions
+            'persepsi.reliability.r1' => ['path' => ['persepsi_answers', 'reliability', 'r1'], 'key' => 'r1'],
+            'persepsi.reliability.r2' => ['path' => ['persepsi_answers', 'reliability', 'r2'], 'key' => 'r2'],
+            'persepsi.reliability.r3' => ['path' => ['persepsi_answers', 'reliability', 'r3'], 'key' => 'r3'],
+            'persepsi.reliability.r4' => ['path' => ['persepsi_answers', 'reliability', 'r4'], 'key' => 'r4'],
+            'persepsi.reliability.r5' => ['path' => ['persepsi_answers', 'reliability', 'r5'], 'key' => 'r5'],
+            'persepsi.reliability.r6' => ['path' => ['persepsi_answers', 'reliability', 'r6'], 'key' => 'r6'],
+            'persepsi.reliability.r7' => ['path' => ['persepsi_answers', 'reliability', 'r7'], 'key' => 'r7'],
+            'persepsi.assurance.a1' => ['path' => ['persepsi_answers', 'assurance', 'a1'], 'key' => 'a1'],
+            'persepsi.assurance.a2' => ['path' => ['persepsi_answers', 'assurance', 'a2'], 'key' => 'a2'],
+            'persepsi.assurance.a3' => ['path' => ['persepsi_answers', 'assurance', 'a3'], 'key' => 'a3'],
+            'persepsi.assurance.a4' => ['path' => ['persepsi_answers', 'assurance', 'a4'], 'key' => 'a4'],
+            'persepsi.tangible.t1' => ['path' => ['persepsi_answers', 'tangible', 't1'], 'key' => 't1'],
+            'persepsi.tangible.t2' => ['path' => ['persepsi_answers', 'tangible', 't2'], 'key' => 't2'],
+            'persepsi.tangible.t3' => ['path' => ['persepsi_answers', 'tangible', 't3'], 'key' => 't3'],
+            'persepsi.tangible.t4' => ['path' => ['persepsi_answers', 'tangible', 't4'], 'key' => 't4'],
+            'persepsi.tangible.t5' => ['path' => ['persepsi_answers', 'tangible', 't5'], 'key' => 't5'],
+            'persepsi.tangible.t6' => ['path' => ['persepsi_answers', 'tangible', 't6'], 'key' => 't6'],
+            'persepsi.empathy.e1' => ['path' => ['persepsi_answers', 'empathy', 'e1'], 'key' => 'e1'],
+            'persepsi.empathy.e2' => ['path' => ['persepsi_answers', 'empathy', 'e2'], 'key' => 'e2'],
+            'persepsi.empathy.e3' => ['path' => ['persepsi_answers', 'empathy', 'e3'], 'key' => 'e3'],
+            'persepsi.empathy.e4' => ['path' => ['persepsi_answers', 'empathy', 'e4'], 'key' => 'e4'],
+            'persepsi.empathy.e5' => ['path' => ['persepsi_answers', 'empathy', 'e5'], 'key' => 'e5'],
+            'persepsi.responsiveness.rs1' => ['path' => ['persepsi_answers', 'responsiveness', 'rs1'], 'key' => 'rs1'],
+            'persepsi.responsiveness.rs2' => ['path' => ['persepsi_answers', 'responsiveness', 'rs2'], 'key' => 'rs2'],
+            'persepsi.applicability.ap1' => ['path' => ['persepsi_answers', 'applicability', 'ap1'], 'key' => 'ap1'],
+            'persepsi.applicability.ap2' => ['path' => ['persepsi_answers', 'applicability', 'ap2'], 'key' => 'ap2'],
+            // Kepuasan questions
+            'kepuasan.k1' => ['path' => ['kepuasan_answers', 'k1'], 'key' => 'k1'],
+            'kepuasan.k2' => ['path' => ['kepuasan_answers', 'k2'], 'key' => 'k2'],
+            'kepuasan.k3' => ['path' => ['kepuasan_answers', 'k3'], 'key' => 'k3'],
+            // Loyalitas questions
+            'loyalitas.l1' => ['path' => ['loyalitas_answers', 'l1'], 'key' => 'l1'],
+            'loyalitas.l2' => ['path' => ['loyalitas_answers', 'l2'], 'key' => 'l2'],
+            'loyalitas.l3' => ['path' => ['loyalitas_answers', 'l3'], 'key' => 'l3']
         ];
 
         foreach ($questionMappings as $questionKey => $mapping) {

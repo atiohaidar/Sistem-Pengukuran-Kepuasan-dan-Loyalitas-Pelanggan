@@ -48,8 +48,8 @@ class SurveyDashboardController extends Controller
     private function getQuestionLabels()
     {
         return [
-            // Importance questions
-            'importance_answers' => [
+            // Harapan questions
+            'harapan_answers' => [
                 'reliability' => [
                     'r1' => 'Materi pelatihan disampaikan dengan jelas dan mudah dipahami',
                     'r2' => 'Materi pelatihan sesuai dengan kebutuhan peserta',
@@ -89,8 +89,8 @@ class SurveyDashboardController extends Controller
                     'ap2' => 'Materi pelatihan memberikan manfaat praktis bagi peserta',
                 ],
             ],
-            // Performance questions (same as importance for now)
-            'performance_answers' => [
+            // Persepsi questions (same as harapan for now)
+            'persepsi_answers' => [
                 'reliability' => [
                     'r1' => 'Materi pelatihan disampaikan dengan jelas dan mudah dipahami',
                     'r2' => 'Materi pelatihan sesuai dengan kebutuhan peserta',
@@ -130,14 +130,14 @@ class SurveyDashboardController extends Controller
                     'ap2' => 'Materi pelatihan memberikan manfaat praktis bagi peserta',
                 ],
             ],
-            // Satisfaction questions
-            'satisfaction_answers' => [
+            // Kepuasan questions
+            'kepuasan_answers' => [
                 'k1' => 'Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelatihan ini?',
                 'k2' => 'Seberapa besar manfaat yang Anda peroleh dari pelatihan ini?',
                 'k3' => 'Apakah Anda akan merekomendasikan pelatihan ini kepada orang lain?',
             ],
-            // Loyalty questions
-            'loyalty_answers' => [
+            // Loyalitas questions
+            'loyalitas_answers' => [
                 'l1' => 'Apakah Anda akan mengikuti pelatihan serupa di masa depan?',
                 'l2' => 'Apakah Anda akan menggunakan jasa pelatihan dari institusi ini lagi?',
                 'l3' => 'Apakah Anda akan merekomendasikan institusi ini kepada orang lain?',

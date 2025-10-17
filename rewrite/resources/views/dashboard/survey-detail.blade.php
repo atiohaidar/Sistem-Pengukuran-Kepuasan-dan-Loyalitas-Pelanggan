@@ -111,14 +111,14 @@
 
                     <!-- Survey Answers -->
                     @if($surveyResponse->status === 'completed')
-                        <!-- Importance Answers -->
-                        @if($surveyResponse->importance_answers)
+                        <!-- Harapan Answers -->
+                        @if($surveyResponse->harapan_answers)
                             <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                                 <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
-                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Pentingnya (Importance)</h3>
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Pentingnya (Harapan)</h3>
                                 </div>
                                 <div class="p-6">
-                                    @foreach($questionLabels['importance_answers'] as $dimension => $questions)
+                                    @foreach($questionLabels['harapan_answers'] as $dimension => $questions)
                                         <h5 class="text-lg font-semibold text-blue-600 mb-3">{{ ucfirst($dimension) }}</h5>
                                         <div class="overflow-x-auto mb-6">
                                             <table class="min-w-full divide-y divide-gray-200">
@@ -134,7 +134,7 @@
                                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
                                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                                    {{ $surveyResponse->importance_answers[$dimension][$key] ?? '-' }}/5
+                                                                    {{ $surveyResponse->harapan_answers[$dimension][$key] ?? '-' }}/5
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -147,14 +147,14 @@
                             </div>
                         @endif
 
-                        <!-- Performance Answers -->
-                        @if($surveyResponse->performance_answers)
+                        <!-- Persepsi Answers -->
+                        @if($surveyResponse->persepsi_answers)
                             <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                                 <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
-                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kinerja (Performance)</h3>
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kinerja (Persepsi)</h3>
                                 </div>
                                 <div class="p-6">
-                                    @foreach($questionLabels['performance_answers'] as $dimension => $questions)
+                                    @foreach($questionLabels['persepsi_answers'] as $dimension => $questions)
                                         <h5 class="text-lg font-semibold text-green-600 mb-3">{{ ucfirst($dimension) }}</h5>
                                         <div class="overflow-x-auto mb-6">
                                             <table class="min-w-full divide-y divide-gray-200">
@@ -170,7 +170,7 @@
                                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
                                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                    {{ $surveyResponse->performance_answers[$dimension][$key] ?? '-' }}/5
+                                                                    {{ $surveyResponse->persepsi_answers[$dimension][$key] ?? '-' }}/5
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -183,11 +183,11 @@
                             </div>
                         @endif
 
-                        <!-- Satisfaction Answers -->
-                        @if($surveyResponse->satisfaction_answers)
+                        <!-- Kepuasan Answers -->
+                        @if($surveyResponse->kepuasan_answers)
                             <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                                 <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
-                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kepuasan (Satisfaction)</h3>
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Kepuasan (Kepuasan)</h3>
                                 </div>
                                 <div class="p-6">
                                     <div class="overflow-x-auto">
@@ -199,12 +199,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
-                                                @foreach($questionLabels['satisfaction_answers'] as $key => $question)
+                                                @foreach($questionLabels['kepuasan_answers'] as $key => $question)
                                                     <tr>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                                {{ $surveyResponse->satisfaction_answers[$key] ?? '-' }}/5
+                                                                {{ $surveyResponse->kepuasan_answers[$key] ?? '-' }}/5
                                                             </span>
                                                         </td>
                                                     </tr>
@@ -216,11 +216,11 @@
                             </div>
                         @endif
 
-                        <!-- Loyalty Answers -->
-                        @if($surveyResponse->loyalty_answers)
+                        <!-- Loyalitas Answers -->
+                        @if($surveyResponse->loyalitas_answers)
                             <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                                 <div class="px-6 py-4 bg-gray-100 border-b border-gray-200">
-                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Loyalitas (Loyalty)</h3>
+                                    <h3 class="text-lg font-medium text-gray-900">Jawaban Loyalitas (Loyalitas)</h3>
                                 </div>
                                 <div class="p-6">
                                     <div class="overflow-x-auto">
@@ -232,12 +232,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
-                                                @foreach($questionLabels['loyalty_answers'] as $key => $question)
+                                                @foreach($questionLabels['loyalitas_answers'] as $key => $question)
                                                     <tr>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $question }}</td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                                {{ $surveyResponse->loyalty_answers[$key] ?? '-' }}/5
+                                                                {{ $surveyResponse->loyalitas_answers[$key] ?? '-' }}/5
                                                             </span>
                                                         </td>
                                                     </tr>

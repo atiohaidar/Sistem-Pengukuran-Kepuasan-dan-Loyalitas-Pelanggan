@@ -15,10 +15,10 @@
         @php
             $steps = [
                 'profile' => 'Profil',
-                'importance' => 'Harapan',
-                'performance' => 'Persepsi',
-                'satisfaction' => 'Kepuasan',
-                'loyalty' => 'Loyalitas',
+                'harapan' => 'Harapan',
+                'persepsi' => 'Persepsi',
+                'kepuasan' => 'Kepuasan',
+                'loyalitas' => 'Loyalitas',
                 'feedback' => 'Saran'
             ];
         @endphp

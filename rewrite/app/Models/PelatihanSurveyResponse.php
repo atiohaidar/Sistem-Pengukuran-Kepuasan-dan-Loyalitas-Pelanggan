@@ -15,10 +15,10 @@ class PelatihanSurveyResponse extends Model
         'session_token',
         'survey_type',
         'profile_data',
-        'importance_answers',
-        'performance_answers',
-        'satisfaction_answers',
-        'loyalty_answers',
+        'harapan_answers',
+        'persepsi_answers',
+        'kepuasan_answers',
+        'loyalitas_answers',
         'feedback_answers',
         'status',
         'started_at',
@@ -27,10 +27,10 @@ class PelatihanSurveyResponse extends Model
 
     protected $casts = [
         'profile_data' => 'array',
-        'importance_answers' => 'array',
-        'performance_answers' => 'array',
-        'satisfaction_answers' => 'array',
-        'loyalty_answers' => 'array',
+        'harapan_answers' => 'array',
+        'persepsi_answers' => 'array',
+        'kepuasan_answers' => 'array',
+        'loyalitas_answers' => 'array',
         'feedback_answers' => 'array',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
@@ -126,7 +126,7 @@ class PelatihanSurveyResponse extends Model
      */
     public function getCompletionPercentage(): float
     {
-        $sections = ['profile_data', 'importance_answers', 'performance_answers', 'satisfaction_answers', 'loyalty_answers', 'feedback_answers'];
+        $sections = ['profile_data', 'harapan_answers', 'persepsi_answers', 'kepuasan_answers', 'loyalitas_answers', 'feedback_answers'];
         $completed = 0;
 
         foreach ($sections as $section) {

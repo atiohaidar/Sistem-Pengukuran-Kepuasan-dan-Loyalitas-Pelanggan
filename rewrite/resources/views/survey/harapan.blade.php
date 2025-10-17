@@ -17,7 +17,7 @@
                 <p class="text-blue-100 mt-1">Berikan jawaban yang sesuai dengan preferensi anda. Tentukan seberapa penting atribut tersebut memengaruhi Anda dalam menggunakan jasa pelatihan ini</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['step' => 'importance']) }}" class="p-6">
+            <form method="POST" action="{{ route('survey.store', ['step' => 'harapan']) }}" class="p-6">
                 @csrf
 
                 @if(session('success'))
@@ -40,10 +40,10 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-blue-50 p-3 rounded">Reliability (Kehandalan)</h3>
                     <div class="space-y-4">
-                        @php $reliabilityData = $survey->getAnswers('importance', 'reliability') ?? []; @endphp
+                        @php $reliabilityData = $survey->getAnswers('harapan', 'reliability') ?? []; @endphp
 
                         @php
-    function renderImportanceSelect($name, $data, $key, $default = null) {
+    function renderHarapanSelect($name, $data, $key, $default = null) {
         $selected = $data[$key] ?? old($name) ?? $default ?? '';
         $options = [
             '' => 'Pilih tingkat kepentingan',
@@ -68,37 +68,37 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Kesesuaian isi post test dengan materi pelatihan yang diberikan</label>
-                                {!! renderImportanceSelect('reliability[r1]', $reliabilityData, 'r1') !!}
+                                {!! renderHarapanSelect('reliability[r1]', $reliabilityData, 'r1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan</label>
-                                {!! renderImportanceSelect('reliability[r2]', $reliabilityData, 'r2') !!}
+                                {!! renderHarapanSelect('reliability[r2]', $reliabilityData, 'r2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Ketepatan waktu dalam memberikan sertifikat pelatihan</label>
-                                {!! renderImportanceSelect('reliability[r3]', $reliabilityData, 'r3') !!}
+                                {!! renderHarapanSelect('reliability[r3]', $reliabilityData, 'r3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Ketepatan trainer dalam menjawab pertanyaan peserta</label>
-                                {!! renderImportanceSelect('reliability[r4]', $reliabilityData, 'r4') !!}
+                                {!! renderHarapanSelect('reliability[r4]', $reliabilityData, 'r4') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">5. Materi pelatihan mudah dimengerti</label>
-                                {!! renderImportanceSelect('reliability[r5]', $reliabilityData, 'r5') !!}
+                                {!! renderHarapanSelect('reliability[r5]', $reliabilityData, 'r5') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">6. Kemudahan dalam melakukan registrasi pelatihan</label>
-                                {!! renderImportanceSelect('reliability[r6]', $reliabilityData, 'r6') !!}
+                                {!! renderHarapanSelect('reliability[r6]', $reliabilityData, 'r6') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">7. Kemudahan dalam melakukan pembayaran pelatihan</label>
-                                {!! renderImportanceSelect('reliability[r7]', $reliabilityData, 'r7') !!}
+                                {!! renderHarapanSelect('reliability[r7]', $reliabilityData, 'r7') !!}
                             </div>
                         </div>
                     </div>
@@ -108,27 +108,27 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-green-50 p-3 rounded">Assurance (Jaminan)</h3>
                     <div class="space-y-4">
-                        @php $assuranceData = $survey->getAnswers('importance', 'assurance') ?? []; @endphp
+                        @php $assuranceData = $survey->getAnswers('harapan', 'assurance') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer/pegawai bersikap sopan</label>
-                                {!! renderImportanceSelect('assurance[a1]', $assuranceData, 'a1') !!}
+                                {!! renderHarapanSelect('assurance[a1]', $assuranceData, 'a1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memiliki pengetahuan yang luas mengenai materi pelatihan</label>
-                                {!! renderImportanceSelect('assurance[a2]', $assuranceData, 'a2') !!}
+                                {!! renderHarapanSelect('assurance[a2]', $assuranceData, 'a2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami</label>
-                                {!! renderImportanceSelect('assurance[a3]', $assuranceData, 'a3') !!}
+                                {!! renderHarapanSelect('assurance[a3]', $assuranceData, 'a3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service selalu dapat menyelesaikan keluhan pelanggan</label>
-                                {!! renderImportanceSelect('assurance[a4]', $assuranceData, 'a4') !!}
+                                {!! renderHarapanSelect('assurance[a4]', $assuranceData, 'a4') !!}
                             </div>
                         </div>
                     </div>
@@ -138,37 +138,37 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-purple-50 p-3 rounded">Tangible (Bukti Fisik)</h3>
                     <div class="space-y-4">
-                        @php $tangibleData = $survey->getAnswers('importance', 'tangible') ?? []; @endphp
+                        @php $tangibleData = $survey->getAnswers('harapan', 'tangible') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Sistem aplikasi pelatihan online yang user friendly</label>
-                                {!! renderImportanceSelect('tangible[t1]', $tangibleData, 't1') !!}
+                                {!! renderHarapanSelect('tangible[t1]', $tangibleData, 't1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Website menampilkan informasi terbaru</label>
-                                {!! renderImportanceSelect('tangible[t2]', $tangibleData, 't2') !!}
+                                {!! renderHarapanSelect('tangible[t2]', $tangibleData, 't2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Perlengkapan audio visual berfungsi dengan baik</label>
-                                {!! renderImportanceSelect('tangible[t3]', $tangibleData, 't3') !!}
+                                {!! renderHarapanSelect('tangible[t3]', $tangibleData, 't3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Koneksi internet host lancar selama pelatihan berlangsung</label>
-                                {!! renderImportanceSelect('tangible[t4]', $tangibleData, 't4') !!}
+                                {!! renderHarapanSelect('tangible[t4]', $tangibleData, 't4') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">5. Tampilan modul pelatihan menarik untuk dibaca</label>
-                                {!! renderImportanceSelect('tangible[t5]', $tangibleData, 't5') !!}
+                                {!! renderHarapanSelect('tangible[t5]', $tangibleData, 't5') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">6. Trainer berpenampilan rapi</label>
-                                {!! renderImportanceSelect('tangible[t6]', $tangibleData, 't6') !!}
+                                {!! renderHarapanSelect('tangible[t6]', $tangibleData, 't6') !!}
                             </div>
                         </div>
                     </div>
@@ -178,32 +178,32 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-pink-50 p-3 rounded">Empathy (Empati)</h3>
                     <div class="space-y-4">
-                        @php $empathyData = $survey->getAnswers('importance', 'empathy') ?? []; @endphp
+                        @php $empathyData = $survey->getAnswers('harapan', 'empathy') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer memberi perhatian kepada peserta</label>
-                                {!! renderImportanceSelect('empathy[e1]', $empathyData, 'e1') !!}
+                                {!! renderHarapanSelect('empathy[e1]', $empathyData, 'e1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memahami kebutuhan peserta</label>
-                                {!! renderImportanceSelect('empathy[e2]', $empathyData, 'e2') !!}
+                                {!! renderHarapanSelect('empathy[e2]', $empathyData, 'e2') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">3. Terjalin komunikasi yang baik antara trainer dengan peserta</label>
-                                {!! renderImportanceSelect('empathy[e3]', $empathyData, 'e3') !!}
+                                {!! renderHarapanSelect('empathy[e3]', $empathyData, 'e3') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer berupaya membantu saat peserta mengalami kesulitan</label>
-                                {!! renderImportanceSelect('empathy[e4]', $empathyData, 'e4') !!}
+                                {!! renderHarapanSelect('empathy[e4]', $empathyData, 'e4') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">5. Kecukupan waktu yang dialokasikan untuk pelatihan</label>
-                                {!! renderImportanceSelect('empathy[e5]', $empathyData, 'e5') !!}
+                                {!! renderHarapanSelect('empathy[e5]', $empathyData, 'e5') !!}
                             </div>
                         </div>
                     </div>
@@ -213,17 +213,17 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-yellow-50 p-3 rounded">Responsiveness (Daya Tanggap)</h3>
                     <div class="space-y-4">
-                        @php $responsivenessData = $survey->getAnswers('importance', 'responsiveness') ?? []; @endphp
+                        @php $responsivenessData = $survey->getAnswers('harapan', 'responsiveness') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Kecepatan respon contact person perusahaan dalam menanggapi peserta</label>
-                                {!! renderImportanceSelect('responsiveness[r1]', $responsivenessData, 'r1') !!}
+                                {!! renderHarapanSelect('responsiveness[r1]', $responsivenessData, 'r1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Kepastian informasi mengenai jadwal pelatihan</label>
-                                {!! renderImportanceSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
+                                {!! renderHarapanSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
                             </div>
                         </div>
                     </div>
@@ -233,17 +233,17 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4 bg-indigo-50 p-3 rounded">Applicability (Penerapan)</h3>
                     <div class="space-y-4">
-                        @php $applicabilityData = $survey->getAnswers('importance', 'applicability') ?? []; @endphp
+                        @php $applicabilityData = $survey->getAnswers('harapan', 'applicability') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">1. Pelatihan berkaitan langsung dengan pekerjaan saya</label>
-                                {!! renderImportanceSelect('applicability[ap1]', $applicabilityData, 'ap1') !!}
+                                {!! renderHarapanSelect('applicability[ap1]', $applicabilityData, 'ap1') !!}
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">2. Pelatihan yang diberikan mudah untuk diterapkan dalam pekerjaan</label>
-                                {!! renderImportanceSelect('applicability[ap2]', $applicabilityData, 'ap2') !!}
+                                {!! renderHarapanSelect('applicability[ap2]', $applicabilityData, 'ap2') !!}
                             </div>
                         </div>
                     </div>

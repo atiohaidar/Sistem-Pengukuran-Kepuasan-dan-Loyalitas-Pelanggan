@@ -25,11 +25,11 @@ class SurveyCalculationServiceTest extends TestCase
         $results = $this->service->calculateSurveyResults($responses);
 
         $this->assertEquals(0, $results['total_respondents']);
-        $this->assertEmpty($results['importance_scores']);
-        $this->assertEmpty($results['performance_scores']);
+        $this->assertEmpty($results['harapan_scores']);
+        $this->assertEmpty($results['persepsi_scores']);
         $this->assertEmpty($results['gap_scores']);
-        $this->assertEquals(0, $results['satisfaction_score']);
-        $this->assertEquals(0, $results['loyalty_score']);
+        $this->assertEquals(0, $results['kepuasan_score']);
+        $this->assertEquals(0, $results['loyalitas_score']);
         $this->assertEmpty($results['recommendations']);
     }
 
@@ -39,34 +39,34 @@ class SurveyCalculationServiceTest extends TestCase
             [
                 'imp1' => 4, 'imp2' => 5, 'imp3' => 3, 'imp4' => 4, 'imp5' => 5, 'imp6' => 4,
                 'perf1' => 3, 'perf2' => 4, 'perf3' => 2, 'perf4' => 3, 'perf5' => 4, 'perf6' => 3,
-                'loyalty1' => 4, 'loyalty2' => 5, 'loyalty3' => 4
+                'loyalitas1' => 4, 'loyalitas2' => 5, 'loyalitas3' => 4
             ],
             [
                 'imp1' => 5, 'imp2' => 4, 'imp3' => 4, 'imp4' => 5, 'imp5' => 4, 'imp6' => 5,
                 'perf1' => 4, 'perf2' => 3, 'perf3' => 3, 'perf4' => 4, 'perf5' => 3, 'perf6' => 4,
-                'loyalty1' => 5, 'loyalty2' => 4, 'loyalty3' => 5
+                'loyalitas1' => 5, 'loyalitas2' => 4, 'loyalitas3' => 5
             ]
         ];
 
         $results = $this->service->calculateSurveyResults($responses);
 
         $this->assertEquals(2, $results['total_respondents']);
-        $this->assertCount(6, $results['importance_scores']);
-        $this->assertCount(6, $results['performance_scores']);
+        $this->assertCount(6, $results['harapan_scores']);
+        $this->assertCount(6, $results['persepsi_scores']);
         $this->assertCount(6, $results['gap_scores']);
 
         // Check specific calculations
-        $this->assertEquals(4.5, $results['importance_scores']['imp1']); // (4+5)/2
-        $this->assertEquals(3.5, $results['performance_scores']['perf1']); // (3+4)/2
+        $this->assertEquals(4.5, $results['harapan_scores']['imp1']); // (4+5)/2
+        $this->assertEquals(3.5, $results['persepsi_scores']['perf1']); // (3+4)/2
         $this->assertEquals(-1.0, $results['gap_scores']['imp1']); // 3.5 - 4.5
 
-        // Satisfaction score is average of performance scores
-        $expectedSatisfaction = (3.5 + 3.5 + 2.5 + 3.5 + 3.5 + 3.5) / 6; // Calculate manually
-        $this->assertEquals($expectedSatisfaction, $results['satisfaction_score']);
+        // Kepuasan score is average of persepsi scores
+        $expectedKepuasan = (3.5 + 3.5 + 2.5 + 3.5 + 3.5 + 3.5) / 6; // Calculate manually
+        $this->assertEquals($expectedKepuasan, $results['kepuasan_score']);
 
-        // Loyalty score
-        $expectedLoyalty = (4.5 + 4.5 + 4.5) / 3; // (4+5)/2, (5+4)/2, (4+5)/2 averaged
-        $this->assertEquals($expectedLoyalty, $results['loyalty_score']);
+        // Loyalitas score
+        $expectedLoyalitas = (4.5 + 4.5 + 4.5) / 3; // (4+5)/2, (5+4)/2, (4+5)/2 averaged
+        $this->assertEquals($expectedLoyalitas, $results['loyalitas_score']);
 
         $this->assertNotEmpty($results['recommendations']);
     }
@@ -96,7 +96,7 @@ class SurveyCalculationServiceTest extends TestCase
     {
         $responses = [
             [
-                'importance_answers' => [
+                'harapan_answers' => [
                     'reliability' => ['r1' => 4, 'r2' => 5],
                     'assurance' => ['a1' => 4],
                     'tangible' => ['t1' => 3],
@@ -104,7 +104,7 @@ class SurveyCalculationServiceTest extends TestCase
                     'responsiveness' => ['rs1' => 4],
                     'applicability' => ['ap1' => 4]
                 ],
-                'performance_answers' => [
+                'persepsi_answers' => [
                     'reliability' => ['r1' => 3, 'r2' => 4],
                     'assurance' => ['a1' => 3],
                     'tangible' => ['t1' => 2],
@@ -114,7 +114,7 @@ class SurveyCalculationServiceTest extends TestCase
                 ]
             ],
             [
-                'importance_answers' => [
+                'harapan_answers' => [
                     'reliability' => ['r1' => 5, 'r2' => 4],
                     'assurance' => ['a1' => 5],
                     'tangible' => ['t1' => 4],
@@ -122,7 +122,7 @@ class SurveyCalculationServiceTest extends TestCase
                     'responsiveness' => ['rs1' => 5],
                     'applicability' => ['ap1' => 5]
                 ],
-                'performance_answers' => [
+                'persepsi_answers' => [
                     'reliability' => ['r1' => 4, 'r2' => 3],
                     'assurance' => ['a1' => 4],
                     'tangible' => ['t1' => 3],
@@ -151,14 +151,14 @@ class SurveyCalculationServiceTest extends TestCase
     public function testCalculateILP()
     {
         $responses = [
-            ['loyalty_answers' => ['l1' => 4, 'l2' => 5, 'l3' => 4]],
-            ['loyalty_answers' => ['l1' => 5, 'l2' => 4, 'l3' => 5]]
+            ['loyalitas_answers' => ['l1' => 4, 'l2' => 5, 'l3' => 4]],
+            ['loyalitas_answers' => ['l1' => 5, 'l2' => 4, 'l3' => 5]]
         ];
 
         $results = $this->service->calculateILP($responses);
 
         $this->assertEquals(2, $results['total_respondents']);
-        $this->assertArrayHasKey('loyalty_item_averages', $results);
+        $this->assertArrayHasKey('loyalitas_item_averages', $results);
         $this->assertArrayHasKey('cli_scores', $results);
         $this->assertArrayHasKey('ilp_percentage', $results);
         $this->assertArrayHasKey('ilp_interpretation', $results);
@@ -171,12 +171,12 @@ class SurveyCalculationServiceTest extends TestCase
     {
         $responses = [
             [
-                'importance_answers' => ['reliability' => ['r1' => 4, 'r2' => 5]],
-                'performance_answers' => ['reliability' => ['r1' => 3, 'r2' => 4]]
+                'harapan_answers' => ['reliability' => ['r1' => 4, 'r2' => 5]],
+                'persepsi_answers' => ['reliability' => ['r1' => 3, 'r2' => 4]]
             ],
             [
-                'importance_answers' => ['reliability' => ['r1' => 5, 'r2' => 4]],
-                'performance_answers' => ['reliability' => ['r1' => 4, 'r2' => 3]]
+                'harapan_answers' => ['reliability' => ['r1' => 5, 'r2' => 4]],
+                'persepsi_answers' => ['reliability' => ['r1' => 4, 'r2' => 3]]
             ]
         ];
 
@@ -189,15 +189,15 @@ class SurveyCalculationServiceTest extends TestCase
         $this->assertCount(2, $results['item_gaps']); // r1 and r2
     }
 
-    public function testCalculateLoyaltyProbabilities()
+    public function testCalculateLoyalitasProbabilities()
     {
         $responses = [
-            ['satisfaction_answers' => ['k1' => 4], 'loyalty_answers' => ['l1' => 5, 'l2' => 4, 'l3' => 5]],
-            ['satisfaction_answers' => ['k1' => 5], 'loyalty_answers' => ['l1' => 4, 'l2' => 5, 'l3' => 4]],
-            ['satisfaction_answers' => ['k1' => 3], 'loyalty_answers' => ['l1' => 3, 'l2' => 3, 'l3' => 3]]
+            ['kepuasan_answers' => ['k1' => 4], 'loyalitas_answers' => ['l1' => 5, 'l2' => 4, 'l3' => 5]],
+            ['kepuasan_answers' => ['k1' => 5], 'loyalitas_answers' => ['l1' => 4, 'l2' => 5, 'l3' => 4]],
+            ['kepuasan_answers' => ['k1' => 3], 'loyalitas_answers' => ['l1' => 3, 'l2' => 3, 'l3' => 3]]
         ];
 
-        $results = $this->service->calculateLoyaltyProbabilities($responses);
+        $results = $this->service->calculateLoyalitasProbabilities($responses);
 
         $this->assertEquals(3, $results['total_respondents']);
         $this->assertArrayHasKey('probabilities', $results);
@@ -229,7 +229,7 @@ class SurveyCalculationServiceTest extends TestCase
         $this->assertArrayHasKey('ikp_analysis', $results);
         $this->assertArrayHasKey('ilp_analysis', $results);
         $this->assertArrayHasKey('gap_analysis', $results);
-        $this->assertArrayHasKey('loyalty_probabilities', $results);
+        $this->assertArrayHasKey('loyalitas_probabilities', $results);
         $this->assertArrayHasKey('demographic_statistics', $results);
         $this->assertArrayHasKey('scale_frequency_analysis', $results);
     }
@@ -260,9 +260,9 @@ class SurveyCalculationServiceTest extends TestCase
     public function testCalculateScaleFrequencyAnalysis()
     {
         $responses = [
-            ['satisfaction_answers' => ['k1' => 4], 'loyalty_answers' => ['l1' => 5]],
-            ['satisfaction_answers' => ['k1' => 5], 'loyalty_answers' => ['l1' => 4]],
-            ['satisfaction_answers' => ['k1' => 3], 'loyalty_answers' => ['l1' => 3]]
+            ['kepuasan_answers' => ['k1' => 4], 'loyalitas_answers' => ['l1' => 5]],
+            ['kepuasan_answers' => ['k1' => 5], 'loyalitas_answers' => ['l1' => 4]],
+            ['kepuasan_answers' => ['k1' => 3], 'loyalitas_answers' => ['l1' => 3]]
         ];
 
         $results = $this->service->calculateScaleFrequencyAnalysis($responses);
@@ -326,7 +326,7 @@ class SurveyCalculationServiceTest extends TestCase
 
         // Assertions
         $this->assertEquals(5, $results['total_respondents']);
-        $this->assertArrayHasKey('loyalty_item_averages', $results);
+        $this->assertArrayHasKey('loyalitas_item_averages', $results);
         $this->assertArrayHasKey('cli_scores', $results);
         $this->assertArrayHasKey('ilp_percentage', $results);
         $this->assertArrayHasKey('ilp_interpretation', $results);
@@ -406,7 +406,7 @@ class SurveyCalculationServiceTest extends TestCase
         $this->assertArrayHasKey('ikp_analysis', $results);
         $this->assertArrayHasKey('ilp_analysis', $results);
         $this->assertArrayHasKey('gap_analysis', $results);
-        $this->assertArrayHasKey('loyalty_probabilities', $results);
+        $this->assertArrayHasKey('loyalitas_probabilities', $results);
         $this->assertArrayHasKey('demographic_statistics', $results);
         $this->assertArrayHasKey('scale_frequency_analysis', $results);
 

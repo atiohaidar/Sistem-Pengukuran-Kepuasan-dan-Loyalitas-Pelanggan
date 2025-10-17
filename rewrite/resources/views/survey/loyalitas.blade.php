@@ -1,6 +1,6 @@
 @extends('layouts.mylayout')
 
-@section('title', 'Kepuasan Responden - Survei Kepuasan Pelatihan')
+@section('title', 'Loyalitas Responden - Survei Kepuasan Pelatihan')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
@@ -12,12 +12,12 @@
 
         <!-- Form -->
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
-                <h2 class="text-2xl font-bold text-white">IV. Kepuasan Responden</h2>
-                <p class="text-green-100 mt-1">Berikan penilaian tingkat kepuasan Anda terhadap layanan pelatihan</p>
+            <div class="bg-gradient-to-r from-yellow-600 to-orange-600 px-6 py-4">
+                <h2 class="text-2xl font-bold text-white">V. Loyalitas Responden</h2>
+                <p class="text-yellow-100 mt-1">Berikan penilaian mengenai loyalitas Anda terhadap layanan pelatihan</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['step' => 'satisfaction']) }}" class="p-6">
+            <form method="POST" action="{{ route('survey.store', ['step' => 'loyalitas']) }}" class="p-6">
                 @csrf
 
                 @if(session('success'))
@@ -37,18 +37,18 @@
                 @endif
 
                 <div class="space-y-8">
-                    @php $satisfactionData = $survey->getAnswers('satisfaction') ?? []; @endphp
+                    @php $loyalitasData = $survey->getAnswers('loyalitas') ?? []; @endphp
 
                     <!-- Question 1 -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Secara keseluruhan, saya merasa puas pada layanan pelatihan ini.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Saya akan mengulangi menggunakan jasa pelatihan ini.</h3>
                         <div class="flex flex-wrap gap-4">
                             @php $options = ['Sangat tidak setuju', 'Tidak setuju', 'Netral', 'Setuju', 'Sangat setuju']; @endphp
                             @for($i = 1; $i <= 5; $i++)
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k1" value="{{ $i }}"
-                                           {{ ($satisfactionData['k1'] ?? old('k1')) == $i ? 'checked' : '' }}
-                                           class="text-green-600 focus:ring-green-500" required>
+                                    <input type="radio" name="l1" value="{{ $i }}"
+                                           {{ ($loyalitasData['l1'] ?? old('l1')) == $i ? 'checked' : '' }}
+                                           class="text-yellow-600 focus:ring-yellow-500" required>
                                     <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
                                 </label>
                             @endfor
@@ -57,13 +57,13 @@
 
                     <!-- Question 2 -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Saya akan tetap memilih jasa pelatihan ini meskipun tersedia alternatif pelatihan lain.</h3>
                         <div class="flex flex-wrap gap-4">
                             @for($i = 1; $i <= 5; $i++)
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k2" value="{{ $i }}"
-                                           {{ ($satisfactionData['k2'] ?? old('k2')) == $i ? 'checked' : '' }}
-                                           class="text-green-600 focus:ring-green-500" required>
+                                    <input type="radio" name="l2" value="{{ $i }}"
+                                           {{ ($loyalitasData['l2'] ?? old('l2')) == $i ? 'checked' : '' }}
+                                           class="text-yellow-600 focus:ring-yellow-500" required>
                                     <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
                                 </label>
                             @endfor
@@ -72,13 +72,13 @@
 
                     <!-- Question 3 -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Saya akan merekomendasikan pelatihan ini kepada orang lain.</h3>
                         <div class="flex flex-wrap gap-4">
                             @for($i = 1; $i <= 5; $i++)
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k3" value="{{ $i }}"
-                                           {{ ($satisfactionData['k3'] ?? old('k3')) == $i ? 'checked' : '' }}
-                                           class="text-green-600 focus:ring-green-500" required>
+                                    <input type="radio" name="l3" value="{{ $i }}"
+                                           {{ ($loyalitasData['l3'] ?? old('l3')) == $i ? 'checked' : '' }}
+                                           class="text-yellow-600 focus:ring-yellow-500" required>
                                     <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
                                 </label>
                             @endfor

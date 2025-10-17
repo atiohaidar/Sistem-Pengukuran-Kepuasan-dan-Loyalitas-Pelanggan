@@ -64,38 +64,38 @@
                             </div>
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Importance</span>
-                                    <span>{{ $survey->importance_answers ? '100%' : '0%' }}</span>
+                                    <span>Harapan</span>
+                                    <span>{{ $survey->harapan_answers ? '100%' : '0%' }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ $survey->importance_answers ? '100%' : '0%' }}"></div>
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ $survey->harapan_answers ? '100%' : '0%' }}"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Performance</span>
-                                    <span>{{ $survey->performance_answers ? '100%' : '0%' }}</span>
+                                    <span>Persepsi</span>
+                                    <span>{{ $survey->persepsi_answers ? '100%' : '0%' }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-purple-600 h-2 rounded-full" style="width: {{ $survey->performance_answers ? '100%' : '0%' }}"></div>
+                                    <div class="bg-purple-600 h-2 rounded-full" style="width: {{ $survey->persepsi_answers ? '100%' : '0%' }}"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Satisfaction</span>
-                                    <span>{{ $survey->satisfaction_answers ? '100%' : '0%' }}</span>
+                                    <span>Kepuasan</span>
+                                    <span>{{ $survey->kepuasan_answers ? '100%' : '0%' }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: {{ $survey->satisfaction_answers ? '100%' : '0%' }}"></div>
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: {{ $survey->kepuasan_answers ? '100%' : '0%' }}"></div>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Loyalty</span>
-                                    <span>{{ $survey->loyalty_answers ? '100%' : '0%' }}</span>
+                                    <span>Loyalitas</span>
+                                    <span>{{ $survey->loyalitas_answers ? '100%' : '0%' }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-orange-600 h-2 rounded-full" style="width: {{ $survey->loyalty_answers ? '100%' : '0%' }}"></div>
+                                    <div class="bg-orange-600 h-2 rounded-full" style="width: {{ $survey->loyalitas_answers ? '100%' : '0%' }}"></div>
                                 </div>
                             </div>
                             <div>

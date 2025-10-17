@@ -9,235 +9,164 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
            
 
-            <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in-up">
+            <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in">
                 <!-- Gradient border effect -->
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10"></div>
                 
                 <div class="relative bg-white sm:rounded-2xl p-8">
-                    <div class="mb-8">
-                        <div class="flex items-center justify-center mb-8 animate-fade-in-up">
-                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-full mr-4 shadow-lg">
-                                <i class="fas fa-chart-bar text-white text-xl"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                    {{ __('Dimensi Reliability') }}
-                                </h2>
-                                <p class="text-gray-600 text-sm mt-1">Analisis Gap Persepsi vs Harapan Pelanggan</p>
-                            </div>
-                        </div>
-                        
-                        @if(empty($reliabilityData) || !is_array($reliabilityData))
-                            <div class="text-center py-8">
-                                <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                                </div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Data Tidak Tersedia') }}</h3>
-                                <p class="text-gray-500">{{ __('Tidak ada data yang dapat ditampilkan untuk grafik Reliability.') }}</p>
-                            </div>
-                        @else
-                            <div class="flex justify-center mb-6">
-                                <div id="reliability-chart" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">
-                                    <!-- Loading overlay -->
-                                    <div id="chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">
-                                        <div class="text-center">
-                                            <div class="loading-spinner"></div>
-                                            <p class="text-gray-600 font-medium">Memuat grafik...</p>
-                                            <p class="text-gray-400 text-sm animate-pulse-slow">Menganalisis data Reliability</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                          
-                          
-                            <div class="overflow-x-auto animate-fade-in-up">
-                                <table class="min-w-full divide-y divide-gray-200 bg-white border-0 table-enhanced">
-                                    <thead class="table-header-gradient">
-                                        <tr>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                                <span class="flex items-center">
-                                                    <i class="fas fa-chart-line mr-2"></i>
-                                                    Kategori
-                                                </span>
-                                            </th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R1</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R2</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R3</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R4</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R5</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R6</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">R7</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-blue-600 mr-3"></div>
-                                                    {{ __('Rata-rata persepsi') }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r1_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r2_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r3_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r4_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r5_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r6_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r7_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-orange-500 mr-3"></div>
-                                                    {{ __('Rata-rata harapan') }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r1_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r2_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r3_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r4_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r5_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r6_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($reliabilityData['r7_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-gray-600 mr-3"></div>
-                                                    {{ __('Gap') }}
-                                                </span>
-                                            </td>
-                                            @for($i = 1; $i <= 7; $i++)
-                                                @php
-                                                    $gap = ($reliabilityData["r{$i}_ratapersepsi_rata"] ?? 0) - ($reliabilityData["r{$i}_ratakepentingan_rata"] ?? 0);
-                                                    $gapClass = $gap >= 0 ? 'gap-positive' : 'gap-negative';
-                                                @endphp
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold {{ $gapClass }} rounded-lg mx-1 my-2 transition-all duration-200">
-                                                    {{ number_format($gap, 2) }}
-                                                </td>
-                                            @endfor
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dimensi Tangible Section -->
-            <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in-up mt-8">
-                <!-- Gradient border effect -->
-                <div class="absolute inset-0 bg-gradient-to-r from-green-500 via-teal-500 to-cyan-500 rounded-2xl opacity-10"></div>
+            @php
+            function renderTableRows($data, $prefix, $count) {
+                $output = '';
                 
-                <div class="relative bg-white sm:rounded-2xl p-8">
-                    <div class="mb-8">
-                        <div class="flex items-center justify-center mb-8 animate-fade-in-up">
-                            <div class="bg-gradient-to-r from-green-500 to-teal-600 p-3 rounded-full mr-4 shadow-lg">
-                                <i class="fas fa-building text-white text-xl"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-                                    {{ __('Dimensi Tangible') }}
-                                </h2>
-                                <p class="text-gray-600 text-sm mt-1">Analisis Gap Persepsi vs Harapan Pelanggan</p>
-                            </div>
-                        </div>
-                        
-                        @if(empty($tangibleData) || !is_array($tangibleData))
-                            <div class="text-center py-8">
-                                <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-                                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                                </div>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Data Tidak Tersedia') }}</h3>
-                                <p class="text-gray-500">{{ __('Tidak ada data yang dapat ditampilkan untuk grafik Tangible.') }}</p>
-                            </div>
-                        @else
-                            <div class="flex justify-center mb-6">
-                                <div id="tangible-chart" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">
-                                    <!-- Loading overlay -->
-                                    <div id="tangible-chart-loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">
-                                        <div class="text-center">
-                                            <div class="loading-spinner"></div>
-                                            <p class="text-gray-600 font-medium">Memuat grafik...</p>
-                                            <p class="text-gray-400 text-sm animate-pulse-slow">Menganalisis data Tangible</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="overflow-x-auto animate-fade-in-up">
-                                <table class="min-w-full divide-y divide-gray-200 bg-white border-0 table-enhanced">
-                                    <thead class="table-header-gradient">
-                                        <tr>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                                <span class="flex items-center">
-                                                    <i class="fas fa-chart-line mr-2"></i>
-                                                    Kategori
-                                                </span>
-                                            </th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T1</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T2</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T3</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T4</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T5</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">T6</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-blue-600 mr-3"></div>
-                                                    {{ __('Rata-rata persepsi') }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t1_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t2_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t3_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t4_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t5_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t6_ratapersepsi_rata'] ?? 0, 2) }}</td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-orange-500 mr-3"></div>
-                                                    {{ __('Rata-rata harapan') }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t1_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t2_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t3_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t4_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t5_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">{{ number_format($tangibleData['t6_ratakepentingan_rata'] ?? 0, 2) }}</td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                                                <span class="flex items-center">
-                                                    <div class="w-3 h-3 rounded-full bg-gray-600 mr-3"></div>
-                                                    {{ __('Gap') }}
-                                                </span>
-                                            </td>
-                                            @for($i = 1; $i <= 6; $i++)
-                                                @php
-                                                    $gap = ($tangibleData["t{$i}_ratapersepsi_rata"] ?? 0) - ($tangibleData["t{$i}_ratakepentingan_rata"] ?? 0);
-                                                    $gapClass = $gap >= 0 ? 'gap-positive' : 'gap-negative';
-                                                @endphp
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold {{ $gapClass }} rounded-lg mx-1 my-2 transition-all duration-200">
-                                                    {{ number_format($gap, 2) }}
-                                                </td>
-                                            @endfor
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+                // Row Persepsi
+                $output .= '<tr class="hover:bg-blue-50 hover:transform hover:translate-y-[-1px] transition-all duration-200">';
+                $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">';
+                $output .= '<span class="flex items-center">';
+                $output .= '<div class="w-3 h-3 rounded-full bg-blue-600 mr-3"></div>';
+                $output .= __('Rata-rata persepsi');
+                $output .= '</span></td>';
+                for($i = 1; $i <= $count; $i++) {
+                    $value = $data[$prefix . $i . '_ratapersepsi_rata'] ?? 0;
+                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">' . number_format($value, 2) . '</td>';
+                }
+                $output .= '</tr>';
+                
+                // Row Harapan
+                $output .= '<tr class="hover:bg-blue-50 hover:transform hover:translate-y-[-1px] transition-all duration-200">';
+                $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">';
+                $output .= '<span class="flex items-center">';
+                $output .= '<div class="w-3 h-3 rounded-full bg-orange-500 mr-3"></div>';
+                $output .= __('Rata-rata harapan');
+                $output .= '</span></td>';
+                for($i = 1; $i <= $count; $i++) {
+                    $value = $data[$prefix . $i . '_ratakepentingan_rata'] ?? 0;
+                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center font-medium">' . number_format($value, 2) . '</td>';
+                }
+                $output .= '</tr>';
+                
+                // Row Gap
+                $output .= '<tr class="hover:bg-blue-50 hover:transform hover:translate-y-[-1px] transition-all duration-200">';
+                $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">';
+                $output .= '<span class="flex items-center">';
+                $output .= '<div class="w-3 h-3 rounded-full bg-gray-600 mr-3"></div>';
+                $output .= __('Gap');
+                $output .= '</span></td>';
+                for($i = 1; $i <= $count; $i++) {
+                    $gap = ($data[$prefix . $i . '_ratapersepsi_rata'] ?? 0) - ($data[$prefix . $i . '_ratakepentingan_rata'] ?? 0);
+                    $gapClass = $gap >= 0 ? 'bg-green-50 text-green-700 font-semibold rounded-md m-0.5 px-2 py-1 transition-all duration-200' : 'bg-red-50 text-red-700 font-semibold rounded-md m-0.5 px-2 py-1 transition-all duration-200';
+                    $output .= '<td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold ' . $gapClass . '">';
+                    $output .= number_format($gap, 2);
+                    $output .= '</td>';
+                }
+                $output .= '</tr>';
+                
+                return $output;
+            }
+            
+            function renderTableHeaders($prefix, $count) {
+                $output = '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">';
+                $output .= '<span class="flex items-center">';
+                $output .= '<i class="fas fa-chart-line mr-2"></i>';
+                $output .= 'Kategori';
+                $output .= '</span></th>';
+                for($i = 1; $i <= $count; $i++) {
+                    $output .= '<th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">' . $prefix . $i . '</th>';
+                }
+                return $output;
+            }
+            
+            function renderDimensionSection($data, $questions, $config) {
+                $output = '';
+                
+                // Section container start
+                $output .= '<div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mt-8">';
+                $output .= '<div class="absolute inset-0 bg-gradient-to-r ' . $config['gradient'] . ' rounded-2xl opacity-10"></div>';
+                $output .= '<div class="relative bg-white sm:rounded-2xl p-8">';
+                $output .= '<div class="mb-8">';
+                
+                // Header
+                $output .= '<div class="flex items-center justify-center mb-8 animate-fade-in">';
+                $output .= '<div class="bg-gradient-to-r ' . $config['headerGradient'] . ' p-3 rounded-full mr-4 shadow-lg">';
+                $output .= '<i class="fas fa-' . $config['icon'] . ' text-white text-xl"></i>';
+                $output .= '</div>';
+                $output .= '<div>';
+                $output .= '<h2 class="text-3xl font-bold bg-gradient-to-r ' . $config['titleGradient'] . ' bg-clip-text text-transparent">';
+                $output .= __('Dimensi ' . $config['name']);
+                $output .= '</h2>';
+                $output .= '<p class="text-gray-600 text-sm mt-1">Analisis Gap Persepsi vs Harapan Pelanggan</p>';
+                $output .= '</div>';
+                $output .= '</div>';
+                
+                // Check if data exists
+                if (empty($data) || !is_array($data)) {
+                    $output .= '<div class="text-center py-8">';
+                    $output .= '<div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">';
+                    $output .= '<i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>';
+                    $output .= '</div>';
+                    $output .= '<h3 class="text-lg font-medium text-gray-900 mb-2">' . __('Data Tidak Tersedia') . '</h3>';
+                    $output .= '<p class="text-gray-500">' . __('Tidak ada data yang dapat ditampilkan untuk grafik ' . $config['name'] . '.') . '</p>';
+                    $output .= '</div>';
+                } else {
+                    // Chart container
+                    $output .= '<div class="flex justify-center mb-6">';
+                    $output .= '<div id="' . $config['chartId'] . '" class="w-full max-w-4xl h-[28rem] chart-container relative overflow-hidden">';
+                    $output .= '<div id="' . $config['loadingId'] . '" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl z-10">';
+                    $output .= '<div class="text-center">';
+                    $output .= '<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>';
+                    $output .= '<p class="text-gray-600 font-medium">Memuat grafik...</p>';
+                    $output .= '<p class="text-gray-400 text-sm animate-pulse">Menganalisis data ' . $config['name'] . '</p>';
+                    $output .= '</div>';
+                    $output .= '</div>';
+                    $output .= '</div>';
+                    $output .= '</div>';
+                    
+                    // Table
+                    $output .= '<div class="overflow-x-auto animate-fade-in">';
+                    $output .= '<table class="min-w-full divide-y divide-gray-200 bg-white border-0 overflow-hidden rounded-xl shadow-md">';
+                    $output .= '<thead class="bg-gradient-to-r from-blue-500 to-purple-600">';
+                    $output .= '<tr>';
+                    $output .= renderTableHeaders($config['prefix'], $config['count']);
+                    $output .= '</tr>';
+                    $output .= '</thead>';
+                    $output .= '<tbody class="bg-white divide-y divide-gray-200">';
+                    $output .= renderTableRows($data, strtolower($config['prefix']), $config['count']);
+                    $output .= '</tbody>';
+                    $output .= '</table>';
+                    $output .= '</div>';
+                }
+                
+                // Section container end
+                $output .= '</div>';
+                $output .= '</div>';
+                $output .= '</div>';
+                
+                return $output;
+            }
+            @endphp
+
+            {!! renderDimensionSection($reliabilityData, $reliabilityQuestions, [
+                'name' => 'Reliability',
+                'prefix' => 'R',
+                'count' => 7,
+                'icon' => 'chart-bar',
+                'chartId' => 'reliability-chart',
+                'loadingId' => 'chart-loading',
+                'gradient' => 'from-blue-500 via-purple-500 to-pink-500',
+                'headerGradient' => 'from-blue-500 to-purple-600',
+                'titleGradient' => 'from-blue-600 to-purple-600'
+            ]) !!}
+
+            {!! renderDimensionSection($tangibleData, $tangibleQuestions, [
+                'name' => 'Tangible',
+                'prefix' => 'T',
+                'count' => 6,
+                'icon' => 'building',
+                'chartId' => 'tangible-chart',
+                'loadingId' => 'tangible-chart-loading',
+                'gradient' => 'from-green-500 via-teal-500 to-cyan-500',
+                'headerGradient' => 'from-green-500 to-teal-600',
+                'titleGradient' => 'from-green-600 to-teal-600'
+            ]) !!}
         </div>
     </div>
 </x-app-layout>
@@ -257,43 +186,6 @@
 
 .bar:hover {
     filter: brightness(1.1);
-}
-
-/* Enhanced table styles */
-.table-enhanced {
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.table-header-gradient {
-    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-}
-
-.gap-positive {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: #059669;
-    font-weight: 600;
-    border-radius: 6px;
-    margin: 2px;
-    padding: 4px 8px;
-    transition: all 0.2s ease;
-}
-
-.gap-negative {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #DC2626;
-    font-weight: 600;
-    border-radius: 6px;
-    margin: 2px;
-    padding: 4px 8px;
-    transition: all 0.2s ease;
-}
-
-.table-row-hover:hover {
-    background-color: rgba(59, 130, 246, 0.05);
-    transform: translateY(-1px);
-    transition: all 0.2s ease;
 }
 
 /* Chart container enhancements */
@@ -348,37 +240,12 @@
     }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out;
 }
 
 .animate-pulse-slow {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Enhanced loading spinner */
-.loading-spinner {
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3B82F6;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 16px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 </style>
 <script>
@@ -635,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Hide loading overlay after animation completes
             setTimeout(() => {
-                d3.select('#chart-loading').style('display', 'none');
+                d3.select(`#${containerId}-loading`).style('display', 'none');
             }, 2000); // Wait for all animations to complete
 
         } catch (error) {
@@ -652,14 +519,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const tangibleChartData = @json($tangibleData);
     const tangibleQuestionsData = @json($tangibleQuestions);
     
-    if (chartData && Object.keys(chartData).length > 0) {
-        const categories = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'];
-        createGroupedBarChart(chartData, categories, 'reliability-chart', '{{ __("Dimensi Reliability") }}', questionsData);
-    }
+    // Configuration for all dimensions
+    const dimensions = [
+        {
+            data: chartData,
+            questions: questionsData,
+            categories: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'],
+            chartId: 'reliability-chart',
+            title: '{{ __("Dimensi Reliability") }}'
+        },
+        {
+            data: tangibleChartData,
+            questions: tangibleQuestionsData,
+            categories: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+            chartId: 'tangible-chart',
+            title: '{{ __("Dimensi Tangible") }}'
+        }
+    ];
     
-    if (tangibleChartData && Object.keys(tangibleChartData).length > 0) {
-        const tangibleCategories = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
-        createGroupedBarChart(tangibleChartData, tangibleCategories, 'tangible-chart', '{{ __("Dimensi Tangible") }}', tangibleQuestionsData);
-    }
+    // Initialize all charts
+    dimensions.forEach(dim => {
+        if (dim.data && Object.keys(dim.data).length > 0) {
+            createGroupedBarChart(dim.data, dim.categories, dim.chartId, dim.title, dim.questions);
+        }
+    });
 });
 </script>

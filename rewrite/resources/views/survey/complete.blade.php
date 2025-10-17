@@ -1,8 +1,4 @@
-@extends('layouts.mylayout')
-
-@section('title', 'Survei Selesai - Terima Kasih')
-
-@section('content')
+<x-mylayout title="Survei Selesai - Terima Kasih">
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         <!-- Success Message -->
@@ -152,4 +148,4 @@
         </div>
     </div>
 </div>
-@endsection
+</x-mylayout>

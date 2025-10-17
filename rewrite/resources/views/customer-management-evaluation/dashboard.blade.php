@@ -1,6 +1,4 @@
-@extends('layouts.mylayout')
-
-@section('content')
+<x-mylayout>
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto space-y-8">
         <!-- Header -->
@@ -228,4 +226,4 @@
         </div>
     </div>
 </div>
-@endsection
+</x-mylayout>

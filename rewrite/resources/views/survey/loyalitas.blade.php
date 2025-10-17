@@ -1,8 +1,4 @@
-@extends('layouts.mylayout')
-
-@section('title', 'Loyalitas Responden - Survei Kepuasan Pelatihan')
-
-@section('content')
+<x-mylayout title="Loyalitas Responden - Survei Kepuasan Pelatihan">
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Progress Bar -->
@@ -159,4 +155,4 @@ if (window.location.search.includes('success')) {
     localStorage.removeItem(storageKey);
 }
 </script>
-@endsection
+</x-mylayout>

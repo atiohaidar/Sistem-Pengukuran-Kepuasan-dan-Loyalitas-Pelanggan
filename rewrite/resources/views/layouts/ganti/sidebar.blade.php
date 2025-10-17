@@ -19,45 +19,12 @@
             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
                 {{ __('Dashboard') }}
             </x-nav-link>
-
-            <!-- Grafik Section -->
-            <div class="mt-8">
-                <h3 class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Analisis & Grafik
-                </h3>
-                <div class="ml-4 space-y-1">
-                    <x-nav-link :href="route('grafik.mean-gap-per-dimensi')" :active="request()->routeIs('grafik.mean-gap-per-dimensi')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Mean Gap per Dimensi') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('grafik.mean-persepsi-harapan-gap-per-dimensi')" :active="request()->routeIs('grafik.mean-persepsi-harapan-gap-per-dimensi')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Persepsi vs Harapan') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('grafik.rekomendasi')" :active="request()->routeIs('grafik.rekomendasi')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Rekomendasi') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('grafik.kepuasan')" :active="request()->routeIs('grafik.kepuasan')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Analisis Kepuasan') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('grafik.loyalitas')" :active="request()->routeIs('grafik.loyalitas')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Analisis Loyalitas') }}
-                    </x-nav-link>
-                </div>
-            </div>
-
-            <!-- Management Section -->
-            <div class="mt-8">
-                <h3 class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Manajemen
-                </h3>
-                <div class="ml-4 space-y-1">
-                    <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Manajemen Survei') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('dashboard.customer-evaluation-management.index')" :active="request()->routeIs('dashboard.customer-evaluation-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
-                        {{ __('Manajemen Evaluasi') }}
-                    </x-nav-link>
-                </div>
-            </div>
+            <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
+                {{ __('Manajemen Survei') }}
+            </x-nav-link>
+            <x-nav-link :href="route('dashboard.customer-evaluation-management.index')" :active="request()->routeIs('dashboard.customer-evaluation-management.*')" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md">
+                {{ __('Manajemen Evaluasi') }}
+            </x-nav-link>
         </div>
     </nav>
 </div>

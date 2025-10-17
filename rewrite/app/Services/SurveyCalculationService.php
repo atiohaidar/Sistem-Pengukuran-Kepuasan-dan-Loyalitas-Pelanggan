@@ -702,4 +702,365 @@ class SurveyCalculationService
 
         return $results;
     }
+
+    /**
+     * Get dimensions configuration for charts
+     */
+    public function getDimensionsConfig()
+    {
+        return [
+            [
+                'name' => 'Reliability',
+                'prefix' => 'r',
+                'count' => 7,
+                'icon' => 'chart-bar',
+                'gradient' => 'from-blue-500 via-purple-500 to-pink-500',
+                'headerGradient' => 'from-blue-500 to-purple-600',
+                'titleGradient' => 'from-blue-600 to-purple-600',
+                'chartId' => 'reliability-chart',
+                'loadingId' => 'chart-loading',
+                'questions' => [
+                    'r1' => 'Kesesuaian isi post test dengan materi pelatihan yang diberikan.',
+                    'r2' => 'Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan.',
+                    'r3' => 'Ketepatan waktu dalam memberikan sertifikat pelatihan.',
+                    'r4' => 'Ketepatan trainer dalam menjawab pertanyaan peserta.',
+                    'r5' => 'Materi pelatihan mudah dimengerti.',
+                    'r6' => 'Kemudahan dalam melakukan registrasi pelatihan.',
+                    'r7' => 'Kemudahan dalam melakukan pembayaran pelatihan.',
+                ],
+            ],
+            [
+                'name' => 'Tangible',
+                'prefix' => 't',
+                'count' => 6,
+                'icon' => 'building',
+                'gradient' => 'from-green-500 via-teal-500 to-cyan-500',
+                'headerGradient' => 'from-green-500 to-teal-600',
+                'titleGradient' => 'from-green-600 to-teal-600',
+                'chartId' => 'tangible-chart',
+                'loadingId' => 'tangible-chart-loading',
+                'questions' => [
+                    't1' => 'Kesesuaian antara materi yang diiklankan dengan yang diberikan.',
+                    't2' => 'Kesesuaian antara biaya yang diiklankan dengan yang dikenakan.',
+                    't3' => 'Kesesuaian antara jadwal yang diiklankan dengan yang dilaksanakan.',
+                    't4' => 'Kesesuaian antara tempat yang diiklankan dengan yang disediakan.',
+                    't5' => 'Kesesuaian antara fasilitas yang diiklankan dengan yang disediakan.',
+                    't6' => 'Kesesuaian antara sertifikat yang diiklankan dengan yang diberikan.',
+                ],
+            ],
+            [
+                'name' => 'Responsiveness',
+                'prefix' => 'rs',
+                'count' => 2,
+                'icon' => 'clock',
+                'gradient' => 'from-yellow-500 via-orange-500 to-red-500',
+                'headerGradient' => 'from-yellow-500 to-orange-600',
+                'titleGradient' => 'from-yellow-600 to-orange-600',
+                'chartId' => 'responsiveness-chart',
+                'loadingId' => 'responsiveness-chart-loading',
+                'questions' => [
+                    'rs1' => 'Ketepatan waktu dalam memberikan informasi pelatihan.',
+                    'rs2' => 'Ketepatan waktu dalam menanggapi keluhan peserta.',
+                ],
+            ],
+            [
+                'name' => 'Assurance',
+                'prefix' => 'a',
+                'count' => 4,
+                'icon' => 'shield-alt',
+                'gradient' => 'from-purple-500 via-pink-500 to-rose-500',
+                'headerGradient' => 'from-purple-500 to-pink-600',
+                'titleGradient' => 'from-purple-600 to-pink-600',
+                'chartId' => 'assurance-chart',
+                'loadingId' => 'assurance-chart-loading',
+                'questions' => [
+                    'a1' => 'Kemampuan trainer dalam memberikan penjelasan yang jelas.',
+                    'a2' => 'Kemampuan trainer dalam memberikan solusi atas masalah peserta.',
+                    'a3' => 'Kepercayaan peserta terhadap kemampuan trainer.',
+                    'a4' => 'Kepercayaan peserta terhadap keamanan data pribadi.',
+                ],
+            ],
+            [
+                'name' => 'Empathy',
+                'prefix' => 'e',
+                'count' => 5,
+                'icon' => 'heart',
+                'gradient' => 'from-red-500 via-pink-500 to-purple-500',
+                'headerGradient' => 'from-red-500 to-pink-600',
+                'titleGradient' => 'from-red-600 to-pink-600',
+                'chartId' => 'empathy-chart',
+                'loadingId' => 'empathy-chart-loading',
+                'questions' => [
+                    'e1' => 'Perhatian trainer terhadap kebutuhan individu peserta.',
+                    'e2' => 'Kemampuan trainer dalam memahami masalah peserta.',
+                    'e3' => 'Kenyamanan komunikasi dengan trainer.',
+                    'e4' => 'Fleksibilitas trainer dalam menyesuaikan metode pembelajaran.',
+                    'e5' => 'Perhatian terhadap keragaman latar belakang peserta.',
+                ],
+            ],
+            [
+                'name' => 'Applicability',
+                'prefix' => 'ap',
+                'count' => 2,
+                'icon' => 'cogs',
+                'gradient' => 'from-indigo-500 via-blue-500 to-cyan-500',
+                'headerGradient' => 'from-indigo-500 to-blue-600',
+                'titleGradient' => 'from-indigo-600 to-blue-600',
+                'chartId' => 'applicability-chart',
+                'loadingId' => 'applicability-chart-loading',
+                'questions' => [
+                    'ap1' => 'Relevansi materi pelatihan dengan pekerjaan peserta.',
+                    'ap2' => 'Manfaat praktis dari materi pelatihan yang diberikan.',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Get dimensions configuration for gap charts
+     */
+    public function getDimensionsConfigForGap()
+    {
+        return [
+            [
+                'name' => 'Reliability',
+                'prefix' => 'reliability',
+                'icon' => 'chart-bar',
+                'gradient' => 'from-blue-500 via-purple-500 to-pink-500',
+                'headerGradient' => 'from-blue-500 to-purple-600',
+                'titleGradient' => 'from-blue-600 to-purple-600',
+                'chartId' => 'reliability-gap-chart',
+                'loadingId' => 'reliability-gap-loading',
+            ],
+            [
+                'name' => 'Tangible',
+                'prefix' => 'tangible',
+                'icon' => 'building',
+                'gradient' => 'from-green-500 via-teal-500 to-cyan-500',
+                'headerGradient' => 'from-green-500 to-teal-600',
+                'titleGradient' => 'from-green-600 to-teal-600',
+                'chartId' => 'tangible-gap-chart',
+                'loadingId' => 'tangible-gap-loading',
+            ],
+            [
+                'name' => 'Responsiveness',
+                'prefix' => 'responsiveness',
+                'icon' => 'clock',
+                'gradient' => 'from-yellow-500 via-orange-500 to-red-500',
+                'headerGradient' => 'from-yellow-500 to-orange-600',
+                'titleGradient' => 'from-yellow-600 to-orange-600',
+                'chartId' => 'responsiveness-gap-chart',
+                'loadingId' => 'responsiveness-gap-loading',
+            ],
+            [
+                'name' => 'Assurance',
+                'prefix' => 'assurance',
+                'icon' => 'shield-alt',
+                'gradient' => 'from-purple-500 via-pink-500 to-rose-500',
+                'headerGradient' => 'from-purple-500 to-pink-600',
+                'titleGradient' => 'from-purple-600 to-pink-600',
+                'chartId' => 'assurance-gap-chart',
+                'loadingId' => 'assurance-gap-loading',
+            ],
+            [
+                'name' => 'Empathy',
+                'prefix' => 'empathy',
+                'icon' => 'heart',
+                'gradient' => 'from-red-500 via-pink-500 to-purple-500',
+                'headerGradient' => 'from-red-500 to-pink-600',
+                'titleGradient' => 'from-red-600 to-pink-600',
+                'chartId' => 'empathy-gap-chart',
+                'loadingId' => 'empathy-gap-loading',
+            ],
+            [
+                'name' => 'Applicability',
+                'prefix' => 'applicability',
+                'icon' => 'cogs',
+                'gradient' => 'from-indigo-500 via-blue-500 to-cyan-500',
+                'headerGradient' => 'from-indigo-500 to-blue-600',
+                'titleGradient' => 'from-indigo-600 to-blue-600',
+                'chartId' => 'applicability-gap-chart',
+                'loadingId' => 'applicability-gap-loading',
+            ],
+        ];
+    }
+
+    /**
+     * Calculate detailed kepuasan metrics
+     */
+    public function calculateKepuasanDetails($responses)
+    {
+        $results = [
+            'avgK1' => 0,
+            'avgK2' => 0,
+            'total_rata_k3' => 0,
+            'total_rata_k2' => 0,
+            'gap' => 0,
+            'k1_count' => 0,
+            'k1_rata_count_1' => 0,
+            'k1_rata_count_2' => 0,
+            'k1_rata_count_3' => 0,
+            'k1_rata_count_4' => 0,
+            'k1_rata_count_5' => 0,
+            'kepuasanDistribution' => [
+                'sangat_puas' => 0,
+                'puas' => 0,
+                'cukup_puas' => 0,
+                'kurang_puas' => 0,
+                'tidak_puas' => 0
+            ],
+            'potensiLoyal' => 0
+        ];
+
+        if (empty($responses)) {
+            return $results;
+        }
+
+        // Hitung rata-rata kepuasan untuk pertanyaan k1 dan k2
+        $kepuasanK1 = [];
+        $kepuasanK2 = [];
+
+        foreach ($responses as $response) {
+            if (isset($response['kepuasan_answers']['k1'])) {
+                $kepuasanK1[] = $response['kepuasan_answers']['k1'];
+            }
+            if (isset($response['kepuasan_answers']['k2'])) {
+                $kepuasanK2[] = $response['kepuasan_answers']['k2'];
+            }
+        }
+
+        $results['avgK1'] = count($kepuasanK1) > 0 ? array_sum($kepuasanK1) / count($kepuasanK1) : 0;
+        $results['avgK2'] = count($kepuasanK2) > 0 ? array_sum($kepuasanK2) / count($kepuasanK2) : 0;
+
+        // Hitung total rata-rata K3 (layanan ideal) dan K2 (harapan)
+        $results['total_rata_k3'] = $results['avgK1']; // K3 adalah pertanyaan kepuasan pertama (layanan ideal)
+        $results['total_rata_k2'] = $results['avgK2']; // K2 adalah pertanyaan kepuasan kedua (harapan)
+        $results['gap'] = $results['total_rata_k3'] - $results['total_rata_k2']; // Gap antara ideal dan harapan
+
+        // Hitung distribusi kepuasan
+        $results['k1_count'] = count($kepuasanK1);
+        foreach ($kepuasanK1 as $score) {
+            if ($score >= 4.5) $results['k1_rata_count_5']++;
+            elseif ($score >= 3.5) $results['k1_rata_count_4']++;
+            elseif ($score >= 2.5) $results['k1_rata_count_3']++;
+            elseif ($score >= 1.5) $results['k1_rata_count_2']++;
+            else $results['k1_rata_count_1']++;
+        }
+
+        $results['kepuasanDistribution'] = [
+            'sangat_puas' => $results['k1_rata_count_5'],
+            'puas' => $results['k1_rata_count_4'],
+            'cukup_puas' => $results['k1_rata_count_3'],
+            'kurang_puas' => $results['k1_rata_count_2'],
+            'tidak_puas' => $results['k1_rata_count_1']
+        ];
+
+        // Hitung potensi loyalitas
+        $loyalitasScores = [];
+        foreach ($responses as $response) {
+            if (isset($response['loyalitas_answers'])) {
+                $loyalitas = $response['loyalitas_answers'];
+                $avgLoyalitas = 0;
+                $count = 0;
+                if (isset($loyalitas['l1'])) { $avgLoyalitas += $loyalitas['l1']; $count++; }
+                if (isset($loyalitas['l2'])) { $avgLoyalitas += $loyalitas['l2']; $count++; }
+                if (isset($loyalitas['l3'])) { $avgLoyalitas += $loyalitas['l3']; $count++; }
+                if ($count > 0) {
+                    $loyalitasScores[] = $avgLoyalitas / $count;
+                }
+            }
+        }
+
+        foreach ($loyalitasScores as $score) {
+            if ($score >= 4.0) $results['potensiLoyal']++; // Berpotensi loyal jika skor >= 4
+        }
+
+        return $results;
+    }
+
+    /**
+     * Calculate detailed loyalitas metrics
+     */
+    public function calculateLoyalitasDetails($responses)
+    {
+        $results = [
+            'avgL1' => 0,
+            'avgL2' => 0,
+            'avgL3' => 0,
+            'l1Distribution' => [
+                'sangat_setuju' => 0,
+                'setuju' => 0,
+                'netral' => 0,
+                'tidak_setuju' => 0,
+                'sangat_tidak_setuju' => 0
+            ],
+            'l2Distribution' => [
+                'sangat_setuju' => 0,
+                'setuju' => 0,
+                'netral' => 0,
+                'tidak_setuju' => 0,
+                'sangat_tidak_setuju' => 0
+            ],
+            'l3Distribution' => [
+                'sangat_setuju' => 0,
+                'setuju' => 0,
+                'netral' => 0,
+                'tidak_setuju' => 0,
+                'sangat_tidak_setuju' => 0
+            ]
+        ];
+
+        if (empty($responses)) {
+            return $results;
+        }
+
+        // Hitung rata-rata per pertanyaan loyalitas
+        $l1Scores = [];
+        $l2Scores = [];
+        $l3Scores = [];
+
+        foreach ($responses as $response) {
+            if (isset($response['loyalitas_answers'])) {
+                $loyalitas = $response['loyalitas_answers'];
+                if (isset($loyalitas['l1'])) $l1Scores[] = $loyalitas['l1'];
+                if (isset($loyalitas['l2'])) $l2Scores[] = $loyalitas['l2'];
+                if (isset($loyalitas['l3'])) $l3Scores[] = $loyalitas['l3'];
+            }
+        }
+
+        $results['avgL1'] = count($l1Scores) > 0 ? array_sum($l1Scores) / count($l1Scores) : 0;
+        $results['avgL2'] = count($l2Scores) > 0 ? array_sum($l2Scores) / count($l2Scores) : 0;
+        $results['avgL3'] = count($l3Scores) > 0 ? array_sum($l3Scores) / count($l3Scores) : 0;
+
+        // Hitung distribusi untuk setiap pertanyaan
+        $results['l1Distribution'] = $this->calculateDistribution($l1Scores);
+        $results['l2Distribution'] = $this->calculateDistribution($l2Scores);
+        $results['l3Distribution'] = $this->calculateDistribution($l3Scores);
+
+        return $results;
+    }
+
+    /**
+     * Calculate distribution for scores
+     */
+    private function calculateDistribution($scores)
+    {
+        $distribution = [
+            'sangat_setuju' => 0,
+            'setuju' => 0,
+            'netral' => 0,
+            'tidak_setuju' => 0,
+            'sangat_tidak_setuju' => 0
+        ];
+
+        foreach ($scores as $score) {
+            if ($score >= 4.5) $distribution['sangat_setuju']++;
+            elseif ($score >= 3.5) $distribution['setuju']++;
+            elseif ($score >= 2.5) $distribution['netral']++;
+            elseif ($score >= 1.5) $distribution['tidak_setuju']++;
+            else $distribution['sangat_tidak_setuju']++;
+        }
+
+        return $distribution;
+    }
 }

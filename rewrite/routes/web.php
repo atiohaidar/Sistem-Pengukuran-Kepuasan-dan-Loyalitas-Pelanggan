@@ -25,7 +25,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Grafik Routes
-    Route::get('/grafik/index3', [GrafikController::class, 'index3'])->name('grafik.index3');
     Route::get('/grafik/mean-gap-per-dimensi', [GrafikController::class, 'mean_gap_per_dimensi'])->name('grafik.mean-gap-per-dimensi');
 
     // Survey Management Dashboard Routes

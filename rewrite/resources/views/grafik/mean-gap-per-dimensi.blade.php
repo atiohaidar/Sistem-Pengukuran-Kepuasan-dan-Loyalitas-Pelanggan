@@ -167,6 +167,54 @@
                 'headerGradient' => 'from-green-500 to-teal-600',
                 'titleGradient' => 'from-green-600 to-teal-600'
             ]) !!}
+
+            {!! renderDimensionSection($responsivenessData, $responsivenessQuestions, [
+                'name' => 'Responsiveness',
+                'prefix' => 'RS',
+                'count' => 2,
+                'icon' => 'clock',
+                'chartId' => 'responsiveness-chart',
+                'loadingId' => 'responsiveness-chart-loading',
+                'gradient' => 'from-yellow-500 via-orange-500 to-red-500',
+                'headerGradient' => 'from-yellow-500 to-orange-600',
+                'titleGradient' => 'from-yellow-600 to-orange-600'
+            ]) !!}
+
+            {!! renderDimensionSection($assuranceData, $assuranceQuestions, [
+                'name' => 'Assurance',
+                'prefix' => 'A',
+                'count' => 4,
+                'icon' => 'shield-alt',
+                'chartId' => 'assurance-chart',
+                'loadingId' => 'assurance-chart-loading',
+                'gradient' => 'from-purple-500 via-pink-500 to-rose-500',
+                'headerGradient' => 'from-purple-500 to-pink-600',
+                'titleGradient' => 'from-purple-600 to-pink-600'
+            ]) !!}
+
+            {!! renderDimensionSection($empathyData, $empathyQuestions, [
+                'name' => 'Empathy',
+                'prefix' => 'E',
+                'count' => 5,
+                'icon' => 'heart',
+                'chartId' => 'empathy-chart',
+                'loadingId' => 'empathy-chart-loading',
+                'gradient' => 'from-red-500 via-pink-500 to-purple-500',
+                'headerGradient' => 'from-red-500 to-pink-600',
+                'titleGradient' => 'from-red-600 to-pink-600'
+            ]) !!}
+
+            {!! renderDimensionSection($applicabilityData, $applicabilityQuestions, [
+                'name' => 'Applicability',
+                'prefix' => 'AP',
+                'count' => 2,
+                'icon' => 'cogs',
+                'chartId' => 'applicability-chart',
+                'loadingId' => 'applicability-chart-loading',
+                'gradient' => 'from-indigo-500 via-blue-500 to-cyan-500',
+                'headerGradient' => 'from-indigo-500 to-blue-600',
+                'titleGradient' => 'from-indigo-600 to-blue-600'
+            ]) !!}
         </div>
     </div>
 </x-app-layout>
@@ -518,6 +566,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const questionsData = @json($reliabilityQuestions);
     const tangibleChartData = @json($tangibleData);
     const tangibleQuestionsData = @json($tangibleQuestions);
+    const responsivenessChartData = @json($responsivenessData);
+    const responsivenessQuestionsData = @json($responsivenessQuestions);
+    const assuranceChartData = @json($assuranceData);
+    const assuranceQuestionsData = @json($assuranceQuestions);
+    const empathyChartData = @json($empathyData);
+    const empathyQuestionsData = @json($empathyQuestions);
+    const applicabilityChartData = @json($applicabilityData);
+    const applicabilityQuestionsData = @json($applicabilityQuestions);
     
     // Configuration for all dimensions
     const dimensions = [
@@ -534,6 +590,34 @@ document.addEventListener('DOMContentLoaded', function() {
             categories: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
             chartId: 'tangible-chart',
             title: '{{ __("Dimensi Tangible") }}'
+        },
+        {
+            data: responsivenessChartData,
+            questions: responsivenessQuestionsData,
+            categories: ['RS1', 'RS2'],
+            chartId: 'responsiveness-chart',
+            title: '{{ __("Dimensi Responsiveness") }}'
+        },
+        {
+            data: assuranceChartData,
+            questions: assuranceQuestionsData,
+            categories: ['A1', 'A2', 'A3', 'A4'],
+            chartId: 'assurance-chart',
+            title: '{{ __("Dimensi Assurance") }}'
+        },
+        {
+            data: empathyChartData,
+            questions: empathyQuestionsData,
+            categories: ['E1', 'E2', 'E3', 'E4', 'E5'],
+            chartId: 'empathy-chart',
+            title: '{{ __("Dimensi Empathy") }}'
+        },
+        {
+            data: applicabilityChartData,
+            questions: applicabilityQuestionsData,
+            categories: ['AP1', 'AP2'],
+            chartId: 'applicability-chart',
+            title: '{{ __("Dimensi Applicability") }}'
         }
     ];
     

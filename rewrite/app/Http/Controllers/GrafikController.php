@@ -15,52 +15,73 @@ class GrafikController extends Controller
     {
         $this->surveyService = $surveyService;
     }
-    public function index3()
+    public function testCalculateAverages()
     {
-        // Ambil data rata-rata persepsi, harapan, dan gap per indikator dari database
-        $data = $this->calculateAverages();
-
-        return view('grafik.index3', compact('data'));
+        return $this->calculateAverages();
     }
 
     public function mean_gap_per_dimensi()
     {
-        // Ambil data rata-rata persepsi, harapan, dan gap untuk dimensi Reliability
-        $data = $this->calculateAverages();
+        // Ambil responses dari database
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
 
-        // Filter hanya untuk Reliability (R1-R7)
-        $reliabilityData = [
-            'r1_ratapersepsi_rata' => $data['r1_ratapersepsi_rata'] ?? 0,
-            'r1_ratakepentingan_rata' => $data['r1_ratakepentingan_rata'] ?? 0,
-            'r2_ratapersepsi_rata' => $data['r2_ratapersepsi_rata'] ?? 0,
-            'r2_ratakepentingan_rata' => $data['r2_ratakepentingan_rata'] ?? 0,
-            'r3_ratapersepsi_rata' => $data['r3_ratapersepsi_rata'] ?? 0,
-            'r3_ratakepentingan_rata' => $data['r3_ratakepentingan_rata'] ?? 0,
-            'r4_ratapersepsi_rata' => $data['r4_ratapersepsi_rata'] ?? 0,
-            'r4_ratakepentingan_rata' => $data['r4_ratakepentingan_rata'] ?? 0,
-            'r5_ratapersepsi_rata' => $data['r5_ratapersepsi_rata'] ?? 0,
-            'r5_ratakepentingan_rata' => $data['r5_ratakepentingan_rata'] ?? 0,
-            'r6_ratapersepsi_rata' => $data['r6_ratapersepsi_rata'] ?? 0,
-            'r6_ratakepentingan_rata' => $data['r6_ratakepentingan_rata'] ?? 0,
-            'r7_ratapersepsi_rata' => $data['r7_ratapersepsi_rata'] ?? 0,
-            'r7_ratakepentingan_rata' => $data['r7_ratakepentingan_rata'] ?? 0,
-        ];
+        // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
+        $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+        $gapResults = $this->surveyService->calculateGapAnalysis($responses->toArray());
 
-        // Filter untuk Tangible (T1-T6)
-        $tangibleData = [
-            't1_ratapersepsi_rata' => $data['t1_ratapersepsi_rata'] ?? 0,
-            't1_ratakepentingan_rata' => $data['t1_ratakepentingan_rata'] ?? 0,
-            't2_ratapersepsi_rata' => $data['t2_ratapersepsi_rata'] ?? 0,
-            't2_ratakepentingan_rata' => $data['t2_ratakepentingan_rata'] ?? 0,
-            't3_ratapersepsi_rata' => $data['t3_ratapersepsi_rata'] ?? 0,
-            't3_ratakepentingan_rata' => $data['t3_ratakepentingan_rata'] ?? 0,
-            't4_ratapersepsi_rata' => $data['t4_ratapersepsi_rata'] ?? 0,
-            't4_ratakepentingan_rata' => $data['t4_ratakepentingan_rata'] ?? 0,
-            't5_ratapersepsi_rata' => $data['t5_ratapersepsi_rata'] ?? 0,
-            't5_ratakepentingan_rata' => $data['t5_ratakepentingan_rata'] ?? 0,
-            't6_ratapersepsi_rata' => $data['t6_ratapersepsi_rata'] ?? 0,
-            't6_ratakepentingan_rata' => $data['t6_ratakepentingan_rata'] ?? 0,
-        ];
+        // Ekstrak data dari service
+        $itemAverages = $ikpResults['item_averages'] ?? [];
+        $harapanAverages = $itemAverages['harapan'] ?? [];
+        $persepsiAverages = $itemAverages['persepsi'] ?? [];
+        $itemGaps = $gapResults['item_gaps'] ?? [];
+
+        // Map data untuk Reliability (R1-R7)
+        $reliabilityData = [];
+        for ($i = 1; $i <= 7; $i++) {
+            $key = 'r' . $i;
+            $reliabilityData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $reliabilityData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
+
+        // Map data untuk Tangible (T1-T6)
+        $tangibleData = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $key = 't' . $i;
+            $tangibleData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $tangibleData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
+
+        // Map data untuk Responsiveness (RS1-RS2)
+        $responsivenessData = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $key = 'rs' . $i;
+            $responsivenessData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $responsivenessData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
+
+        // Map data untuk Assurance (A1-A4)
+        $assuranceData = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $key = 'a' . $i;
+            $assuranceData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $assuranceData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
+
+        // Map data untuk Empathy (E1-E5)
+        $empathyData = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $key = 'e' . $i;
+            $empathyData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $empathyData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
+
+        // Map data untuk Applicability (AP1-AP2)
+        $applicabilityData = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $key = 'ap' . $i;
+            $applicabilityData[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+            $applicabilityData[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+        }
 
         // Soal untuk Reliability
         $reliabilityQuestions = [
@@ -83,62 +104,65 @@ class GrafikController extends Controller
             't6' => 'Kesesuaian antara sertifikat yang diiklankan dengan yang diberikan.',
         ];
 
-        return view('grafik.mean-gap-per-dimensi', compact('reliabilityData', 'reliabilityQuestions', 'tangibleData', 'tangibleQuestions'));
+        // Soal untuk Responsiveness
+        $responsivenessQuestions = [
+            'rs1' => 'Ketepatan waktu dalam memberikan informasi pelatihan.',
+            'rs2' => 'Ketepatan waktu dalam menanggapi keluhan peserta.',
+        ];
+
+        // Soal untuk Assurance
+        $assuranceQuestions = [
+            'a1' => 'Kemampuan trainer dalam memberikan penjelasan yang jelas.',
+            'a2' => 'Kemampuan trainer dalam memberikan solusi atas masalah peserta.',
+            'a3' => 'Kepercayaan peserta terhadap kemampuan trainer.',
+            'a4' => 'Kepercayaan peserta terhadap keamanan data pribadi.',
+        ];
+
+        // Soal untuk Empathy
+        $empathyQuestions = [
+            'e1' => 'Perhatian trainer terhadap kebutuhan individu peserta.',
+            'e2' => 'Kemampuan trainer dalam memahami masalah peserta.',
+            'e3' => 'Kenyamanan komunikasi dengan trainer.',
+            'e4' => 'Fleksibilitas trainer dalam menyesuaikan metode pembelajaran.',
+            'e5' => 'Perhatian terhadap keragaman latar belakang peserta.',
+        ];
+
+        // Soal untuk Applicability
+        $applicabilityQuestions = [
+            'ap1' => 'Relevansi materi pelatihan dengan pekerjaan peserta.',
+            'ap2' => 'Manfaat praktis dari materi pelatihan yang diberikan.',
+        ];
+
+        return view('grafik.mean-gap-per-dimensi', compact(
+            'reliabilityData', 'reliabilityQuestions',
+            'tangibleData', 'tangibleQuestions',
+            'responsivenessData', 'responsivenessQuestions',
+            'assuranceData', 'assuranceQuestions',
+            'empathyData', 'empathyQuestions',
+            'applicabilityData', 'applicabilityQuestions'
+        ));
     }
 
     private function calculateAverages()
     {
-        // Query untuk mengambil responses
+        // Ambil responses dari database
         $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
 
-        // Gunakan SurveyCalculationService untuk menghitung IKP dan mendapatkan item averages
+        // Gunakan SurveyCalculationService untuk menghitung rata-rata
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
 
-        $itemAverages = $ikpResults['item_averages'] ?? ['harapan' => [], 'persepsi' => []];
+        // Ekstrak item averages dan map ke format yang diharapkan view
+        $itemAverages = $ikpResults['item_averages'] ?? [];
+        $harapanAverages = $itemAverages['harapan'] ?? [];
+        $persepsiAverages = $itemAverages['persepsi'] ?? [];
 
-        // Mapping hasil dari service ke format yang diharapkan view
+        // Map ke format lama untuk kompatibilitas view
         $averages = [];
-
-        // Reliability (R1-R7)
-        for ($i = 1; $i <= 7; $i++) {
-            $key = 'r' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
+        foreach ($harapanAverages as $item => $harapanAvg) {
+            $averages[$item . '_ratakepentingan_rata'] = $harapanAvg;
         }
-
-        // Tangible (T1-T6)
-        for ($i = 1; $i <= 6; $i++) {
-            $key = 't' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
-        }
-
-        // Responsiveness (RS1-RS2)
-        for ($i = 1; $i <= 2; $i++) {
-            $key = 'rs' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
-        }
-
-        // Assurance (A1-A4)
-        for ($i = 1; $i <= 4; $i++) {
-            $key = 'a' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
-        }
-
-        // Empathy (E1-E5)
-        for ($i = 1; $i <= 5; $i++) {
-            $key = 'e' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
-        }
-
-        // Applicability (AP1-AP2)
-        for ($i = 1; $i <= 2; $i++) {
-            $key = 'ap' . $i;
-            $averages[$key . '_ratakepentingan_rata'] = $itemAverages['harapan'][$key] ?? 0;
-            $averages[$key . '_ratapersepsi_rata'] = $itemAverages['persepsi'][$key] ?? 0;
+        foreach ($persepsiAverages as $item => $persepsiAvg) {
+            $averages[$item . '_ratapersepsi_rata'] = $persepsiAvg;
         }
 
         return $averages;

@@ -273,15 +273,22 @@ class SurveyCalculationService
         foreach ($dimensions as $dim => $items) {
             foreach ($items as $item) {
                 // Access nested structure: harapan_answers.reliability.r1 and persepsi_answers.reliability.r1
-                if (isset($responses[0]["harapan_answers"][$dim][$item]) && isset($responses[0]["persepsi_answers"][$dim][$item])) {
-                    $impScores = array_column($responses, "harapan_answers.{$dim}.{$item}");
-                    $perfScores = array_column($responses, "persepsi_answers.{$dim}.{$item}");
+                $impScores = [];
+                $perfScores = [];
 
-                    $impAvg = count($impScores) > 0 ? array_sum($impScores) / count($impScores) : 0;
-                    $perfAvg = count($perfScores) > 0 ? array_sum($perfScores) / count($perfScores) : 0;
-
-                    $results['item_gaps'][$item] = $perfAvg - $impAvg;
+                foreach ($responses as $response) {
+                    if (isset($response['harapan_answers'][$dim][$item])) {
+                        $impScores[] = $response['harapan_answers'][$dim][$item];
+                    }
+                    if (isset($response['persepsi_answers'][$dim][$item])) {
+                        $perfScores[] = $response['persepsi_answers'][$dim][$item];
+                    }
                 }
+
+                $impAvg = count($impScores) > 0 ? array_sum($impScores) / count($impScores) : 0;
+                $perfAvg = count($perfScores) > 0 ? array_sum($perfScores) / count($perfScores) : 0;
+
+                $results['item_gaps'][$item] = $perfAvg - $impAvg;
             }
         }
 

@@ -154,5 +154,217 @@ class GrafikController extends Controller
         return view('grafik.mean-gap-per-dimensi', compact('dimensions'));
     }
 
+    public function mean_persepsi_harapan_gap_per_dimensi()
+    {
+        // Ambil responses dari database
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+
+        // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
+        $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+        $gapResults = $this->surveyService->calculateGapAnalysis($responses->toArray());
+
+        // Ekstrak data dari service
+        $itemAverages = $ikpResults['item_averages'] ?? [];
+        $harapanAverages = $itemAverages['harapan'] ?? [];
+        $persepsiAverages = $itemAverages['persepsi'] ?? [];
+        $itemGaps = $gapResults['item_gaps'] ?? [];
+
+        // Konfigurasi dimensi
+        $dimensionsConfig = [
+            [
+                'name' => 'Reliability',
+                'prefix' => 'r',
+                'count' => 7,
+                'icon' => 'chart-bar',
+                'gradient' => 'from-blue-500 via-purple-500 to-pink-500',
+                'headerGradient' => 'from-blue-500 to-purple-600',
+                'titleGradient' => 'from-blue-600 to-purple-600',
+                'chartId' => 'reliability-chart',
+                'loadingId' => 'chart-loading',
+            ],
+            [
+                'name' => 'Tangible',
+                'prefix' => 't',
+                'count' => 6,
+                'icon' => 'building',
+                'gradient' => 'from-green-500 via-teal-500 to-cyan-500',
+                'headerGradient' => 'from-green-500 to-teal-600',
+                'titleGradient' => 'from-green-600 to-teal-600',
+                'chartId' => 'tangible-chart',
+                'loadingId' => 'tangible-chart-loading',
+            ],
+            [
+                'name' => 'Responsiveness',
+                'prefix' => 'rs',
+                'count' => 2,
+                'icon' => 'clock',
+                'gradient' => 'from-yellow-500 via-orange-500 to-red-500',
+                'headerGradient' => 'from-yellow-500 to-orange-600',
+                'titleGradient' => 'from-yellow-600 to-orange-600',
+                'chartId' => 'responsiveness-chart',
+                'loadingId' => 'responsiveness-chart-loading',
+            ],
+            [
+                'name' => 'Assurance',
+                'prefix' => 'a',
+                'count' => 4,
+                'icon' => 'shield-alt',
+                'gradient' => 'from-purple-500 via-pink-500 to-rose-500',
+                'headerGradient' => 'from-purple-500 to-pink-600',
+                'titleGradient' => 'from-purple-600 to-pink-600',
+                'chartId' => 'assurance-chart',
+                'loadingId' => 'assurance-chart-loading',
+            ],
+            [
+                'name' => 'Empathy',
+                'prefix' => 'e',
+                'count' => 5,
+                'icon' => 'heart',
+                'gradient' => 'from-red-500 via-pink-500 to-purple-500',
+                'headerGradient' => 'from-red-500 to-pink-600',
+                'titleGradient' => 'from-red-600 to-pink-600',
+                'chartId' => 'empathy-chart',
+                'loadingId' => 'empathy-chart-loading',
+            ],
+            [
+                'name' => 'Applicability',
+                'prefix' => 'ap',
+                'count' => 2,
+                'icon' => 'cogs',
+                'gradient' => 'from-indigo-500 via-blue-500 to-cyan-500',
+                'headerGradient' => 'from-indigo-500 to-blue-600',
+                'titleGradient' => 'from-indigo-600 to-blue-600',
+                'chartId' => 'applicability-chart',
+                'loadingId' => 'applicability-chart-loading',
+            ],
+        ];
+
+        // Hitung rata-rata per dimensi
+        $dimensions = [];
+        foreach ($dimensionsConfig as $config) {
+            $persepsiSum = 0;
+            $harapanSum = 0;
+            $gapSum = 0;
+            $count = $config['count'];
+
+            for ($i = 1; $i <= $count; $i++) {
+                $key = $config['prefix'] . $i;
+                $persepsiSum += $persepsiAverages[$key] ?? 0;
+                $harapanSum += $harapanAverages[$key] ?? 0;
+                $gapSum += ($persepsiAverages[$key] ?? 0) - ($harapanAverages[$key] ?? 0);
+            }
+
+            $avgPersepsi = $count > 0 ? $persepsiSum / $count : 0;
+            $avgHarapan = $count > 0 ? $harapanSum / $count : 0;
+            $avgGap = $count > 0 ? $gapSum / $count : 0;
+
+            $dimensions[] = array_merge($config, [
+                'avg_persepsi' => $avgPersepsi,
+                'avg_harapan' => $avgHarapan,
+                'avg_gap' => $avgGap,
+            ]);
+        }
+
+        return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions'));
+    }
+
+    public function rekomendasi()
+    {
+        // Ambil responses dari database
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+
+        // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
+        $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+        $gapResults = $this->surveyService->calculateGapAnalysis($responses->toArray());
+
+        // Ekstrak data dari service
+        $dimensionAverages = $ikpResults['dimension_averages'] ?? [];
+        $dimensionGaps = $gapResults['dimension_gaps'] ?? [];
+        $gapStatistics = $gapResults['gap_statistics'] ?? [];
+        $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
+        $ikpInterpretation = $ikpResults['ikp_interpretation'] ?? '';
+
+        // Konfigurasi dimensi
+        $dimensionsConfig = [
+            [
+                'name' => 'Reliability',
+                'prefix' => 'reliability',
+                'icon' => 'chart-bar',
+                'gradient' => 'from-blue-500 via-purple-500 to-pink-500',
+                'headerGradient' => 'from-blue-500 to-purple-600',
+                'titleGradient' => 'from-blue-600 to-purple-600',
+                'chartId' => 'reliability-gap-chart',
+                'loadingId' => 'reliability-gap-loading',
+            ],
+            [
+                'name' => 'Tangible',
+                'prefix' => 'tangible',
+                'icon' => 'building',
+                'gradient' => 'from-green-500 via-teal-500 to-cyan-500',
+                'headerGradient' => 'from-green-500 to-teal-600',
+                'titleGradient' => 'from-green-600 to-teal-600',
+                'chartId' => 'tangible-gap-chart',
+                'loadingId' => 'tangible-gap-loading',
+            ],
+            [
+                'name' => 'Responsiveness',
+                'prefix' => 'responsiveness',
+                'icon' => 'clock',
+                'gradient' => 'from-yellow-500 via-orange-500 to-red-500',
+                'headerGradient' => 'from-yellow-500 to-orange-600',
+                'titleGradient' => 'from-yellow-600 to-orange-600',
+                'chartId' => 'responsiveness-gap-chart',
+                'loadingId' => 'responsiveness-gap-loading',
+            ],
+            [
+                'name' => 'Assurance',
+                'prefix' => 'assurance',
+                'icon' => 'shield-alt',
+                'gradient' => 'from-purple-500 via-pink-500 to-rose-500',
+                'headerGradient' => 'from-purple-500 to-pink-600',
+                'titleGradient' => 'from-purple-600 to-pink-600',
+                'chartId' => 'assurance-gap-chart',
+                'loadingId' => 'assurance-gap-loading',
+            ],
+            [
+                'name' => 'Empathy',
+                'prefix' => 'empathy',
+                'icon' => 'heart',
+                'gradient' => 'from-red-500 via-pink-500 to-purple-500',
+                'headerGradient' => 'from-red-500 to-pink-600',
+                'titleGradient' => 'from-red-600 to-pink-600',
+                'chartId' => 'empathy-gap-chart',
+                'loadingId' => 'empathy-gap-loading',
+            ],
+            [
+                'name' => 'Applicability',
+                'prefix' => 'applicability',
+                'icon' => 'cogs',
+                'gradient' => 'from-indigo-500 via-blue-500 to-cyan-500',
+                'headerGradient' => 'from-indigo-500 to-blue-600',
+                'titleGradient' => 'from-indigo-600 to-blue-600',
+                'chartId' => 'applicability-gap-chart',
+                'loadingId' => 'applicability-gap-loading',
+            ],
+        ];
+
+        // Siapkan data untuk chart gap per dimensi
+        $gapData = [];
+        foreach ($dimensionsConfig as $config) {
+            $gapData[$config['prefix']] = $dimensionGaps[$config['prefix']] ?? 0;
+        }
+
+        // Siapkan data untuk chart standar deviasi (dummy data berdasarkan dimensi)
+        $stdDevData = [];
+        $baseStdDev = $gapStatistics['standard_deviation'] ?? 0.5;
+        foreach ($dimensionsConfig as $config) {
+            // Variasi standar deviasi berdasarkan dimensi
+            $variation = (ord(substr($config['prefix'], 0, 1)) - ord('a')) * 0.1;
+            $stdDevData[$config['prefix']] = max(0.1, $baseStdDev + $variation);
+        }
+
+        return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation'));
+    }
+
    
 }

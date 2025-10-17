@@ -181,7 +181,7 @@ class SurveyController extends Controller
         return match ($step) {
             'profile' => $request->validate([
                 'email' => 'required|email',
-                'whatsapp' => 'required|string|max:20',
+                'whatsapp' => 'nullable|string|max:20',
                 'jenis_kelamin' => 'required|in:L,P',
                 'usia' => 'required|integer|min:1|max:120',
                 'pekerjaan' => 'required|string',

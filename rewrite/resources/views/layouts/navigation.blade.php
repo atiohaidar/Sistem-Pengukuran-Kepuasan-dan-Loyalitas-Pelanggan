@@ -15,12 +15,6 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('survey.index')" :active="request()->routeIs('survey.*')">
-                        {{ __('Pengukuran Kepuasan') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('customer-management-evaluation.welcome')" :active="request()->routeIs('customer-management-evaluation.*')">
-                        {{ __('Evaluasi Manajemen') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')">
                         {{ __('Manajemen Survei') }}
                     </x-nav-link>
@@ -81,12 +75,6 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('survey.index')" :active="request()->routeIs('survey.*')">
-                {{ __('Pengukuran Kepuasan') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('customer-management-evaluation.welcome')" :active="request()->routeIs('customer-management-evaluation.*')">
-                {{ __('Evaluasi Manajemen') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard.survey-management.index')" :active="request()->routeIs('dashboard.survey-management.*')">
                 {{ __('Manajemen Survei') }}

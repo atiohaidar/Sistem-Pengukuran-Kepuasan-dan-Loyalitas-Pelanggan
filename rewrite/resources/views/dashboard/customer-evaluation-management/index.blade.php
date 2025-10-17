@@ -7,6 +7,23 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Header Info -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Manajemen Evaluasi Manajemen Pelanggan</h3>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Kelola data evaluasi perusahaan |
+                                <a href="{{ route('customer-management-evaluation.welcome') }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    Akses Evaluasi Manajemen →
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Total Evaluations -->

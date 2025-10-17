@@ -226,15 +226,7 @@
                                 {!! renderPerformanceSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Committee service memberikan respon yang cepat terhadap keluhan peserta</label>
-                                {!! renderPerformanceSelect('responsiveness[r3]', $responsivenessData, 'r3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service memberikan respon yang cepat terhadap permintaan peserta</label>
-                                {!! renderPerformanceSelect('responsiveness[r4]', $responsivenessData, 'r4') !!}
-                            </div>
+                       
                         </div>
                     </div>
                 </div>

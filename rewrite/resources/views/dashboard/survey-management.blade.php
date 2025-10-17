@@ -11,7 +11,15 @@
                 <div class="p-6 text-gray-900">
                     <!-- Header with Export Button -->
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-medium text-gray-900">Manajemen Data Survei Pelatihan</h3>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Manajemen Data Survei Pelatihan</h3>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Kelola data survei responden |
+                                <a href="{{ route('survey.index') }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    Akses Pengukuran Kepuasan →
+                                </a>
+                            </p>
+                        </div>
                         <a href="{{ route('dashboard.survey-management.export') }}"
                            class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

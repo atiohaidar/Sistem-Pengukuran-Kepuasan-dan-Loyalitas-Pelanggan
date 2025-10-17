@@ -39,7 +39,44 @@ class GrafikController extends Controller
             'r7_ratakepentingan_rata' => $data['r7_ratakepentingan_rata'] ?? 0,
         ];
 
-        return view('grafik.mean-gap-per-dimensi', compact('reliabilityData'));
+        // Filter untuk Tangible (T1-T6)
+        $tangibleData = [
+            't1_ratapersepsi_rata' => $data['t1_ratapersepsi_rata'] ?? 0,
+            't1_ratakepentingan_rata' => $data['t1_ratakepentingan_rata'] ?? 0,
+            't2_ratapersepsi_rata' => $data['t2_ratapersepsi_rata'] ?? 0,
+            't2_ratakepentingan_rata' => $data['t2_ratakepentingan_rata'] ?? 0,
+            't3_ratapersepsi_rata' => $data['t3_ratapersepsi_rata'] ?? 0,
+            't3_ratakepentingan_rata' => $data['t3_ratakepentingan_rata'] ?? 0,
+            't4_ratapersepsi_rata' => $data['t4_ratapersepsi_rata'] ?? 0,
+            't4_ratakepentingan_rata' => $data['t4_ratakepentingan_rata'] ?? 0,
+            't5_ratapersepsi_rata' => $data['t5_ratapersepsi_rata'] ?? 0,
+            't5_ratakepentingan_rata' => $data['t5_ratakepentingan_rata'] ?? 0,
+            't6_ratapersepsi_rata' => $data['t6_ratapersepsi_rata'] ?? 0,
+            't6_ratakepentingan_rata' => $data['t6_ratakepentingan_rata'] ?? 0,
+        ];
+
+        // Soal untuk Reliability
+        $reliabilityQuestions = [
+            'r1' => 'Kesesuaian isi post test dengan materi pelatihan yang diberikan.',
+            'r2' => 'Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan.',
+            'r3' => 'Ketepatan waktu dalam memberikan sertifikat pelatihan.',
+            'r4' => 'Ketepatan trainer dalam menjawab pertanyaan peserta.',
+            'r5' => 'Materi pelatihan mudah dimengerti.',
+            'r6' => 'Kemudahan dalam melakukan registrasi pelatihan.',
+            'r7' => 'Kemudahan dalam melakukan pembayaran pelatihan.',
+        ];
+
+        // Soal untuk Tangible
+        $tangibleQuestions = [
+            't1' => 'Kesesuaian antara materi yang diiklankan dengan yang diberikan.',
+            't2' => 'Kesesuaian antara biaya yang diiklankan dengan yang dikenakan.',
+            't3' => 'Kesesuaian antara jadwal yang diiklankan dengan yang dilaksanakan.',
+            't4' => 'Kesesuaian antara tempat yang diiklankan dengan yang disediakan.',
+            't5' => 'Kesesuaian antara fasilitas yang diiklankan dengan yang disediakan.',
+            't6' => 'Kesesuaian antara sertifikat yang diiklankan dengan yang diberikan.',
+        ];
+
+        return view('grafik.mean-gap-per-dimensi', compact('reliabilityData', 'reliabilityQuestions', 'tangibleData', 'tangibleQuestions'));
     }
 
     private function calculateAverages()

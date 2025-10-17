@@ -38,20 +38,5 @@
                 </main>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('alpine:init', () => {
-                Alpine.store('sidebar', {
-                    open: window.innerWidth >= 768
-                });
-
-                // Auto-close sidebar after 1 second if initially open
-                if (window.innerWidth >= 768) {
-                    setTimeout(() => {
-                        Alpine.store('sidebar').open = false;
-                    }, 1000);
-                }
-            });
-        </script>
     </body>
 </html>

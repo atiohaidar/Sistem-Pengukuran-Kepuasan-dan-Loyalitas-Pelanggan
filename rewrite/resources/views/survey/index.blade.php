@@ -83,7 +83,7 @@
         <div class="text-center">
             <form method="POST" action="{{ route('survey.start') }}">
                 @csrf
-                <button type="submit" class="group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-5 px-10 rounded-xl text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg border-2 border-transparent hover:border-indigo-300">
+                    <button type="submit" class="group bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-5 px-10 rounded-xl text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg border-2 border-transparent hover:border-blue-300">
                     <i class="fas fa-play-circle mr-3 group-hover:animate-pulse"></i>
                     Mulai Survei
                     <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>

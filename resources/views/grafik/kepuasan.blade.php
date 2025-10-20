@@ -32,7 +32,7 @@
                                     <div class="text-2xl font-bold text-blue-600 mb-3">K1</div>
                                     <div class="text-lg font-semibold text-gray-800 mb-3">Kepuasan Keseluruhan</div>
                                     <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelatihan ini?"
+                                        "Secara keseluruhan, saya merasa puas pada layanan pelatihan ini"
                                     </div>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                                     <div class="text-2xl font-bold text-green-600 mb-3">K2</div>
                                     <div class="text-lg font-semibold text-gray-800 mb-3">Manfaat Praktis</div>
                                     <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Seberapa besar manfaat yang Anda peroleh dari pelatihan ini?"
+                                        "Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya"
                                     </div>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@
                                     <div class="text-2xl font-bold text-purple-600 mb-3">K3</div>
                                     <div class="text-lg font-semibold text-gray-800 mb-3">Willingness to Recommend</div>
                                     <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Apakah Anda akan merekomendasikan pelatihan ini kepada orang lain?"
+                                        "Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal"
                                     </div>
                                 </div>
                             </div>

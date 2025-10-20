@@ -132,9 +132,9 @@ class SurveyDashboardController extends Controller
             ],
             // Kepuasan questions
             'kepuasan_answers' => [
-                'k1' => 'Secara keseluruhan, bagaimana tingkat kepuasan Anda terhadap pelatihan ini?',
-                'k2' => 'Seberapa besar manfaat yang Anda peroleh dari pelatihan ini?',
-                'k3' => 'Apakah Anda akan merekomendasikan pelatihan ini kepada orang lain?',
+                'k1' => 'Secara keseluruhan, saya merasa puas pada layanan pelatihan ini',
+                'k2' => 'Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya',
+                'k3' => 'Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal',
             ],
             // Loyalitas questions
             'loyalitas_answers' => [

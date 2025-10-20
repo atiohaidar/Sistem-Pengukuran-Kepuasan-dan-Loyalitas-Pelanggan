@@ -20,9 +20,9 @@
 
                 // Define loyalty questions
                 $loyaltyQuestions = [
-                    1 => 'Saya akan terus menggunakan produk/jasa ini di masa depan',
-                    2 => 'Saya akan merekomendasikan produk/jasa ini kepada orang lain',
-                    3 => 'Saya akan membela produk/jasa ini jika ada orang yang mengkritiknya'
+                    1 => 'Saya akan mengulangi menggunakan jasa pelatihan ini.',
+                    2 => 'Saya akan tetap memilih jasa pelatihan ini meskipun tersedia alternatif pelatihan lain.',
+                    3 => 'Saya akan merekomendasikan pelatihan ini kepada orang lain.'
                 ];
 
                 // Section container start

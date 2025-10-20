@@ -35,51 +35,25 @@
                 <div class="space-y-8">
                     @php $kepuasanData = $survey->getAnswers('kepuasan') ?? []; @endphp
 
-                    <!-- Question 1 -->
+                    @php $counter = 1; @endphp
+                    @foreach($questions['kepuasan_answers'] as $key => $question)
+                    <!-- Question {{ $counter }} -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Secara keseluruhan, saya merasa puas pada layanan pelatihan ini.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $counter }}. {{ $question }}</h3>
                         <div class="flex flex-wrap gap-4">
                             @php $options = ['Sangat tidak setuju', 'Tidak setuju', 'Netral', 'Setuju', 'Sangat setuju']; @endphp
                             @for($i = 1; $i <= 5; $i++)
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k1" value="{{ $i }}"
-                                           {{ ($kepuasanData['k1'] ?? old('k1')) == $i ? 'checked' : '' }}
+                                    <input type="radio" name="{{ $key }}" value="{{ $i }}"
+                                           {{ ($kepuasanData[$key] ?? old($key)) == $i ? 'checked' : '' }}
                                            class="text-green-600 focus:ring-green-500" required>
                                     <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
                                 </label>
                             @endfor
                         </div>
                     </div>
-
-                    <!-- Question 2 -->
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya.</h3>
-                        <div class="flex flex-wrap gap-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k2" value="{{ $i }}"
-                                           {{ ($kepuasanData['k2'] ?? old('k2')) == $i ? 'checked' : '' }}
-                                           class="text-green-600 focus:ring-green-500" required>
-                                    <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
-                                </label>
-                            @endfor
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal.</h3>
-                        <div class="flex flex-wrap gap-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="k3" value="{{ $i }}"
-                                           {{ ($kepuasanData['k3'] ?? old('k3')) == $i ? 'checked' : '' }}
-                                           class="text-green-600 focus:ring-green-500" required>
-                                    <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
-                                </label>
-                            @endfor
-                        </div>
-                    </div>
+                    @php $counter++; @endphp
+                    @endforeach
                 </div>
 
                 <!-- Navigation Buttons -->

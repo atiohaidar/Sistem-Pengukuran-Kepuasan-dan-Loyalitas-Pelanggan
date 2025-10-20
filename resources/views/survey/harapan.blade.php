@@ -62,40 +62,14 @@
 @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['reliability'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Kesesuaian isi post test dengan materi pelatihan yang diberikan</label>
-                                {!! renderHarapanSelect('reliability[r1]', $reliabilityData, 'r1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('reliability[' . $key . ']', $reliabilityData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan</label>
-                                {!! renderHarapanSelect('reliability[r2]', $reliabilityData, 'r2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Ketepatan waktu dalam memberikan sertifikat pelatihan</label>
-                                {!! renderHarapanSelect('reliability[r3]', $reliabilityData, 'r3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Ketepatan trainer dalam menjawab pertanyaan peserta</label>
-                                {!! renderHarapanSelect('reliability[r4]', $reliabilityData, 'r4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Materi pelatihan mudah dimengerti</label>
-                                {!! renderHarapanSelect('reliability[r5]', $reliabilityData, 'r5') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Kemudahan dalam melakukan registrasi pelatihan</label>
-                                {!! renderHarapanSelect('reliability[r6]', $reliabilityData, 'r6') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">7. Kemudahan dalam melakukan pembayaran pelatihan</label>
-                                {!! renderHarapanSelect('reliability[r7]', $reliabilityData, 'r7') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -107,25 +81,14 @@
                         @php $assuranceData = $survey->getAnswers('harapan', 'assurance') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['assurance'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer/pegawai bersikap sopan</label>
-                                {!! renderHarapanSelect('assurance[a1]', $assuranceData, 'a1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('assurance[' . $key . ']', $assuranceData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memiliki pengetahuan yang luas mengenai materi pelatihan</label>
-                                {!! renderHarapanSelect('assurance[a2]', $assuranceData, 'a2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami</label>
-                                {!! renderHarapanSelect('assurance[a3]', $assuranceData, 'a3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service selalu dapat menyelesaikan keluhan pelanggan</label>
-                                {!! renderHarapanSelect('assurance[a4]', $assuranceData, 'a4') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -137,35 +100,14 @@
                         @php $tangibleData = $survey->getAnswers('harapan', 'tangible') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['tangible'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Sistem aplikasi pelatihan online yang user friendly</label>
-                                {!! renderHarapanSelect('tangible[t1]', $tangibleData, 't1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('tangible[' . $key . ']', $tangibleData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Website menampilkan informasi terbaru</label>
-                                {!! renderHarapanSelect('tangible[t2]', $tangibleData, 't2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Perlengkapan audio visual berfungsi dengan baik</label>
-                                {!! renderHarapanSelect('tangible[t3]', $tangibleData, 't3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Koneksi internet host lancar selama pelatihan berlangsung</label>
-                                {!! renderHarapanSelect('tangible[t4]', $tangibleData, 't4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Tampilan modul pelatihan menarik untuk dibaca</label>
-                                {!! renderHarapanSelect('tangible[t5]', $tangibleData, 't5') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Trainer berpenampilan rapi</label>
-                                {!! renderHarapanSelect('tangible[t6]', $tangibleData, 't6') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -177,30 +119,14 @@
                         @php $empathyData = $survey->getAnswers('harapan', 'empathy') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['empathy'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer memberi perhatian kepada peserta</label>
-                                {!! renderHarapanSelect('empathy[e1]', $empathyData, 'e1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('empathy[' . $key . ']', $empathyData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memahami kebutuhan peserta</label>
-                                {!! renderHarapanSelect('empathy[e2]', $empathyData, 'e2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Terjalin komunikasi yang baik antara trainer dengan peserta</label>
-                                {!! renderHarapanSelect('empathy[e3]', $empathyData, 'e3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer berupaya membantu saat peserta mengalami kesulitan</label>
-                                {!! renderHarapanSelect('empathy[e4]', $empathyData, 'e4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Kecukupan waktu yang dialokasikan untuk pelatihan</label>
-                                {!! renderHarapanSelect('empathy[e5]', $empathyData, 'e5') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -212,15 +138,14 @@
                         @php $responsivenessData = $survey->getAnswers('harapan', 'responsiveness') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['responsiveness'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Kecepatan respon contact person perusahaan dalam menanggapi peserta</label>
-                                {!! renderHarapanSelect('responsiveness[r1]', $responsivenessData, 'r1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('responsiveness[' . $key . ']', $responsivenessData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Kepastian informasi mengenai jadwal pelatihan</label>
-                                {!! renderHarapanSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -232,15 +157,14 @@
                         @php $applicabilityData = $survey->getAnswers('harapan', 'applicability') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['harapan_answers']['applicability'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Pelatihan berkaitan langsung dengan pekerjaan saya</label>
-                                {!! renderHarapanSelect('applicability[ap1]', $applicabilityData, 'ap1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderHarapanSelect('applicability[' . $key . ']', $applicabilityData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Pelatihan yang diberikan mudah untuk diterapkan dalam pekerjaan</label>
-                                {!! renderHarapanSelect('applicability[ap2]', $applicabilityData, 'ap2') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>

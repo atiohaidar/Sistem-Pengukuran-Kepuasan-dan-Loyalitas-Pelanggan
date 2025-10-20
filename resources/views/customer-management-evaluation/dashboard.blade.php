@@ -37,16 +37,8 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @php
-                                $maturityLabels = [
-                                    'visi' => 'Visi',
-                                    'strategi' => 'Strategi',
-                                    'pengalamanKonsumen' => 'Pengalaman Konsumen',
-                                    'kolaborasiOrganisasi' => 'Kolaborasi Organisasi',
-                                    'proses' => 'Proses',
-                                    'informasi' => 'Informasi',
-                                    'teknologi' => 'Teknologi',
-                                    'matriks' => 'Matriks',
-                                ];
+                                $maturityQuestions = app(\App\Services\SurveyQuestionService::class)->getMaturityQuestions();
+                                $maturityLabels = array_column($maturityQuestions, 'label', 'key');
                             @endphp
                             @foreach($maturityLabels as $key => $label)
                                 <tr>

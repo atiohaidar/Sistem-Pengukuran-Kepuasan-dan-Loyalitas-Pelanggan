@@ -36,38 +36,22 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- K1 Question -->
-                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                            @php
+                            $colors = ['blue', 'green', 'purple'];
+                            $i = 0;
+                            @endphp
+                            @foreach($questions['kepuasan_answers'] as $key => $question)
+                            <div class="bg-gradient-to-r from-{{ $colors[$i % 3] }}-50 to-{{ $colors[$i % 3] }}-100 rounded-xl p-6 border border-{{ $colors[$i % 3] }}-200">
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-blue-600 mb-3">K1</div>
-                                    <div class="text-lg font-semibold text-gray-800 mb-3">Kepuasan Keseluruhan</div>
+                                    <div class="text-2xl font-bold text-{{ $colors[$i % 3] }}-600 mb-3">{{ strtoupper($key) }}</div>
+                                    <div class="text-lg font-semibold text-gray-800 mb-3">{{ ucfirst($key) }} Question</div>
                                     <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Secara keseluruhan, saya merasa puas pada layanan pelatihan ini"
+                                        "{{ $question }}"
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- K2 Question -->
-                            <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-green-600 mb-3">K2</div>
-                                    <div class="text-lg font-semibold text-gray-800 mb-3">Manfaat Praktis</div>
-                                    <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya"
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- K3 Question -->
-                            <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-purple-600 mb-3">K3</div>
-                                    <div class="text-lg font-semibold text-gray-800 mb-3">Willingness to Recommend</div>
-                                    <div class="text-sm text-gray-600 leading-relaxed">
-                                        "Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal"
-                                    </div>
-                                </div>
-                            </div>
+                            @php $i++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>

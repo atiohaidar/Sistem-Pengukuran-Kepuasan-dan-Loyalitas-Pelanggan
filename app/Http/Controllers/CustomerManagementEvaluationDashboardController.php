@@ -56,34 +56,7 @@ class CustomerManagementEvaluationDashboardController extends Controller
         $evaluation = CustomerManagementEvaluation::findOrFail($id);
 
         // Prepare question labels for display
-        $questionLabels = [
-            'maturity' => [
-                'visi' => 'Visi',
-                'strategi' => 'Strategi',
-                'pengalamanKonsumen' => 'Pengalaman Konsumen',
-                'kolaborasiOrganisasi' => 'Kolaborasi Organisasi',
-                'proses' => 'Proses',
-                'informasi' => 'Informasi',
-                'teknologi' => 'Teknologi',
-                'matriks' => 'Matriks',
-            ],
-            'priority' => [
-                'kepemimpinan_strategis' => 'Kepemimpinan Strategis',
-                'budaya_organisasi' => 'Budaya Organisasi',
-                'proses_bisnis' => 'Proses Bisnis',
-                'teknologi_informasi' => 'Teknologi Informasi',
-                'sumber_daya_manusia' => 'Sumber Daya Manusia',
-                'pengukuran_kinerja' => 'Pengukuran Kinerja',
-            ],
-            'readiness' => [
-                'q1' => 'Kesiapan dalam hal kepemimpinan strategis',
-                'q2' => 'Kesiapan dalam hal budaya organisasi',
-                'q3' => 'Kesiapan dalam hal proses bisnis',
-                'q4' => 'Kesiapan dalam hal teknologi informasi',
-                'q5' => 'Kesiapan dalam hal sumber daya manusia',
-                'q6' => 'Kesiapan dalam hal pengukuran kinerja',
-            ]
-        ];
+        $questionLabels = app(\App\Services\SurveyQuestionService::class)->getCustomerEvaluationQuestions();
 
         return view('dashboard.customer-evaluation-management.show', compact('evaluation', 'questionLabels'));
     }

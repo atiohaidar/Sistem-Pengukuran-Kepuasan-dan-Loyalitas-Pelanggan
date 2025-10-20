@@ -76,6 +76,9 @@ class SurveyController extends Controller
             return redirect()->route('survey.step', ['step' => $lastAccessibleStep]);
         }
 
+        // Get questions from service
+        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+
         $viewData = [
             'survey' => $survey,
             'step' => $step,
@@ -84,6 +87,7 @@ class SurveyController extends Controller
             'canGoBack' => $currentStepNumber > 1,
             'canGoForward' => $currentStepNumber < count(self::STEPS),
             'progress' => $survey->getCompletionPercentage(),
+            'questions' => $questions,
         ];
 
         return view("survey.{$step}", $viewData);

@@ -33,19 +33,7 @@
                 <!-- Priority Items -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @php
-                        $priorityItems = [
-                            'kepemimpinanStrategis' => ['label' => 'Kepemimpinan Strategis', 'description' => 'Tingkat komitmen dan keterlibatan manajemen puncak.'],
-                            'posisiKompetitif' => ['label' => 'Posisi Kompetitif', 'description' => 'Posisi perusahaan jika dibandingkan dengan perusahaan lainnya.'],
-                            'kepuasanPelanggan' => ['label' => 'Kepuasan pelanggan', 'description' => 'Kemampuan organisasi dalam memahami, mengukur, dan meningkatkan kepuasan pelanggan.'],
-                            'nilaiUmurPelanggan' => ['label' => 'Nilai umur pelanggan', 'description' => 'Kemampuan organisasi dalam memahami nilai jangka panjang pelanggan.'],
-                            'efisiensiBiaya' => ['label' => 'Efisiensi Biaya', 'description' => 'Penggunaan biaya dalam melayani pelanggan secara efisien.'],
-                            'aksesPelanggan' => ['label' => 'Akses pelanggan', 'description' => 'Efektivitas dan integrasi kanal yang digunakan pelanggan.'],
-                            'solusiAplikasiPelanggan' => ['label' => 'Solusi dan aplikasi pelanggan', 'description' => 'Evaluasi terhadap solusi dan aplikasi yang digunakan pelanggan.'],
-                            'informasiPelanggan' => ['label' => 'Informasi Pelanggan', 'description' => 'Kualitas, integritas, dan penggunaan informasi pelanggan.'],
-                            'prosesPelanggan' => ['label' => 'Proses Pelanggan', 'description' => 'Efisiensi dan efektivitas proses internal yang mendukung pelanggan.'],
-                            'standarSDM' => ['label' => 'Standar SDM', 'description' => 'Standar kompetensi dan motivasi karyawan dalam memberikan layanan.'],
-                            'pelaporanKinerja' => ['label' => 'Pelaporan Kinerja', 'description' => 'Ketersediaan sistem pengukuran kinerja SPP secara menyeluruh.'],
-                        ];
+                        $priorityItems = app(\App\Services\SurveyQuestionService::class)->getPriorityItems();
                     @endphp
 
                     @foreach($priorityItems as $key => $item)

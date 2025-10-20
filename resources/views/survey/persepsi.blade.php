@@ -62,40 +62,14 @@
 @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['reliability'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Isi post test sesuai dengan materi pelatihan yang diberikan</label>
-                                {!! renderPersepsiSelect('reliability[r1]', $reliabilityData, 'r1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('reliability[' . $key . ']', $reliabilityData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Waktu pelatihan sesuai dengan jadwal yang telah dijanjikan</label>
-                                {!! renderPersepsiSelect('reliability[r2]', $reliabilityData, 'r2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Sertifikat pelatihan diberikan tepat waktu</label>
-                                {!! renderPersepsiSelect('reliability[r3]', $reliabilityData, 'r3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer menjawab pertanyaan peserta dengan baik</label>
-                                {!! renderPersepsiSelect('reliability[r4]', $reliabilityData, 'r4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Materi pelatihan mudah dimengerti</label>
-                                {!! renderPersepsiSelect('reliability[r5]', $reliabilityData, 'r5') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Registrasi pelatihan mudah dilakukan</label>
-                                {!! renderPersepsiSelect('reliability[r6]', $reliabilityData, 'r6') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">7. Pembayaran pelatihan mudah dilakukan</label>
-                                {!! renderPersepsiSelect('reliability[r7]', $reliabilityData, 'r7') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -107,25 +81,14 @@
                         @php $assuranceData = $survey->getAnswers('persepsi', 'assurance') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['assurance'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer/pegawai bersikap sopan</label>
-                                {!! renderPersepsiSelect('assurance[a1]', $assuranceData, 'a1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('assurance[' . $key . ']', $assuranceData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memiliki pengetahuan yang luas mengenai materi pelatihan</label>
-                                {!! renderPersepsiSelect('assurance[a2]', $assuranceData, 'a2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami</label>
-                                {!! renderPersepsiSelect('assurance[a3]', $assuranceData, 'a3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Committee service selalu dapat menyelesaikan keluhan pelanggan</label>
-                                {!! renderPersepsiSelect('assurance[a4]', $assuranceData, 'a4') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -137,35 +100,14 @@
                         @php $tangibleData = $survey->getAnswers('persepsi', 'tangible') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['tangible'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Sistem aplikasi pelatihan online yang user friendly</label>
-                                {!! renderPersepsiSelect('tangible[t1]', $tangibleData, 't1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('tangible[' . $key . ']', $tangibleData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Website menampilkan informasi terbaru</label>
-                                {!! renderPersepsiSelect('tangible[t2]', $tangibleData, 't2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Perlengkapan audio visual berfungsi dengan baik</label>
-                                {!! renderPersepsiSelect('tangible[t3]', $tangibleData, 't3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Koneksi internet host lancar selama pelatihan berlangsung</label>
-                                {!! renderPersepsiSelect('tangible[t4]', $tangibleData, 't4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Tampilan modul pelatihan menarik untuk dibaca</label>
-                                {!! renderPersepsiSelect('tangible[t5]', $tangibleData, 't5') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">6. Trainer berpenampilan rapi</label>
-                                {!! renderPersepsiSelect('tangible[t6]', $tangibleData, 't6') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -177,30 +119,14 @@
                         @php $empathyData = $survey->getAnswers('persepsi', 'empathy') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['empathy'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Trainer memberikan perhatian kepada peserta</label>
-                                {!! renderPersepsiSelect('empathy[e1]', $empathyData, 'e1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('empathy[' . $key . ']', $empathyData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Trainer memahami kebutuhan peserta</label>
-                                {!! renderPersepsiSelect('empathy[e2]', $empathyData, 'e2') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">3. Terjalin komunikasi yang baik antara trainer dengan peserta</label>
-                                {!! renderPersepsiSelect('empathy[e3]', $empathyData, 'e3') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">4. Trainer berupaya membantu saat peserta mengalami kesulitan.</label>
-                                {!! renderPersepsiSelect('empathy[e4]', $empathyData, 'e4') !!}
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">5. Waktu yang dialokasikan untuk pelatihan cukup</label>
-                                {!! renderPersepsiSelect('empathy[e5]', $empathyData, 'e5') !!}
-                            </div>
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -212,17 +138,14 @@
                         @php $responsivenessData = $survey->getAnswers('persepsi', 'responsiveness') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['responsiveness'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Contact person Perusahaan cepat memberikan respon dalam menanggapi peserta</label>
-                                {!! renderPersepsiSelect('responsiveness[r1]', $responsivenessData, 'r1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('responsiveness[' . $key . ']', $responsivenessData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Informasi Jadwal pelatihan diberikan dengan tepat</label>
-                                {!! renderPersepsiSelect('responsiveness[r2]', $responsivenessData, 'r2') !!}
-                            </div>
-
-                       
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -234,17 +157,14 @@
                         @php $applicabilityData = $survey->getAnswers('persepsi', 'applicability') ?? []; @endphp
 
                         <div class="grid md:grid-cols-2 gap-4">
+                            @php $counter = 1; @endphp
+                            @foreach($questions['persepsi_answers']['applicability'] as $key => $question)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">1. Materi pelatihan mudah diterapkan dalam pekerjaan sehari-hari</label>
-                                {!! renderPersepsiSelect('applicability[ap1]', $applicabilityData, 'ap1') !!}
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $counter }}. {{ $question }}</label>
+                                {!! renderPersepsiSelect('applicability[' . $key . ']', $applicabilityData, $key) !!}
                             </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">2. Materi pelatihan dapat meningkatkan produktivitas kerja</label>
-                                {!! renderPersepsiSelect('applicability[ap2]', $applicabilityData, 'ap2') !!}
-                            </div>
-
-
+                            @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 </div>

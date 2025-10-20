@@ -209,10 +209,14 @@ class GrafikController extends Controller
         $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
         $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
 
+        // Get questions from service
+        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+
         return view('grafik.kepuasan', compact(
             'ikpPercentage',
             'ilpPercentage',
-            'responses'
+            'responses',
+            'questions'
         ) + $kepuasanDetails);
     }
 
@@ -229,10 +233,14 @@ class GrafikController extends Controller
         $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
         $ilpInterpretation = $ilpResults['ilp_interpretation'] ?? '';
 
+        // Get questions from service
+        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+
         return view('grafik.loyalitas', compact(
             'ilpPercentage',
             'ilpInterpretation',
-            'responses'
+            'responses',
+            'questions'
         ) + $loyalitasDetails);
     }
 

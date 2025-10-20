@@ -22,15 +22,8 @@
 
                 <div class="relative bg-white sm:rounded-2xl p-8">
             @php
-            function renderLoyalitasQuestionChart($distribution, $questionNumber, $avgScore) {
+            function renderLoyalitasQuestionChart($distribution, $questionNumber, $avgScore, $questions) {
                 $output = '';
-
-                // Define loyalty questions
-                $loyaltyQuestions = [
-                    1 => 'Saya akan mengulangi menggunakan jasa pelatihan ini.',
-                    2 => 'Saya akan tetap memilih jasa pelatihan ini meskipun tersedia alternatif pelatihan lain.',
-                    3 => 'Saya akan merekomendasikan pelatihan ini kepada orang lain.'
-                ];
 
                 // Section container start
                 $output .= '<div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in mt-8">';
@@ -52,12 +45,14 @@
                 $output .= '</div>';
 
                 // Question Text Card
+                $questionKey = 'l' . $questionNumber;
+                $questionText = $questions['loyalitas_answers'][$questionKey] ?? 'Pertanyaan tidak ditemukan';
                 $output .= '<div class="bg-gradient-to-r from-indigo-50 to-purple-100 rounded-xl p-6 mb-6 border border-indigo-200">';
                 $output .= '<div class="flex items-start">';
                 $output .= '<div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">L' . $questionNumber . '</div>';
                 $output .= '<div>';
                 $output .= '<h3 class="text-lg font-semibold text-gray-800 mb-2">Pertanyaan:</h3>';
-                $output .= '<p class="text-gray-700 leading-relaxed">' . $loyaltyQuestions[$questionNumber] . '</p>';
+                $output .= '<p class="text-gray-700 leading-relaxed">' . $questionText . '</p>';
                 $output .= '</div>';
                 $output .= '</div>';
                 $output .= '</div>';
@@ -182,9 +177,9 @@
             }
             @endphp
 
-            {!! renderLoyalitasQuestionChart($l1Distribution, 1, $avgL1) !!}
-            {!! renderLoyalitasQuestionChart($l2Distribution, 2, $avgL2) !!}
-            {!! renderLoyalitasQuestionChart($l3Distribution, 3, $avgL3) !!}
+            {!! renderLoyalitasQuestionChart($l1Distribution, 1, $avgL1, $questions) !!}
+            {!! renderLoyalitasQuestionChart($l2Distribution, 2, $avgL2, $questions) !!}
+            {!! renderLoyalitasQuestionChart($l3Distribution, 3, $avgL3, $questions) !!}
             {!! renderILPTable($ilpPercentage, $ilpInterpretation) !!}
         </div>
     </div>

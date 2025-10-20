@@ -35,51 +35,25 @@
                 <div class="space-y-8">
                     @php $loyalitasData = $survey->getAnswers('loyalitas') ?? []; @endphp
 
-                    <!-- Question 1 -->
+                    @php $counter = 1; @endphp
+                    @foreach($questions['loyalitas_answers'] as $key => $question)
+                    <!-- Question {{ $counter }} -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Saya akan mengulangi menggunakan jasa pelatihan ini.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $counter }}. {{ $question }}</h3>
                         <div class="flex flex-wrap gap-4">
                             @php $options = ['Sangat tidak setuju', 'Tidak setuju', 'Netral', 'Setuju', 'Sangat setuju']; @endphp
                             @for($i = 1; $i <= 5; $i++)
                                 <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="l1" value="{{ $i }}"
-                                           {{ ($loyalitasData['l1'] ?? old('l1')) == $i ? 'checked' : '' }}
+                                    <input type="radio" name="{{ $key }}" value="{{ $i }}"
+                                           {{ ($loyalitasData[$key] ?? old($key)) == $i ? 'checked' : '' }}
                                            class="text-yellow-600 focus:ring-yellow-500" required>
                                     <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
                                 </label>
                             @endfor
                         </div>
                     </div>
-
-                    <!-- Question 2 -->
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Saya akan tetap memilih jasa pelatihan ini meskipun tersedia alternatif pelatihan lain.</h3>
-                        <div class="flex flex-wrap gap-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="l2" value="{{ $i }}"
-                                           {{ ($loyalitasData['l2'] ?? old('l2')) == $i ? 'checked' : '' }}
-                                           class="text-yellow-600 focus:ring-yellow-500" required>
-                                    <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
-                                </label>
-                            @endfor
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Saya akan merekomendasikan pelatihan ini kepada orang lain.</h3>
-                        <div class="flex flex-wrap gap-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <label class="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="l3" value="{{ $i }}"
-                                           {{ ($loyalitasData['l3'] ?? old('l3')) == $i ? 'checked' : '' }}
-                                           class="text-yellow-600 focus:ring-yellow-500" required>
-                                    <span class="text-sm font-medium">{{ $i }} - {{ $options[$i-1] }}</span>
-                                </label>
-                            @endfor
-                        </div>
-                    </div>
+                    @php $counter++; @endphp
+                    @endforeach
                 </div>
 
                 <!-- Navigation Buttons -->

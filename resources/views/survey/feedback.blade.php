@@ -35,27 +35,30 @@
                 <div class="space-y-8">
                     @php $feedbackData = $survey->getAnswers('feedback') ?? []; @endphp
 
-                    <!-- Question 1: Kritik dan Saran -->
+                    @php $counter = 1; @endphp
+                    @foreach($questions['feedback_answers'] as $key => $question)
+                    @if($key === 'kritik_saran')
+                    <!-- Question {{ $counter }}: Kritik dan Saran -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Silahkan berikan kritik dan saran terkait layanan pelatihan berdasarkan apa yang Anda alami.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $counter }}. {{ $question }}</h3>
                         <textarea name="kritik_saran" rows="6"
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-vertical"
                                   placeholder="Tuliskan kritik dan saran Anda di sini...">{{ $feedbackData['kritik_saran'] ?? old('kritik_saran') }}</textarea>
                         <p class="text-sm text-gray-500 mt-2">Maksimal 1000 karakter</p>
                     </div>
-
-                    <!-- Question 2: Tema/Judul Pelatihan -->
+                    @elseif($key === 'tema_judul')
+                    <!-- Question {{ $counter }}: Tema/Judul Pelatihan -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Tema dan judul pelatihan yang Anda inginkan.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $counter }}. {{ $question }}</h3>
                         <textarea name="tema_judul" rows="4"
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-vertical"
                                   placeholder="Contoh: Digital Marketing untuk UMKM, Manajemen Keuangan, dll.">{{ $feedbackData['tema_judul'] ?? old('tema_judul') }}</textarea>
                         <p class="text-sm text-gray-500 mt-2">Maksimal 500 karakter</p>
                     </div>
-
-                    <!-- Question 3: Bentuk Pelatihan -->
+                    @elseif($key === 'bentuk_pelatihan')
+                    <!-- Question {{ $counter }}: Bentuk Pelatihan -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Bentuk pelatihan yang Anda inginkan.</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $counter }}. {{ $question }}</h3>
                         <p class="text-gray-600 mb-4">Pilih semua yang sesuai:</p>
 
                         @php
@@ -105,6 +108,9 @@
                             </label>
                         </div>
                     </div>
+                    @endif
+                    @php $counter++; @endphp
+                    @endforeach
                 </div>
 
                 <!-- Navigation Buttons -->

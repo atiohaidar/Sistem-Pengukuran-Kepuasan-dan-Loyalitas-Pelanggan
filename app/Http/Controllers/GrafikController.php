@@ -236,5 +236,24 @@ class GrafikController extends Controller
         ) + $loyalitasDetails);
     }
 
-   
+    public function dashboardPelatihan()
+    {
+        // Ambil data statistik dasar untuk dashboard
+        $totalResponses = PelatihanSurveyResponse::where('status', 'completed')->count();
+
+        // Hitung statistik dasar menggunakan service
+        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        if ($responses->count() > 0) {
+            $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+            $ilpResults = $this->surveyService->calculateILP($responses->toArray());
+            $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
+            $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+        } else {
+            $ikpPercentage = 0;
+            $ilpPercentage = 0;
+        }
+
+        return view('dashboard.pelatihan', compact('totalResponses', 'ikpPercentage', 'ilpPercentage'));
+    }
+
 }

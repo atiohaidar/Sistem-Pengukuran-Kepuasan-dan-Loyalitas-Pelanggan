@@ -7,6 +7,13 @@
 
     <div class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Back Button -->
+            <div class="mb-6">
+                <a href="{{ route('dashboard.pelatihan') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 border border-indigo-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-indigo-600 hover:to-indigo-700 hover:border-indigo-600 transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2 text-lg"></i>
+                    <span class="font-semibold">Kembali ke Dashboard</span>
+                </a>
+            </div>
 
 
             <div class="bg-white overflow-hidden shadow-2xl sm:rounded-2xl border-0 relative animate-fade-in">

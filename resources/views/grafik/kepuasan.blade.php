@@ -379,6 +379,152 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Function to create gap ideal vs harapan chart
+    function createGapIdealChart(data, containerId) {
+        try {
+            const margin = chartConfig.margin;
+            const width = chartConfig.width - margin.left - margin.right;
+            const height = chartConfig.height - margin.top - margin.bottom;
+
+            // Clear existing chart
+            const container = d3.select(`#${containerId}`);
+            container.selectAll('*').remove();
+
+            const svg = container
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Create tooltip
+            const tooltip = d3.select(`#${containerId}`)
+                .append('div')
+                .attr('class', 'tooltip')
+                .style('position', 'absolute')
+                .style('background', 'rgba(0, 0, 0, 0.8)')
+                .style('color', 'white')
+                .style('padding', '8px 12px')
+                .style('border-radius', '4px')
+                .style('font-size', '12px')
+                .style('pointer-events', 'none')
+                .style('opacity', 0)
+                .style('z-index', 1000);
+
+            // Prepare data for two bars: Ideal (K3) and Harapan (K2)
+            const chartData = [
+                { label: 'Layanan Ideal', value: data.total_rata_k3, color: '#10B981' },
+                { label: 'Harapan', value: data.total_rata_k2, color: '#3B82F6' }
+            ];
+
+            // Scales
+            const x = d3.scaleBand()
+                .domain(chartData.map(d => d.label))
+                .range([0, width])
+                .padding(0.3);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(chartData, d => d.value) + 1])
+                .nice()
+                .range([height, 0]);
+
+            // Create bars
+            svg.selectAll('.bar')
+                .data(chartData)
+                .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(d.label))
+                .attr('y', d => y(d.value))
+                .attr('width', x.bandwidth())
+                .attr('height', d => height - y(d.value))
+                .attr('fill', d => d.color)
+                .attr('opacity', 0.8)
+                .style('cursor', 'pointer')
+                .on('mouseover', function(event, d) {
+                    tooltip
+                        .style('opacity', 1)
+                        .html(`<div class="font-semibold">${d.label}</div>
+                               <div>Rata-rata: ${d.value.toFixed(2)}</div>`);
+
+                    d3.select(this).attr('opacity', 1);
+                })
+                .on('mousemove', function(event) {
+                    tooltip
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 10) + 'px');
+                })
+                .on('mouseout', function() {
+                    tooltip.style('opacity', 0);
+                    d3.select(this).attr('opacity', 0.8);
+                });
+
+            // Add data labels
+            svg.selectAll('.label')
+                .data(chartData)
+                .enter().append('text')
+                .attr('class', 'label')
+                .attr('x', d => x(d.label) + x.bandwidth() / 2)
+                .attr('y', d => y(d.value) - 5)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '12px')
+                .attr('fill', '#333')
+                .text(d => d.value.toFixed(2));
+
+            // Add axes
+            svg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            svg.append('g')
+                .call(d3.axisLeft(y));
+
+            // Add gap line and annotation
+            const gap = data.gap;
+            const midX = (x('Layanan Ideal') + x.bandwidth() / 2 + x('Harapan') + x.bandwidth() / 2) / 2;
+            const gapY = height / 2;
+
+            // Gap line
+            svg.append('line')
+                .attr('x1', x('Layanan Ideal') + x.bandwidth())
+                .attr('y1', y(chartData[0].value))
+                .attr('x2', x('Harapan'))
+                .attr('y2', y(chartData[1].value))
+                .attr('stroke', gap >= 0 ? '#10B981' : '#EF4444')
+                .attr('stroke-width', 2)
+                .attr('stroke-dasharray', '5,5');
+
+            // Gap annotation
+            svg.append('text')
+                .attr('x', midX)
+                .attr('y', gapY - 20)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '14px')
+                .attr('font-weight', 'bold')
+                .attr('fill', gap >= 0 ? '#10B981' : '#EF4444')
+                .text(`Gap: ${gap.toFixed(2)}`);
+
+            // Add title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', -10)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '16px')
+                .attr('font-weight', 'bold')
+                .text('Perbandingan Layanan Ideal vs Harapan');
+
+            // Hide loading overlay
+            d3.select(`#${containerId}-loading`).style('display', 'none');
+
+        } catch (error) {
+            console.error('Error creating gap ideal chart:', error);
+            d3.select(`#${containerId}`)
+                .html('<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik gap</div>');
+        }
+    }
+
     // Function to create kepuasan distribution chart
     function createKepuasanChart(data, containerId) {
         try {
@@ -411,48 +557,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 .style('opacity', 0)
                 .style('z-index', 1000);
 
-            // Prepare data
-            const categories = Object.keys(data);
-            const values = categories.map(cat => data[cat]);
-            const colors = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#10B981']; // Red to Green
+            // Prepare data for satisfaction levels
+            const chartData = [
+                { label: 'Tidak Puas', value: data.tidak_puas, color: '#EF4444' },
+                { label: 'Kurang Puas', value: data.kurang_puas, color: '#F97316' },
+                { label: 'Cukup Puas', value: data.cukup_puas, color: '#F59E0B' },
+                { label: 'Puas', value: data.puas, color: '#3B82F6' },
+                { label: 'Sangat Puas', value: data.sangat_puas, color: '#10B981' }
+            ];
 
             // Scales
             const x = d3.scaleBand()
-                .domain(categories)
+                .domain(chartData.map(d => d.label))
                 .range([0, width])
-                .padding(0.1);
+                .padding(0.3);
 
             const y = d3.scaleLinear()
-                .domain([0, d3.max(values) + 5])
+                .domain([0, d3.max(chartData, d => d.value) + 1])
                 .nice()
                 .range([height, 0]);
 
             // Create bars
             svg.selectAll('.bar')
-                .data(categories)
+                .data(chartData)
                 .enter().append('rect')
                 .attr('class', 'bar')
-                .attr('x', d => x(d))
-                .attr('y', d => y(data[d]))
+                .attr('x', d => x(d.label))
+                .attr('y', d => y(d.value))
                 .attr('width', x.bandwidth())
-                .attr('height', d => height - y(data[d]))
-                .attr('fill', (d, i) => colors[i])
+                .attr('height', d => height - y(d.value))
+                .attr('fill', d => d.color)
                 .attr('opacity', 0.8)
                 .style('cursor', 'pointer')
                 .on('mouseover', function(event, d) {
-                    const value = data[d];
-                    const labels = {
-                        'sangat_puas': 'Sangat Puas',
-                        'puas': 'Puas',
-                        'cukup_puas': 'Cukup Puas',
-                        'kurang_puas': 'Kurang Puas',
-                        'tidak_puas': 'Tidak Puas'
-                    };
-
                     tooltip
                         .style('opacity', 1)
-                        .html(`<div class="font-semibold">${labels[d] || d}</div>
-                               <div>Jumlah: ${value} responden</div>`);
+                        .html(`<div class="font-semibold">${d.label}</div>
+                               <div>Jumlah: ${d.value}</div>`);
 
                     d3.select(this).attr('opacity', 1);
                 })
@@ -468,15 +609,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Add data labels
             svg.selectAll('.label')
-                .data(categories)
+                .data(chartData)
                 .enter().append('text')
                 .attr('class', 'label')
-                .attr('x', d => x(d) + x.bandwidth() / 2)
-                .attr('y', d => y(data[d]) - 5)
+                .attr('x', d => x(d.label) + x.bandwidth() / 2)
+                .attr('y', d => y(d.value) - 5)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '12px')
                 .attr('fill', '#333')
-                .text(d => data[d]);
+                .text(d => d.value);
 
             // Add axes
             svg.append('g')
@@ -504,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error creating kepuasan chart:', error);
             d3.select(`#${containerId}`)
-                .html('<div class="text-center py-8 text-green-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik kepuasan</div>');
+                .html('<div class="text-center py-8 text-red-600"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>Gagal memuat grafik kepuasan</div>');
         }
     }
 
@@ -531,6 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize charts
     const avgK1 = @json($avgK1);
     const avgK2 = @json($avgK2);
+    const gap = @json($gap);
+    const total_rata_k3 = @json($total_rata_k3);
+    const total_rata_k2 = @json($total_rata_k2);
     const kepuasanDistribution = @json($kepuasanDistribution);
     const k1_count = @json($k1_count);
     const k1_rata_count_1 = @json($k1_rata_count_1);
@@ -541,6 +685,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load charts immediately for testing
     setTimeout(() => {
+        console.log('Loading gap ideal chart...');
+        const gapData = {
+            gap: gap,
+            total_rata_k3: total_rata_k3,
+            total_rata_k2: total_rata_k2
+        };
+        renderChartAsync(createGapIdealChart, gapData, 'gap-ideal-chart-container');
+
         console.log('Loading kepuasan chart...');
         // Use the satisfaction distribution data for the chart
         const satisfactionData = {

@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
     // Dashboard Pelatihan Route
     Route::get('/dashboard/pelatihan', [GrafikController::class, 'dashboardPelatihan'])->name('dashboard.pelatihan');
 
+    // Dashboard Produk Route
+    Route::get('/dashboard/produk', [GrafikController::class, 'dashboardProduk'])->name('dashboard.produk');
+
     // Survey Management Dashboard Routes
     Route::prefix('dashboard/survey-management')->name('dashboard.survey-management.')->group(function () {
         Route::get('/', [SurveyDashboardController::class, 'index'])->name('index');

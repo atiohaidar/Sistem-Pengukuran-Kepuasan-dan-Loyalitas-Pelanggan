@@ -26,7 +26,7 @@
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
                     <a href="{{ route('dashboard.pelatihan') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Pelatihan</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-400 cursor-not-allowed rounded-md opacity-50 text-left" disabled>Produk (Belum diimplementasikan)</a>
+                    <a href="{{ route('dashboard.produk') }}" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Produk</a>
                 </div>
             </div>
             <!-- Manajemen Evaluasi CRM with Submenu -->

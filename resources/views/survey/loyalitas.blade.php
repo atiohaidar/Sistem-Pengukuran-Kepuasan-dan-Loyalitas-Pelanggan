@@ -1,3 +1,9 @@
+@php
+    // Allow consumers to override route prefix and controller for multi-flow reuse
+    $routePrefix = $routePrefix ?? 'survey.';
+    $controllerClass = $controllerClass ?? \App\Http\Controllers\SurveyController::class;
+@endphp
+
 <x-guest-layout title="Loyalitas Responden - Survei Kepuasan Pelatihan">
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,7 +19,7 @@
                 <p class="text-yellow-100 mt-1">Berikan penilaian mengenai loyalitas Anda terhadap layanan pelatihan</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['step' => 'loyalitas']) }}" class="p-6">
+            <form method="POST" action="{{ route($routePrefix . 'store', ['step' => 'loyalitas']) }}" class="p-6">
                 @csrf
 
                 @if(session('success'))
@@ -60,7 +66,7 @@
                 <div class="mt-8 flex justify-between">
                     <div>
                         @if($canGoBack)
-                            <a href="{{ route('survey.step', ['step' => \App\Http\Controllers\SurveyController::getPreviousStep($step)]) }}"
+                            <a href="{{ route($routePrefix . 'step', ['step' => $controllerClass::getPreviousStep($step)]) }}"
                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                 <i class="fas fa-arrow-left mr-1"></i>Kembali
                             </a>

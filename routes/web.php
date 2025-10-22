@@ -68,6 +68,17 @@ Route::prefix('survey')->name('survey.')->group(function () {
     Route::get('/complete', [SurveyController::class, 'complete'])->name('complete');
 });
 
+// Produk Survey Routes (mirror Pelatihan flow)
+use App\Http\Controllers\ProdukSurveyController;
+
+Route::prefix('survey/produk')->name('survey.produk.')->group(function () {
+    Route::get('/', [ProdukSurveyController::class, 'index'])->name('index');
+    Route::post('/start', [ProdukSurveyController::class, 'start'])->name('start');
+    Route::get('/step/{step}', [ProdukSurveyController::class, 'step'])->name('step');
+    Route::post('/step/{step}', [ProdukSurveyController::class, 'store'])->name('store');
+    Route::get('/complete', [ProdukSurveyController::class, 'complete'])->name('complete');
+});
+
 // Customer Management Evaluation Routes
 Route::prefix('customer-management-evaluation')->name('customer-management-evaluation.')->group(function () {
     Route::get('/', [CustomerManagementEvaluationController::class, 'welcome'])->name('welcome');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sistem Pengukuran Kepuasan dan Loyalitas Pelanggan</title>
+    <title>Platform Survei & Assessment UMKM</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -28,14 +28,14 @@
                 </div>
 
                 <h1 class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                    Sistem Pengukuran
+                    Platform Survei &
                 </h1>
                 <h2 class="text-2xl md:text-4xl font-semibold text-gray-700 mb-6">
-                    Kepuasan dan Loyalitas Pelanggan
+                    Assessment UMKM
                 </h2>
 
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                    Pilih jenis survei yang ingin Anda ikuti
+                    Pilih layanan yang sesuai dengan kebutuhan Anda
                 </p>
             </div>
 
@@ -56,8 +56,11 @@
 
                             <!-- Title -->
                             <h3 class="text-2xl font-bold text-gray-800 mb-4">
-                                Survei Pelatihan
+                                Survei Kepuasan Pelatihan
                             </h3>
+
+                            <!-- Subtitle -->
+                            <p class="text-sm text-blue-600 font-medium mb-2">UNTUK PESERTA PELATIHAN</p>
 
                             <!-- Description -->
                             <p class="text-gray-600 mb-8 leading-relaxed">
@@ -113,6 +116,9 @@
                                 Evaluasi Manajemen Pelanggan
                             </h3>
 
+                            <!-- Subtitle -->
+                            <p class="text-sm text-green-600 font-medium mb-2">UNTUK PERUSAHAAN UMKM</p>
+
                             <!-- Description -->
                             <p class="text-gray-600 mb-8 leading-relaxed">
                                 Evaluasi komprehensif terhadap kesiapan dan prioritas implementasi sistem manajemen pelanggan.
@@ -159,8 +165,8 @@
                         <span class="text-sm font-medium text-gray-700">Informasi</span>
                     </div>
                     <p class="text-sm text-gray-600 leading-relaxed">
-                        Kedua survei ini dirancang untuk membantu kami memberikan layanan yang lebih baik.
-                        Jawaban Anda akan sangat berharga untuk pengembangan sistem kami.
+                        Platform ini menyediakan dua layanan berbeda: survei untuk peserta pelatihan dan assessment untuk perusahaan UMKM.
+                        Pilih layanan yang sesuai dengan kebutuhan Anda untuk hasil yang optimal.
                     </p>
                 </div>
             </div>

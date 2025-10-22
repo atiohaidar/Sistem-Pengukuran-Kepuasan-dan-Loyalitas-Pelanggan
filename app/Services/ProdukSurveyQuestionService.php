@@ -6,7 +6,7 @@ class ProdukSurveyQuestionService
 {
     /**
      * Get all questions for produk survey
-     * For now, questions are copied from pelatihan as per requirements
+     * Questions are adapted to describe products/layanan (originally copied from pelatihan)
      * Structure is designed to be easily updated later
      */
     public function getProdukQuestions(): array
@@ -15,102 +15,102 @@ class ProdukSurveyQuestionService
             // Harapan questions
             'harapan_answers' => [
                 'reliability' => [
-                    'r1' => 'Kesesuaian isi post test dengan materi pelatihan yang diberikan',
-                    'r2' => 'Ketepatan waktu pelatihan sesuai dengan jadwal yang telah dijanjikan',
-                    'r3' => 'Ketepatan waktu dalam memberikan sertifikat pelatihan',
-                    'r4' => 'Ketepatan trainer dalam menjawab pertanyaan peserta',
-                    'r5' => 'Materi pelatihan mudah dimengerti',
-                    'r6' => 'Kemudahan dalam melakukan registrasi pelatihan',
-                    'r7' => 'Kemudahan dalam melakukan pembayaran pelatihan',
+                    'r1' => 'Kesesuaian informasi yang diberikan dengan produk yang ditawarkan',
+                    'r2' => 'Ketepatan waktu pengiriman sesuai dengan estimasi yang dijanjikan',
+                    'r3' => 'Ketepatan waktu dalam pengiriman produk',
+                    'r4' => 'Ketepatan penyedia dalam menjawab pertanyaan pelanggan',
+                    'r5' => 'Informasi produk mudah dimengerti',
+                    'r6' => 'Kemudahan dalam proses pemesanan produk',
+                    'r7' => 'Kemudahan dalam melakukan pembayaran',
                 ],
                 'assurance' => [
-                    'a1' => 'Trainer/pegawai bersikap sopan',
-                    'a2' => 'Trainer memiliki pengetahuan yang luas mengenai materi pelatihan',
-                    'a3' => 'Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami',
-                    'a4' => 'Committee service selalu dapat menyelesaikan keluhan pelanggan',
+                    'a1' => 'Staf/penyedia bersikap sopan',
+                    'a2' => 'Penyedia memiliki pengetahuan yang memadai tentang produk',
+                    'a3' => 'Penyedia mampu menjelaskan produk dengan jelas',
+                    'a4' => 'Layanan pelanggan selalu dapat menyelesaikan keluhan pelanggan',
                 ],
                 'tangible' => [
-                    't1' => 'Sistem aplikasi pelatihan online yang user friendly',
-                    't2' => 'Website menampilkan informasi terbaru',
-                    't3' => 'Perlengkapan audio visual berfungsi dengan baik',
-                    't4' => 'Koneksi internet host lancar selama pelatihan berlangsung',
-                    't5' => 'Tampilan modul pelatihan menarik untuk dibaca',
-                    't6' => 'Trainer berpenampilan rapi',
+                    't1' => 'Platform/website pemesanan produk yang user friendly',
+                    't2' => 'Halaman produk menampilkan informasi yang akurat',
+                    't3' => 'Kondisi fisik produk sesuai ekspektasi',
+                    't4' => 'Proses transaksi dan pemesanan berjalan lancar',
+                    't5' => 'Deskripsi produk menarik dan informatif',
+                    't6' => 'Produk dikemas rapi',
                 ],
                 'empathy' => [
-                    'e1' => 'Trainer memberi perhatian kepada peserta',
-                    'e2' => 'Trainer memahami kebutuhan peserta',
-                    'e3' => 'Terjalin komunikasi yang baik antara trainer dengan peserta',
-                    'e4' => 'Trainer berupaya membantu saat peserta mengalami kesulitan',
-                    'e5' => 'Kecukupan waktu yang dialokasikan untuk pelatihan',
+                    'e1' => 'Penyedia memberi perhatian kepada pelanggan',
+                    'e2' => 'Penyedia memahami kebutuhan pelanggan',
+                    'e3' => 'Terjalin komunikasi yang baik antara penyedia dengan pelanggan',
+                    'e4' => 'Penyedia berupaya membantu saat pelanggan mengalami masalah',
+                    'e5' => 'Ketersediaan dukungan selama proses pembelian',
                 ],
                 'responsiveness' => [
-                    'rs1' => 'Kecepatan respon contact person perusahaan dalam menanggapi peserta',
-                    'rs2' => 'Kepastian informasi mengenai jadwal pelatihan',
+                    'rs1' => 'Kecepatan respon layanan pelanggan dalam menanggapi pelanggan',
+                    'rs2' => 'Kepastian informasi mengenai status pesanan/pengiriman',
                 ],
                 'applicability' => [
-                    'ap1' => 'Pelatihan berkaitan langsung dengan pekerjaan saya',
-                    'ap2' => 'Pelatihan yang diberikan mudah untuk diterapkan dalam pekerjaan',
+                    'ap1' => 'Produk berkaitan langsung dengan kebutuhan saya',
+                    'ap2' => 'Produk mudah digunakan atau diterapkan',
                 ],
             ],
             // Persepsi questions (same structure as harapan but different text)
             'persepsi_answers' => [
                 'reliability' => [
-                    'r1' => 'Isi post test sesuai dengan materi pelatihan yang diberikan',
-                    'r2' => 'Waktu pelatihan sesuai dengan jadwal yang telah dijanjikan',
-                    'r3' => 'Sertifikat pelatihan diberikan tepat waktu',
-                    'r4' => 'Trainer menjawab pertanyaan peserta dengan baik',
-                    'r5' => 'Materi pelatihan mudah dimengerti',
-                    'r6' => 'Registrasi pelatihan mudah dilakukan',
-                    'r7' => 'Pembayaran pelatihan mudah dilakukan',
+                    'r1' => 'Informasi produk sesuai dengan yang ditawarkan',
+                    'r2' => 'Pengiriman produk sesuai dengan estimasi yang dijanjikan',
+                    'r3' => 'Produk diterima tepat waktu',
+                    'r4' => 'Penyedia menjawab pertanyaan pelanggan dengan baik',
+                    'r5' => 'Informasi produk mudah dimengerti',
+                    'r6' => 'Proses pemesanan produk mudah dilakukan',
+                    'r7' => 'Proses pembayaran mudah dilakukan',
                 ],
                 'assurance' => [
-                    'a1' => 'Trainer/pegawai bersikap sopan',
-                    'a2' => 'Trainer memiliki pengetahuan yang luas mengenai materi pelatihan',
-                    'a3' => 'Trainer mampu menyampaikan materi pelatihan dengan cara yang mudah dipahami',
-                    'a4' => 'Committee service selalu dapat menyelesaikan keluhan pelanggan',
+                    'a1' => 'Staf/penyedia bersikap sopan',
+                    'a2' => 'Penyedia memiliki pengetahuan yang memadai tentang produk',
+                    'a3' => 'Penyedia mampu menjelaskan produk dengan jelas',
+                    'a4' => 'Layanan pelanggan selalu dapat menyelesaikan keluhan pelanggan',
                 ],
                 'tangible' => [
-                    't1' => 'Sistem aplikasi pelatihan online yang user friendly',
-                    't2' => 'Website menampilkan informasi terbaru',
-                    't3' => 'Perlengkapan audio visual berfungsi dengan baik',
-                    't4' => 'Koneksi internet host lancar selama pelatihan berlangsung',
-                    't5' => 'Tampilan modul pelatihan menarik untuk dibaca',
-                    't6' => 'Trainer berpenampilan rapi',
+                    't1' => 'Platform/website pemesanan produk yang user friendly',
+                    't2' => 'Halaman produk menampilkan informasi yang akurat',
+                    't3' => 'Kondisi fisik produk sesuai ekspektasi',
+                    't4' => 'Proses transaksi dan pemesanan berjalan lancar',
+                    't5' => 'Deskripsi produk menarik dan informatif',
+                    't6' => 'Produk dikemas rapi',
                 ],
                 'empathy' => [
-                    'e1' => 'Trainer memberikan perhatian kepada peserta',
-                    'e2' => 'Trainer memahami kebutuhan peserta',
-                    'e3' => 'Terjalin komunikasi yang baik antara trainer dengan peserta',
-                    'e4' => 'Trainer berupaya membantu saat peserta mengalami kesulitan.',
-                    'e5' => 'Waktu yang dialokasikan untuk pelatihan cukup',
+                    'e1' => 'Penyedia memberikan perhatian kepada pelanggan',
+                    'e2' => 'Penyedia memahami kebutuhan pelanggan',
+                    'e3' => 'Terjalin komunikasi yang baik antara penyedia dengan pelanggan',
+                    'e4' => 'Penyedia berupaya membantu saat pelanggan mengalami masalah.',
+                    'e5' => 'Ketersediaan dukungan selama proses pembelian',
                 ],
                 'responsiveness' => [
-                    'rs1' => 'Contact person Perusahaan cepat memberikan respon dalam menanggapi peserta',
-                    'rs2' => 'Informasi Jadwal pelatihan diberikan dengan tepat',
+                    'rs1' => 'Layanan pelanggan cepat memberikan respon dalam menanggapi pelanggan',
+                    'rs2' => 'Informasi mengenai status pesanan/pengiriman diberikan dengan tepat',
                 ],
                 'applicability' => [
-                    'ap1' => 'Materi pelatihan mudah diterapkan dalam pekerjaan sehari-hari',
-                    'ap2' => 'Materi pelatihan dapat meningkatkan produktivitas kerja',
+                    'ap1' => 'Produk mudah diterapkan dalam kebutuhan sehari-hari',
+                    'ap2' => 'Produk dapat meningkatkan kenyamanan atau produktivitas kerja',
                 ],
             ],
             // Kepuasan questions
             'kepuasan_answers' => [
-                'k1' => 'Secara keseluruhan, saya merasa puas pada layanan pelatihan ini.',
-                'k2' => 'Menurut saya, kinerja layanan pelatihan ini telah sesuai dengan harapan saya.',
-                'k3' => 'Menurut saya, layanan pelatihan ini telah sesuai dengan layanan pelatihan yang ideal.',
+                'k1' => 'Secara keseluruhan, saya merasa puas dengan produk/layanan ini.',
+                'k2' => 'Menurut saya, kinerja produk/layanan ini telah sesuai dengan harapan saya.',
+                'k3' => 'Menurut saya, produk/layanan ini telah sesuai dengan produk/layanan yang ideal.',
             ],
             // Loyalitas questions
             'loyalitas_answers' => [
-                'l1' => 'Saya akan mengulangi menggunakan jasa pelatihan ini.',
-                'l2' => 'Saya akan tetap memilih jasa pelatihan ini meskipun tersedia alternatif pelatihan lain.',
-                'l3' => 'Saya akan merekomendasikan pelatihan ini kepada orang lain.',
+                'l1' => 'Saya akan membeli/menggunakan produk ini lagi.',
+                'l2' => 'Saya akan tetap memilih produk ini meskipun tersedia alternatif lain.',
+                'l3' => 'Saya akan merekomendasikan produk ini kepada orang lain.',
             ],
             // Feedback questions
             'feedback_answers' => [
-                'kritik_saran' => 'Silahkan berikan kritik dan saran terkait layanan pelatihan berdasarkan apa yang Anda alami.',
-                'tema_judul' => 'Tema dan judul pelatihan yang Anda inginkan.',
-                'bentuk_pelatihan' => 'Bentuk pelatihan yang Anda inginkan.',
+                'kritik_saran' => 'Silahkan berikan kritik dan saran terkait produk/layanan berdasarkan apa yang Anda alami.',
+                'tema_judul' => 'Fitur atau kategori produk yang Anda inginkan.',
+                'bentuk_pelatihan' => 'Bentuk produk/layanan yang Anda inginkan.',
             ],
         ];
     }

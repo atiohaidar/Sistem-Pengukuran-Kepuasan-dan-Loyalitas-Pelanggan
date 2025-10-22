@@ -309,8 +309,8 @@
                 .attr('stroke', '#ffffff')
                 .attr('stroke-width', 2)
                 .style('cursor', 'pointer')
-                .on('mouseover', function(event, d, i) { showTooltip(event, { index: i }); })
-                .on('mousemove', function(event, d, i) { showTooltip(event, { index: i }); })
+                .on('mouseover', function (event, d, i) { showTooltip(event, { index: i }); })
+                .on('mousemove', function (event, d, i) { showTooltip(event, { index: i }); })
                 .on('mouseout', hideTooltip);
 
             // Create label nodes (movable). Initial offset is to the right-top.
@@ -392,9 +392,9 @@
             function hideTooltip() { tooltip.style('display', 'none'); }
 
             // Add hover for labels
-          texts.on('mouseover', function(event, d) { showTooltip(event, d); })
-              .on('mousemove', function(event, d) { showTooltip(event, d); })
-              .on('mouseout', hideTooltip);
+            texts.on('mouseover', function (event, d) { showTooltip(event, d); })
+                .on('mousemove', function (event, d) { showTooltip(event, d); })
+                .on('mouseout', hideTooltip);
 
             // Measure text widths (needs DOM to render first) then store width in node
             // Use a short timeout to ensure browser has rendered the text

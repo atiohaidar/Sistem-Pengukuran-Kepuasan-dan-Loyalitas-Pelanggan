@@ -1,4 +1,4 @@
-<x-guest-layout title="Kritik dan Saran - Survei Kepuasan Pelatihan">
+<x-guest-layout title="Kritik dan Saran - Survei Kepuasan {{ ucfirst($type ?? 'Pelatihan') }}">
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Progress Bar -->
@@ -10,10 +10,10 @@
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="bg-gradient-to-r from-red-600 to-pink-600 px-6 py-4">
                 <h2 class="text-2xl font-bold text-white">VI. Kritik dan Saran</h2>
-                <p class="text-red-100 mt-1">>Dengan anda mengisi kritik dan saran ini, diharapkan kualitas layanan pelatihan ini akan semakin baik dan sesuai dengan kepentingan anda.</p>
+                <p class="text-red-100 mt-1">Dengan anda mengisi kritik dan saran ini, diharapkan kualitas {{ $type === 'produk' ? 'produk/layanan' : 'layanan pelatihan' }} ini akan semakin baik dan sesuai dengan kepentingan anda.</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['step' => 'feedback']) }}" class="p-6">
+            <form method="POST" action="{{ route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'feedback']) }}" class="p-6">
                 @csrf
 
                 @if(session('success'))
@@ -117,8 +117,8 @@
                 <div class="mt-8 flex justify-between">
                     <div>
                         @if($canGoBack)
-                            <a href="{{ route('survey.step', ['step' => \App\Http\Controllers\SurveyController::getPreviousStep($step)]) }}"
-                               class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <a href="{{ route('survey.step', ['type' => $type, 'step' => \App\Http\Controllers\SurveyController::getPreviousStep($step)]) }}"
+                               class="text-gray-600 hover:text-gray-800 text-sm font-medium">
                                 <i class="fas fa-arrow-left mr-1"></i>Kembali
                             </a>
                         @endif

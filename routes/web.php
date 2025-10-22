@@ -55,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/produk', [GrafikController::class, 'dashboardProduk'])->name('dashboard.produk');
 
     // Survey Management Dashboard Routes
-    Route::prefix('dashboard/survey-management')->name('dashboard.survey-management.')->group(function () {
+    Route::prefix('dashboard/survey-management/{type}')->name('dashboard.survey-management.')->group(function () {
         Route::get('/', [SurveyDashboardController::class, 'index'])->name('index');
         Route::get('/show/{id}', [SurveyDashboardController::class, 'show'])->name('show');
         Route::delete('/{id}', [SurveyDashboardController::class, 'destroy'])->name('destroy');
@@ -71,8 +71,8 @@ Route::middleware('auth')->group(function () {
 
 use App\Http\Controllers\SurveyController;
 
-// Survey Routes
-Route::prefix('survey')->name('survey.')->group(function () {
+// Survey Routes (Generic for pelatihan and produk)
+Route::prefix('survey/{type}')->name('survey.')->group(function () {
     Route::get('/', [SurveyController::class, 'index'])->name('index');
     Route::post('/start', [SurveyController::class, 'start'])->name('start');
     Route::get('/step/{step}', [SurveyController::class, 'step'])->name('step');
@@ -80,7 +80,7 @@ Route::prefix('survey')->name('survey.')->group(function () {
     Route::get('/complete', [SurveyController::class, 'complete'])->name('complete');
 });
 
-// Produk Survey Routes (mirror Pelatihan flow)
+// Legacy routes for backward compatibility
 use App\Http\Controllers\ProdukSurveyController;
 
 Route::prefix('survey/produk')->name('survey.produk.')->group(function () {
@@ -89,6 +89,17 @@ Route::prefix('survey/produk')->name('survey.produk.')->group(function () {
     Route::get('/step/{step}', [ProdukSurveyController::class, 'step'])->name('step');
     Route::post('/step/{step}', [ProdukSurveyController::class, 'store'])->name('store');
     Route::get('/complete', [ProdukSurveyController::class, 'complete'])->name('complete');
+});
+
+// Pelatihan Survey Routes (mirror Produk flow, namespaced)
+use App\Http\Controllers\SurveyController as PelatihanSurveyController;
+
+Route::prefix('survey/pelatihan')->name('survey.pelatihan.')->group(function () {
+    Route::get('/', [PelatihanSurveyController::class, 'index'])->name('index');
+    Route::post('/start', [PelatihanSurveyController::class, 'start'])->name('start');
+    Route::get('/step/{step}', [PelatihanSurveyController::class, 'step'])->name('step');
+    Route::post('/step/{step}', [PelatihanSurveyController::class, 'store'])->name('store');
+    Route::get('/complete', [PelatihanSurveyController::class, 'complete'])->name('complete');
 });
 
 // Customer Management Evaluation Routes
@@ -103,4 +114,4 @@ Route::prefix('customer-management-evaluation')->name('customer-management-evalu
     Route::get('/dashboard/{token?}', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

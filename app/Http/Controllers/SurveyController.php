@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PelatihanSurveyResponse;
+use App\Models\ProdukSurveyResponse;
+use App\Services\SurveyQuestionService;
+use App\Services\ProdukSurveyQuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -18,22 +21,61 @@ class SurveyController extends Controller
     ];
 
     /**
+     * Get the last completed step number for a survey
+     */
+    private function getLastCompletedStep($survey): int
+    {
+        $stepFields = [
+            1 => 'profile_data',
+            2 => 'harapan_answers',
+            3 => 'persepsi_answers',
+            4 => 'kepuasan_answers',
+            5 => 'loyalitas_answers',
+            6 => 'feedback_answers',
+        ];
+
+        $lastCompletedStep = 0;
+
+        foreach ($stepFields as $stepNumber => $field) {
+            if (!empty($survey->$field)) {
+                $lastCompletedStep = $stepNumber;
+            } else {
+                break; // Stop at the first incomplete step
+            }
+        }
+
+        return $lastCompletedStep;
+    }
+
+    /**
      * Landing page survei
      */
-    public function index()
+    public function index($type = 'pelatihan')
     {
-        return view('survey.index');
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        return view('survey.index', compact('type'));
     }
 
     /**
      * Mulai survei baru
      */
-    public function start(Request $request)
+    public function start($type, Request $request = null)
     {
-        $sessionToken = PelatihanSurveyResponse::generateSessionToken();
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
+        $sessionToken = $model::generateSessionToken();
 
         // Buat record baru
-        $survey = PelatihanSurveyResponse::create([
+        $survey = $model::create([
             'session_token' => $sessionToken,
             'started_at' => now(),
         ]);
@@ -41,73 +83,85 @@ class SurveyController extends Controller
         // Simpan session token
         Session::put('survey_token', $sessionToken);
 
-        return redirect()->route('survey.step', ['step' => 'profile']);
+        return redirect()->route('survey.step', ['type' => $type, 'step' => 'profile']);
     }
 
     /**
      * Tampilkan step tertentu
      */
-    public function step($step)
+    public function step($type, $step)
     {
-        $sessionToken = Session::get('survey_token');
-
-        if (!$sessionToken) {
-            return redirect()->route('survey.index')->with('error', 'Sesi survei tidak valid');
+        // Validate type and step
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
         }
 
-        $survey = PelatihanSurveyResponse::where('session_token', $sessionToken)->first();
-
-        if (!$survey) {
-            return redirect()->route('survey.index')->with('error', 'Data survei tidak ditemukan');
-        }
-
-        // Cek apakah step valid
         if (!array_key_exists($step, self::STEPS)) {
-            return redirect()->route('survey.step', ['step' => 'profile']);
+            abort(404);
         }
 
-        // Cek progress - user hanya bisa akses step yang sudah diisi atau step berikutnya
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
+        // Get survey from session
+        $sessionToken = Session::get('survey_token');
+        if (!$sessionToken) {
+            return redirect()->route('survey.index', $type)->with('error', 'Sesi survei tidak valid');
+        }
+
+        $survey = $model::where('session_token', $sessionToken)->first();
+        if (!$survey) {
+            return redirect()->route('survey.index', $type)->with('error', 'Data survei tidak ditemukan');
+        }
+
+        // Check if step is accessible
         $currentStepNumber = self::STEPS[$step];
-        $completedSteps = $this->getCompletedSteps($survey);
+        $lastCompletedStep = $this->getLastCompletedStep($survey);
 
-        if ($currentStepNumber > $completedSteps + 1) {
-            // Redirect ke step terakhir yang bisa diakses
-            $lastAccessibleStep = $this->getLastAccessibleStep($completedSteps);
-            return redirect()->route('survey.step', ['step' => $lastAccessibleStep]);
+        if ($currentStepNumber > $lastCompletedStep + 1) {
+            $lastAccessibleStep = array_search($lastCompletedStep + 1, self::STEPS);
+            return redirect()->route('survey.step', ['type' => $type, 'step' => $lastAccessibleStep]);
         }
 
-        // Get questions from service
-        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        // Calculate progress variables for progress bar
+        $stepNumber = $currentStepNumber;
+        $totalSteps = count(self::STEPS);
+        $progress = round(($currentStepNumber / $totalSteps) * 100);
 
-        $viewData = [
-            'survey' => $survey,
-            'step' => $step,
-            'stepNumber' => $currentStepNumber,
-            'totalSteps' => count(self::STEPS),
-            'canGoBack' => $currentStepNumber > 1,
-            'canGoForward' => $currentStepNumber < count(self::STEPS),
-            'progress' => $survey->getCompletionPercentage(),
-            'questions' => $questions,
-        ];
+        // Get questions based on survey type
+        $questions = $type === 'produk'
+            ? (new ProdukSurveyQuestionService())->getProdukQuestions()
+            : (new SurveyQuestionService())->getPelatihanQuestions();
 
-        return view("survey.{$step}", $viewData);
+        // Navigation variables
+        $canGoBack = $currentStepNumber > 1;
+        $routePrefix = 'survey.';
+        $controllerClass = self::class;
+
+        return view('survey.' . $step, compact('survey', 'step', 'type', 'stepNumber', 'totalSteps', 'progress', 'questions', 'canGoBack', 'routePrefix', 'controllerClass'));
     }
 
     /**
      * Simpan data step
      */
-    public function store(Request $request, $step)
+    public function store(Request $request, $type, $step)
     {
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
         $sessionToken = Session::get('survey_token');
 
         if (!$sessionToken) {
-            return redirect()->route('survey.index')->with('error', 'Sesi survei tidak valid');
+            return redirect()->route('survey.index', $type)->with('error', 'Sesi survei tidak valid');
         }
 
-        $survey = PelatihanSurveyResponse::where('session_token', $sessionToken)->first();
+        $survey = $model::where('session_token', $sessionToken)->first();
 
         if (!$survey) {
-            return redirect()->route('survey.index')->with('error', 'Data survei tidak ditemukan');
+            return redirect()->route('survey.index', $type)->with('error', 'Data survei tidak ditemukan');
         }
 
         // Validasi dan simpan berdasarkan step
@@ -140,16 +194,16 @@ class SurveyController extends Controller
 
         if ($action === 'back') {
             $prevStep = $this->getPreviousStep($step);
-            return redirect()->route('survey.step', ['step' => $prevStep]);
+            return redirect()->route('survey.step', ['type' => $type, 'step' => $prevStep]);
         } elseif ($action === 'save') {
             return back()->with('success', 'Data berhasil disimpan');
         } else {
             // Next or complete
             if ($step === 'feedback') {
-                return redirect()->route('survey.complete');
+                return redirect()->route('survey.complete', ['type' => $type]);
             } else {
                 $nextStep = $this->getNextStep($step);
-                return redirect()->route('survey.step', ['step' => $nextStep])->with('success', 'Data berhasil disimpan');
+                return redirect()->route('survey.step', ['type' => $type, 'step' => $nextStep])->with('success', 'Data berhasil disimpan');
             }
         }
     }
@@ -157,24 +211,31 @@ class SurveyController extends Controller
     /**
      * Halaman selesai
      */
-    public function complete()
+    public function complete($type = 'pelatihan')
     {
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
         $sessionToken = Session::get('survey_token');
 
         if (!$sessionToken) {
-            return redirect()->route('survey.index');
+            return redirect()->route('survey.index', $type);
         }
 
-        $survey = PelatihanSurveyResponse::where('session_token', $sessionToken)->first();
+        $survey = $model::where('session_token', $sessionToken)->first();
 
         if (!$survey || !$survey->isCompleted()) {
-            return redirect()->route('survey.step', ['step' => 'profile']);
+            return redirect()->route('survey.step', ['type' => $type, 'step' => 'profile']);
         }
 
         // Clear session
         Session::forget('survey_token');
 
-        return view('survey.complete', compact('survey'));
+        return view('survey.complete', compact('survey', 'type'));
     }
 
     /**

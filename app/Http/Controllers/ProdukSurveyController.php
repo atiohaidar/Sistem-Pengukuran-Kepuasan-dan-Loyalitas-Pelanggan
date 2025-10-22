@@ -31,14 +31,14 @@ class ProdukSurveyController extends Controller
             'started_at' => now(),
         ]);
 
-        Session::put('survey_produktoken', $sessionToken);
+        Session::put('survey_produk_token', $sessionToken);
 
         return redirect()->route('survey.produk.step', ['step' => 'profile']);
     }
 
     public function step($step)
     {
-        $sessionToken = Session::get('survey_produktoken');
+        $sessionToken = Session::get('survey_produk_token');
 
         if (!$sessionToken) {
             return redirect()->route('survey.produk.index')->with('error', 'Sesi survei tidak valid');
@@ -80,7 +80,7 @@ class ProdukSurveyController extends Controller
 
     public function store(Request $request, $step)
     {
-        $sessionToken = Session::get('survey_produktoken');
+        $sessionToken = Session::get('survey_produk_token');
 
         if (!$sessionToken) {
             return redirect()->route('survey.produk.index')->with('error', 'Sesi survei tidak valid');
@@ -135,7 +135,7 @@ class ProdukSurveyController extends Controller
 
     public function complete()
     {
-        $sessionToken = Session::get('survey_produktoken');
+        $sessionToken = Session::get('survey_produk_token');
 
         if (!$sessionToken) {
             return redirect()->route('survey.produk.index');
@@ -147,7 +147,7 @@ class ProdukSurveyController extends Controller
             return redirect()->route('survey.produk.step', ['step' => 'profile']);
         }
 
-        Session::forget('survey_produktoken');
+        Session::forget('survey_produk_token');
 
         return view('survey.produk.complete', compact('survey'));
     }

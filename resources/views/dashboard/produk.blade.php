@@ -207,7 +207,7 @@
                                 Kelola dan pantau semua data responden survey produk.
                                 Lihat detail responden, export data, dan hapus data yang tidak diperlukan.
                             </p>
-                            <a href="{{ route('dashboard.survey-management.index') }}"
+                            <a href="{{ route('dashboard.survey-management.index', 'produk') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-teal-600 group-hover:to-cyan-700">
                                 <i class="fas fa-cogs mr-3"></i>
                                 Kelola Data Survey

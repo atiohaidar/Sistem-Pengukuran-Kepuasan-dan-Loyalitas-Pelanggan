@@ -1,4 +1,4 @@
-<x-guest-layout title="Kepuasan Responden - Survei Kepuasan Pelatihan">
+<x-guest-layout title="Kepuasan Responden - Survei Kepuasan {{ ucfirst($type ?? 'Pelatihan') }}">
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Progress Bar -->
@@ -10,10 +10,10 @@
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
                 <h2 class="text-2xl font-bold text-white">IV. Kepuasan Responden</h2>
-                <p class="text-green-100 mt-1">Berikan penilaian tingkat kepuasan Anda terhadap layanan pelatihan</p>
+                <p class="text-green-100 mt-1">Berikan penilaian tingkat kepuasan Anda terhadap {{ $type === 'produk' ? 'produk/layanan' : 'layanan pelatihan' }}</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['step' => 'kepuasan']) }}" class="p-6">
+            <form method="POST" action="{{ route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'kepuasan']) }}" class="p-6">
                 @csrf
 
                 @if(session('success'))
@@ -60,8 +60,8 @@
                 <div class="mt-8 flex justify-between">
                     <div>
                         @if($canGoBack)
-                            <a href="{{ route('survey.step', ['step' => \App\Http\Controllers\SurveyController::getPreviousStep($step)]) }}"
-                               class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <a href="{{ route('survey.step', ['type' => $type, 'step' => \App\Http\Controllers\SurveyController::getPreviousStep($step)]) }}"
+                               class="text-gray-600 hover:text-gray-800 text-sm font-medium">
                                 <i class="fas fa-arrow-left mr-1"></i>Kembali
                             </a>
                         @endif

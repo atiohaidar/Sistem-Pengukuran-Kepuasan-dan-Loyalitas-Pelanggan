@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PelatihanSurveyResponse;
+use App\Models\ProdukSurveyResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,72 +12,111 @@ class SurveyDashboardController extends Controller
     /**
      * Display survey responses management dashboard
      */
-    public function index(Request $request)
+    public function index($type, Request $request = null)
     {
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
         // Get survey responses with pagination
-        $surveyResponses = PelatihanSurveyResponse::with([])
+        $surveyResponses = $model::with([])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         // Get survey statistics
         $stats = [
-            'total_responses' => PelatihanSurveyResponse::count(),
-            'completed_responses' => PelatihanSurveyResponse::where('status', 'completed')->count(),
-            'draft_responses' => PelatihanSurveyResponse::where('status', 'draft')->count(),
-            'unique_sessions' => PelatihanSurveyResponse::distinct('session_token')->count(),
+            'total_responses' => $model::count(),
+            'completed_responses' => $model::where('status', 'completed')->count(),
+            'draft_responses' => $model::where('status', 'draft')->count(),
+            'unique_sessions' => $model::distinct('session_token')->count(),
         ];
 
-        return view('dashboard.survey-management', compact('surveyResponses', 'stats'));
+        return view('dashboard.survey-management', compact('surveyResponses', 'stats', 'type'));
     }
 
     /**
      * Show detailed view of a specific survey response
      */
-    public function show($id)
+    public function show($type, $id)
     {
-        $surveyResponse = PelatihanSurveyResponse::findOrFail($id);
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $service = $type === 'produk' ? \App\Services\ProdukSurveyQuestionService::class : \App\Services\SurveyQuestionService::class;
+
+        $surveyResponse = $model::findOrFail($id);
 
         // Define question labels for better display
-        $questionLabels = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        $method = $type === 'produk' ? 'getProdukQuestions' : 'getPelatihanQuestions';
+        $questionLabels = app($service)->$method();
 
-        return view('dashboard.survey-detail', compact('surveyResponse', 'questionLabels'));
+        return view('dashboard.survey-detail', compact('surveyResponse', 'questionLabels', 'type'));
     }
 
     /**
      * Delete a survey response
      */
-    public function destroy($id)
+    public function destroy($type, $id)
     {
-        $surveyResponse = PelatihanSurveyResponse::findOrFail($id);
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
+        $surveyResponse = $model::findOrFail($id);
         $surveyResponse->delete();
 
-        return redirect()->route('dashboard.survey-management.index')
+        return redirect()->route('dashboard.survey-management.index', $type)
             ->with('success', 'Data survei berhasil dihapus');
     }
 
     /**
      * Export survey data to CSV
      */
-    public function export(Request $request)
+    public function export(Request $request, $type)
     {
-        $filename = 'survey_responses_' . date('Y-m-d_H-i-s') . '.csv';
+        // Validate type
+        if (!in_array($type, ['pelatihan', 'produk'])) {
+            abort(404);
+        }
+
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+
+        $filename = 'survey_responses_' . $type . '_' . date('Y-m-d_H-i-s') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() {
+        $callback = function () use ($model) {
             $file = fopen('php://output', 'w');
 
             // CSV headers
             fputcsv($file, [
-                'ID', 'Session Token', 'Email', 'WhatsApp', 'Jenis Kelamin', 'Usia',
-                'Pekerjaan', 'Domisili', 'Status', 'Started At', 'Completed At'
+                'ID',
+                'Session Token',
+                'Email',
+                'WhatsApp',
+                'Jenis Kelamin',
+                'Usia',
+                'Pekerjaan',
+                'Domisili',
+                'Status',
+                'Started At',
+                'Completed At'
             ]);
 
             // Get all responses
-            PelatihanSurveyResponse::chunk(100, function($responses) use ($file) {
+            $model::chunk(100, function ($responses) use ($file) {
                 foreach ($responses as $response) {
                     fputcsv($file, [
                         $response->id,

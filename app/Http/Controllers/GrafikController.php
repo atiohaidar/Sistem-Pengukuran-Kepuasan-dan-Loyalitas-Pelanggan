@@ -48,7 +48,7 @@ class GrafikController extends Controller
             $dimensions[] = array_merge($config, ['data' => $data]);
         }
 
-        return view('grafik.mean-gap-per-dimensi', compact('dimensions'));
+        return view('grafik.mean-gap-per-dimensi', compact('dimensions', 'type'));
     }
 
     public function profilResponden($type = 'pelatihan')
@@ -100,7 +100,7 @@ class GrafikController extends Controller
             return ['label' => $group->first()->profile_data['domisili'] ?? 'Tidak Diketahui', 'value' => $group->count()];
         })->values()->toArray();
 
-        return view('grafik.profil-responden', compact('ageData', 'genderData', 'occupationData', 'domicileData'));
+        return view('grafik.profil-responden', compact('ageData', 'genderData', 'occupationData', 'domicileData', 'type'));
     }
 
     private function getAgeGroup($usia)
@@ -157,7 +157,7 @@ class GrafikController extends Controller
             ]);
         }
 
-        return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions'));
+        return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions', 'type'));
     }
 
     public function rekomendasi($type = 'pelatihan')
@@ -195,7 +195,7 @@ class GrafikController extends Controller
             $stdDevData[$config['prefix']] = max(0.1, $baseStdDev + $variation);
         }
 
-        return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation'));
+        return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation', 'type'));
     }
 
     public function kepuasan($type = 'pelatihan')
@@ -226,7 +226,8 @@ class GrafikController extends Controller
             'ikpPercentage',
             'ilpPercentage',
             'responses',
-            'questions'
+            'questions',
+            'type'
         ) + $kepuasanDetails);
     }
 
@@ -255,7 +256,8 @@ class GrafikController extends Controller
             'ilpPercentage',
             'ilpInterpretation',
             'responses',
-            'questions'
+            'questions',
+            'type'
         ) + $loyalitasDetails);
     }
 

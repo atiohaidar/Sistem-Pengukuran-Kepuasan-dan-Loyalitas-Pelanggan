@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Back Button -->
             <div class="mb-6">
-                <a href="{{ route('dashboard.pelatihan') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-blue-600 hover:to-blue-700 hover:border-blue-600 transition-all duration-200 transform hover:scale-105">
+                <a href="{{ route($type === 'produk' ? 'dashboard.produk' : 'dashboard.pelatihan') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-blue-600 hover:to-blue-700 hover:border-blue-600 transition-all duration-200 transform hover:scale-105">
                     <i class="fas fa-arrow-left mr-2 text-lg"></i>
                     <span class="font-semibold">Kembali ke Dashboard</span>
                 </a>

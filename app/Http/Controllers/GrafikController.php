@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PelatihanSurveyResponse;
+use App\Models\ProdukSurveyResponse;
 use App\Services\SurveyCalculationService;
 
 class GrafikController extends Controller
@@ -262,6 +263,26 @@ class GrafikController extends Controller
         }
 
         return view('dashboard.pelatihan', compact('totalResponses', 'ikpPercentage', 'ilpPercentage'));
+    }
+
+    public function dashboardProduk()
+    {
+        // Ambil data statistik dasar untuk dashboard
+        $totalResponses = ProdukSurveyResponse::where('status', 'completed')->count();
+
+        // Hitung statistik dasar menggunakan service
+        $responses = ProdukSurveyResponse::where('status', 'completed')->get();
+        if ($responses->count() > 0) {
+            $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
+            $ilpResults = $this->surveyService->calculateILP($responses->toArray());
+            $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
+            $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+        } else {
+            $ikpPercentage = 0;
+            $ilpPercentage = 0;
+        }
+
+        return view('dashboard.produk', compact('totalResponses', 'ikpPercentage', 'ilpPercentage'));
     }
 
 }

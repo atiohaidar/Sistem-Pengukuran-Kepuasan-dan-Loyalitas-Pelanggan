@@ -24,13 +24,33 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Grafik Routes
+    // Grafik Routes - Pelatihan (default)
     Route::get('/grafik/mean-gap-per-dimensi', [GrafikController::class, 'mean_gap_per_dimensi'])->name('grafik.mean-gap-per-dimensi');
     Route::get('/grafik/mean-persepsi-harapan-gap-per-dimensi', [GrafikController::class, 'mean_persepsi_harapan_gap_per_dimensi'])->name('grafik.mean-persepsi-harapan-gap-per-dimensi');
     Route::get('/grafik/profil-responden', [GrafikController::class, 'profilResponden'])->name('grafik.profil-responden');
     Route::get('/grafik/rekomendasi', [GrafikController::class, 'rekomendasi'])->name('grafik.rekomendasi');
     Route::get('/grafik/kepuasan', [GrafikController::class, 'kepuasan'])->name('grafik.kepuasan');
     Route::get('/grafik/loyalitas', [GrafikController::class, 'loyalitas'])->name('grafik.loyalitas');
+
+    // Grafik Routes - Produk
+    Route::get('/grafik/produk/mean-gap-per-dimensi', function() {
+        return app(GrafikController::class)->mean_gap_per_dimensi('produk');
+    })->name('grafik.produk.mean-gap-per-dimensi');
+    Route::get('/grafik/produk/mean-persepsi-harapan-gap-per-dimensi', function() {
+        return app(GrafikController::class)->mean_persepsi_harapan_gap_per_dimensi('produk');
+    })->name('grafik.produk.mean-persepsi-harapan-gap-per-dimensi');
+    Route::get('/grafik/produk/profil-responden', function() {
+        return app(GrafikController::class)->profilResponden('produk');
+    })->name('grafik.produk.profil-responden');
+    Route::get('/grafik/produk/rekomendasi', function() {
+        return app(GrafikController::class)->rekomendasi('produk');
+    })->name('grafik.produk.rekomendasi');
+    Route::get('/grafik/produk/kepuasan', function() {
+        return app(GrafikController::class)->kepuasan('produk');
+    })->name('grafik.produk.kepuasan');
+    Route::get('/grafik/produk/loyalitas', function() {
+        return app(GrafikController::class)->loyalitas('produk');
+    })->name('grafik.produk.loyalitas');
 
     // Dashboard Pelatihan Route
     Route::get('/dashboard/pelatihan', [GrafikController::class, 'dashboardPelatihan'])->name('dashboard.pelatihan');

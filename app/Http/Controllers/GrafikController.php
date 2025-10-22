@@ -17,10 +17,11 @@ class GrafikController extends Controller
         $this->surveyService = $surveyService;
     }
    
-    public function mean_gap_per_dimensi()
+    public function mean_gap_per_dimensi($type = 'pelatihan')
     {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        // Ambil responses dari database berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::where('status', 'completed')->get();
 
         // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -50,10 +51,11 @@ class GrafikController extends Controller
         return view('grafik.mean-gap-per-dimensi', compact('dimensions'));
     }
 
-    public function profilResponden()
+    public function profilResponden($type = 'pelatihan')
     {
-        // Ambil data profil responden
-        $responses = PelatihanSurveyResponse::completed()->get();
+        // Ambil data profil responden berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::completed()->get();
 
         // Data untuk chart batang usia berdasarkan gender
         $ageGroups = ['18-25', '26-35', '36-45', '46-55', '56+'];
@@ -110,10 +112,11 @@ class GrafikController extends Controller
         return '56+';
     }
 
-    public function mean_persepsi_harapan_gap_per_dimensi()
+    public function mean_persepsi_harapan_gap_per_dimensi($type = 'pelatihan')
     {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        // Ambil responses dari database berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::where('status', 'completed')->get();
 
         // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -157,10 +160,11 @@ class GrafikController extends Controller
         return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions'));
     }
 
-    public function rekomendasi()
+    public function rekomendasi($type = 'pelatihan')
     {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        // Ambil responses dari database berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::where('status', 'completed')->get();
 
         // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -194,10 +198,11 @@ class GrafikController extends Controller
         return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation'));
     }
 
-    public function kepuasan()
+    public function kepuasan($type = 'pelatihan')
     {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        // Ambil responses dari database berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::where('status', 'completed')->get();
 
         // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -210,8 +215,12 @@ class GrafikController extends Controller
         $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
         $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
 
-        // Get questions from service
-        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        // Get questions from service based on type
+        if ($type === 'produk') {
+            $questions = app(\App\Services\ProdukSurveyQuestionService::class)->getProdukQuestions();
+        } else {
+            $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        }
 
         return view('grafik.kepuasan', compact(
             'ikpPercentage',
@@ -221,10 +230,11 @@ class GrafikController extends Controller
         ) + $kepuasanDetails);
     }
 
-    public function loyalitas()
+    public function loyalitas($type = 'pelatihan')
     {
-        // Ambil responses dari database
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        // Ambil responses dari database berdasarkan tipe
+        $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        $responses = $modelClass::where('status', 'completed')->get();
 
         // Gunakan SurveyCalculationService untuk menghitung ILP
         $ilpResults = $this->surveyService->calculateILP($responses->toArray());
@@ -234,8 +244,12 @@ class GrafikController extends Controller
         $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
         $ilpInterpretation = $ilpResults['ilp_interpretation'] ?? '';
 
-        // Get questions from service
-        $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        // Get questions from service based on type
+        if ($type === 'produk') {
+            $questions = app(\App\Services\ProdukSurveyQuestionService::class)->getProdukQuestions();
+        } else {
+            $questions = app(\App\Services\SurveyQuestionService::class)->getPelatihanQuestions();
+        }
 
         return view('grafik.loyalitas', compact(
             'ilpPercentage',

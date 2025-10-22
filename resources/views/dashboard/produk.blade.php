@@ -69,7 +69,7 @@
                                 Analisis demografi responden berdasarkan usia, jenis kelamin, pekerjaan, dan domisili.
                                 Memahami karakteristik pelanggan produk secara menyeluruh.
                             </p>
-                            <a href="{{ route('grafik.profil-responden') }}"
+                            <a href="{{ route('grafik.produk.profil-responden') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-blue-600 group-hover:to-purple-700">
                                 <i class="fas fa-chart-bar mr-3"></i>
                                 Lihat Analisis Profil
@@ -92,7 +92,7 @@
                                 Evaluasi tingkat kepuasan pelanggan terhadap produk dengan Indeks Kepuasan Pelanggan (IKP).
                                 Mengidentifikasi area kekuatan dan kelemahan.
                             </p>
-                            <a href="{{ route('grafik.kepuasan') }}"
+                            <a href="{{ route('grafik.produk.kepuasan') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-green-600 group-hover:to-teal-700">
                                 <i class="fas fa-chart-line mr-3"></i>
                                 Lihat Analisis Kepuasan
@@ -115,7 +115,7 @@
                                 Mengukur tingkat loyalitas pelanggan dengan Indeks Loyalitas Pelanggan (ILP).
                                 Mengidentifikasi potensi retensi dan rekomendasi pelanggan.
                             </p>
-                            <a href="{{ route('grafik.loyalitas') }}"
+                            <a href="{{ route('grafik.produk.loyalitas') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-purple-600 group-hover:to-pink-700">
                                 <i class="fas fa-chart-pie mr-3"></i>
                                 Lihat Analisis Loyalitas
@@ -138,7 +138,7 @@
                                 Analisis perbedaan antara ekspektasi (harapan) dan persepsi (realitas) pelanggan.
                                 Mengidentifikasi area yang perlu diperbaiki dalam produk.
                             </p>
-                            <a href="{{ route('grafik.mean-persepsi-harapan-gap-per-dimensi') }}"
+                            <a href="{{ route('grafik.produk.mean-persepsi-harapan-gap-per-dimensi') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-yellow-600 group-hover:to-orange-700">
                                 <i class="fas fa-chart-area mr-3"></i>
                                 Lihat Gap Analysis
@@ -161,7 +161,7 @@
                                 Saran perbaikan berdasarkan hasil analisis gap dan kepuasan.
                                 Rekomendasi strategis untuk meningkatkan kualitas produk.
                             </p>
-                            <a href="{{ route('grafik.rekomendasi') }}"
+                            <a href="{{ route('grafik.produk.rekomendasi') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-indigo-600 group-hover:to-blue-700">
                                 <i class="fas fa-clipboard-list mr-3"></i>
                                 Lihat Rekomendasi
@@ -184,7 +184,7 @@
                                 Analisis detail gap untuk setiap indikator dalam dimensi SERVQUAL.
                                 Memahami performa spesifik dari setiap aspek produk.
                             </p>
-                            <a href="{{ route('grafik.mean-gap-per-dimensi') }}"
+                            <a href="{{ route('grafik.produk.mean-gap-per-dimensi') }}"
                                class="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-red-600 group-hover:to-pink-700">
                                 <i class="fas fa-chart-column mr-3"></i>
                                 Lihat Detail Gap

@@ -1,15 +1,11 @@
 <?php
-use App\Http\Controllers\PelatihanSurveyController;
-    use App\Http\Controllers\SurveyDashboardController;
 
-use App\Http\Controllers\GrafikController;
-
-
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerManagementEvaluationController;
 use App\Http\Controllers\CustomerManagementEvaluationDashboardController;
-
+use App\Http\Controllers\GrafikController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SurveyDashboardController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -33,22 +29,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/grafik/loyalitas', [GrafikController::class, 'loyalitas'])->name('grafik.loyalitas');
 
     // Grafik Routes - Produk
-    Route::get('/grafik/produk/mean-gap-per-dimensi', function() {
+    Route::get('/grafik/produk/mean-gap-per-dimensi', function () {
         return app(GrafikController::class)->mean_gap_per_dimensi('produk');
     })->name('grafik.produk.mean-gap-per-dimensi');
-    Route::get('/grafik/produk/mean-persepsi-harapan-gap-per-dimensi', function() {
+    Route::get('/grafik/produk/mean-persepsi-harapan-gap-per-dimensi', function () {
         return app(GrafikController::class)->mean_persepsi_harapan_gap_per_dimensi('produk');
     })->name('grafik.produk.mean-persepsi-harapan-gap-per-dimensi');
-    Route::get('/grafik/produk/profil-responden', function() {
+    Route::get('/grafik/produk/profil-responden', function () {
         return app(GrafikController::class)->profilResponden('produk');
     })->name('grafik.produk.profil-responden');
-    Route::get('/grafik/produk/rekomendasi', function() {
+    Route::get('/grafik/produk/rekomendasi', function () {
         return app(GrafikController::class)->rekomendasi('produk');
     })->name('grafik.produk.rekomendasi');
-    Route::get('/grafik/produk/kepuasan', function() {
+    Route::get('/grafik/produk/kepuasan', function () {
         return app(GrafikController::class)->kepuasan('produk');
     })->name('grafik.produk.kepuasan');
-    Route::get('/grafik/produk/loyalitas', function() {
+    Route::get('/grafik/produk/loyalitas', function () {
         return app(GrafikController::class)->loyalitas('produk');
     })->name('grafik.produk.loyalitas');
 
@@ -65,17 +61,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [SurveyDashboardController::class, 'destroy'])->name('destroy');
         Route::get('/export', [SurveyDashboardController::class, 'export'])->name('export');
     });
-        Route::prefix('dashboard/customer-evaluation-management')->name('dashboard.customer-evaluation-management.')->group(function () {
+    Route::prefix('dashboard/customer-evaluation-management')->name('dashboard.customer-evaluation-management.')->group(function () {
         Route::get('/', [CustomerManagementEvaluationDashboardController::class, 'index'])->name('index');
         Route::get('/show/{id}', [CustomerManagementEvaluationDashboardController::class, 'show'])->name('show');
         Route::delete('/{id}', [CustomerManagementEvaluationDashboardController::class, 'destroy'])->name('destroy');
         Route::get('/export', [CustomerManagementEvaluationDashboardController::class, 'export'])->name('export');
     });
 });
-
-
-
-
 
 use App\Http\Controllers\SurveyController;
 
@@ -99,6 +91,5 @@ Route::prefix('customer-management-evaluation')->name('customer-management-evalu
     Route::post('/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
     Route::get('/dashboard/{token?}', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
 });
-
 
 require __DIR__.'/auth.php';

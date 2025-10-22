@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\PelatihanSurveyResponse;
 use App\Models\ProdukSurveyResponse;
 use App\Services\SurveyCalculationService;
@@ -16,7 +14,7 @@ class GrafikController extends Controller
     {
         $this->surveyService = $surveyService;
     }
-   
+
     public function mean_gap_per_dimensi($type = 'pelatihan')
     {
         // Ambil responses dari database berdasarkan tipe
@@ -41,9 +39,9 @@ class GrafikController extends Controller
         foreach ($dimensionsConfig as $config) {
             $data = [];
             for ($i = 1; $i <= $config['count']; $i++) {
-                $key = $config['prefix'] . $i;
-                $data[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
-                $data[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+                $key = $config['prefix'].$i;
+                $data[$key.'_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+                $data[$key.'_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
             }
             $dimensions[] = array_merge($config, ['data' => $data]);
         }
@@ -66,11 +64,13 @@ class GrafikController extends Controller
                 'male' => $responses->filter(function ($response) use ($group) {
                     $jenisKelamin = $response->profile_data['jenis_kelamin'] ?? '';
                     $usia = $response->profile_data['usia'] ?? 0;
+
                     return $jenisKelamin === 'L' && $this->getAgeGroup($usia) === $group;
                 })->count(),
                 'female' => $responses->filter(function ($response) use ($group) {
                     $jenisKelamin = $response->profile_data['jenis_kelamin'] ?? '';
                     $usia = $response->profile_data['usia'] ?? 0;
+
                     return $jenisKelamin === 'P' && $this->getAgeGroup($usia) === $group;
                 })->count(),
             ];
@@ -105,10 +105,19 @@ class GrafikController extends Controller
 
     private function getAgeGroup($usia)
     {
-        if ($usia >= 18 && $usia <= 25) return '18-25';
-        if ($usia >= 26 && $usia <= 35) return '26-35';
-        if ($usia >= 36 && $usia <= 45) return '36-45';
-        if ($usia >= 46 && $usia <= 55) return '46-55';
+        if ($usia >= 18 && $usia <= 25) {
+            return '18-25';
+        }
+        if ($usia >= 26 && $usia <= 35) {
+            return '26-35';
+        }
+        if ($usia >= 36 && $usia <= 45) {
+            return '36-45';
+        }
+        if ($usia >= 46 && $usia <= 55) {
+            return '46-55';
+        }
+
         return '56+';
     }
 
@@ -140,7 +149,7 @@ class GrafikController extends Controller
             $count = $config['count'];
 
             for ($i = 1; $i <= $count; $i++) {
-                $key = $config['prefix'] . $i;
+                $key = $config['prefix'].$i;
                 $persepsiSum += $persepsiAverages[$key] ?? 0;
                 $harapanSum += $harapanAverages[$key] ?? 0;
                 $gapSum += ($persepsiAverages[$key] ?? 0) - ($harapanAverages[$key] ?? 0);
@@ -300,5 +309,4 @@ class GrafikController extends Controller
 
         return view('dashboard.produk', compact('totalResponses', 'ikpPercentage', 'ilpPercentage'));
     }
-
 }

@@ -80,7 +80,14 @@ class CustomerManagementEvaluationController extends Controller
         }
 
         $maturityData = array_intersect_key($validated, array_flip([
-            'visi', 'strategi', 'pengalamanKonsumen', 'kolaborasiOrganisasi', 'proses', 'informasi', 'teknologi', 'matriks'
+            'visi',
+            'strategi',
+            'pengalamanKonsumen',
+            'kolaborasiOrganisasi',
+            'proses',
+            'informasi',
+            'teknologi',
+            'matriks'
         ]));
 
         $this->evaluationService->updateMaturityData($evaluation, $maturityData);
@@ -114,9 +121,17 @@ class CustomerManagementEvaluationController extends Controller
     {
         $rules = [];
         $priorityItems = [
-            'kepemimpinanStrategis', 'posisiKompetitif', 'kepuasanPelanggan', 'nilaiUmurPelanggan',
-            'efisiensiBiaya', 'aksesPelanggan', 'solusiAplikasiPelanggan', 'informasiPelanggan',
-            'prosesPelanggan', 'standarSDM', 'pelaporanKinerja'
+            'kepemimpinanStrategis',
+            'posisiKompetitif',
+            'kepuasanPelanggan',
+            'nilaiUmurPelanggan',
+            'efisiensiBiaya',
+            'aksesPelanggan',
+            'solusiAplikasiPelanggan',
+            'informasiPelanggan',
+            'prosesPelanggan',
+            'standarSDM',
+            'pelaporanKinerja'
         ];
 
         foreach ($priorityItems as $item) {
@@ -126,7 +141,7 @@ class CustomerManagementEvaluationController extends Controller
         $validated = $request->validate($rules);
 
         // Filter out empty values
-        $filledValues = array_filter($validated, function($value) {
+        $filledValues = array_filter($validated, function ($value) {
             return $value !== null && $value !== '';
         });
 

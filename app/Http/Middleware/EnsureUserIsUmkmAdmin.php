@@ -41,7 +41,7 @@ class EnsureUserIsUmkmAdmin
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Account not approved.'], 403);
             }
-            return redirect()->route('umkm.pending');
+            return redirect()->route('auth.pending');
         }
 
         // Determine UMKM id from route parameter (supports model binding or plain id)

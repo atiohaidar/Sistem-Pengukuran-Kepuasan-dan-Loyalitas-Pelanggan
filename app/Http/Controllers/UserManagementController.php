@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Mail\UserStatusUpdated;
+use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Http\Request;
 
@@ -51,8 +53,17 @@ class UserManagementController extends Controller
 
         $user->status = $newStatus;
         $user->save();
+        $pesan = "Status user {$user->name} telah diperbarui menjadi {$newStatus}.";
+        // Kirim email notifikasi ke user
+        try {
+            Mail::to($user->email)->send(new UserStatusUpdated($user, $newStatus));
+        } catch (\Throwable $th) {
+            \Log::error('Failed to send status update email to user ID ' . $user->id . ': ' . $th->getMessage());
+            $pesan .= " Namun, gagal mengirim email notifikasi.";
 
-        return redirect()->back()->with('success', 'User status updated successfully.');
+        }
+
+        return redirect()->back()->with('success', $pesan);
     }
     public function show(User $user)
     {
@@ -60,7 +71,7 @@ class UserManagementController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        return view('user-management.detail', compact('user'));
+        return view('user-management.show', compact('user'));
     }
 
     public function update(Request $request, $id)
@@ -74,7 +85,7 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:user,superadmin',
+            'role' => 'required|in:umkm,superadmin',
             'status' => 'required|in:pending,approved,rejected',
         ]);
 

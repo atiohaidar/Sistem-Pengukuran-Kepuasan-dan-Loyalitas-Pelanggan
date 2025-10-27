@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Mail\NewUserRegistered;
+use Illuminate\Support\Facades\Mail;
+use Log;
 
 class RegisteredUserController extends Controller
 {
@@ -65,12 +68,21 @@ class RegisteredUserController extends Controller
                 'deskripsi' => $request->deskripsi ?? null,
                 'kategori_usaha' => $request->kategori_usaha ?? null,
                 'alamat' => $request->alamat ?? null,
-                'status' => 'pending',
             ]);
 
             // link user -> umkm
             $user->umkm_id = $umkm->id;
             $user->save();
+        }
+        try {
+            // Kirim email ke semua superadmin untuk approval
+            $superadmins = User::where('role', 'superadmin')->get();
+            foreach ($superadmins as $admin) {
+                Mail::to($admin->email)->send(new NewUserRegistered($user));
+            }
+            //code...
+        } catch (\Throwable $th) {
+            Log::error('Failed to send new user registration email to superadmins: ' . $th->getMessage());
         }
 
         event(new Registered($user));

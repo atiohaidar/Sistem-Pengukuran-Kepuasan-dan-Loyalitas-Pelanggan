@@ -98,21 +98,31 @@
                         <form method="GET" action="{{ route('user-management.index') }}" class="flex space-x-2">
                             <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama atau email..."
                                 class="block w-full sm:w-80 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <select name="status"
-                                class="block px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm">
-                                <option value="all">Semua Status</option>
-                                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>
-                                    Disetujui</option>
-                                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending
-                                </option>
-                                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Ditolak
-                                </option>
-                            </select>
                             <button type="submit"
                                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                                 Cari
                             </button>
                         </form>
+
+                        <!-- Status Filter Buttons -->
+                        <div class="flex space-x-2">
+                            <a href="{{ route('user-management.index', array_merge(request()->query(), ['status' => 'all'])) }}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md {{ request('status', 'all') === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                                Semua
+                            </a>
+                            <a href="{{ route('user-management.index', array_merge(request()->query(), ['status' => 'approved'])) }}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md {{ request('status') === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                                Disetujui
+                            </a>
+                            <a href="{{ route('user-management.index', array_merge(request()->query(), ['status' => 'pending'])) }}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md {{ request('status') === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                                Pending
+                            </a>
+                            <a href="{{ route('user-management.index', array_merge(request()->query(), ['status' => 'rejected'])) }}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md {{ request('status') === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                                Ditolak
+                            </a>
+                        </div>
                     </div>
 
                     <a href="#"
@@ -125,24 +135,42 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nama</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                                    Email</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                    UMKM</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                    Kategori UMKM</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                    Peran</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(0)">
+                                    <div class="flex items-center">
+                                        Nama
+                                        <i id="sort-icon-0" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden sm:table-cell" onclick="sortTable(1)">
+                                    <div class="flex items-center">
+                                        Email
+                                        <i id="sort-icon-1" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden md:table-cell" onclick="sortTable(2)">
+                                    <div class="flex items-center">
+                                        UMKM
+                                        <i id="sort-icon-2" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden lg:table-cell" onclick="sortTable(3)">
+                                    <div class="flex items-center">
+                                        Kategori UMKM
+                                        <i id="sort-icon-3" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hidden md:table-cell" onclick="sortTable(4)">
+                                    <div class="flex items-center">
+                                        Peran
+                                        <i id="sort-icon-4" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(5)">
+                                    <div class="flex items-center">
+                                        Status
+                                        <i id="sort-icon-5" class="fas fa-sort ml-1"></i>
+                                    </div>
+                                </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Aksi</th>
@@ -242,4 +270,40 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let sortDirections = [true, true, true, true, true, true]; // true = asc, false = desc
+
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            const direction = sortDirections[columnIndex];
+            sortDirections[columnIndex] = !direction;
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim().toLowerCase();
+                const bText = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+                if (direction) {
+                    return aText.localeCompare(bText);
+                } else {
+                    return bText.localeCompare(aText);
+                }
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Update icons
+            for (let i = 0; i < sortDirections.length; i++) {
+                const icon = document.getElementById(`sort-icon-${i}`);
+                if (i === columnIndex) {
+                    icon.className = sortDirections[i] ? 'fas fa-sort-up ml-1' : 'fas fa-sort-down ml-1';
+                } else {
+                    icon.className = 'fas fa-sort ml-1';
+                }
+            }
+        }
+    </script>
 </x-app-layout>

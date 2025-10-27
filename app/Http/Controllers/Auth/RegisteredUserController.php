@@ -38,42 +38,31 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'nama_usaha' => ['required', 'string', 'max:255'],
+            'deskripsi' => ['nullable', 'string'],
+            'kategori_usaha' => ['required', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string'],
         ];
-
-        $isUmkm = $request->has('is_umkm');
-        if ($isUmkm) {
-            $rules = array_merge($rules, [
-                'nama_usaha' => ['required', 'string', 'max:255'],
-                'deskripsi' => ['nullable', 'string'],
-                'kategori_usaha' => ['nullable', 'string', 'max:255'],
-                'alamat' => ['nullable', 'string'],
-            ]);
-        }
 
         $request->validate($rules);
 
-        // Create user with default role/status. If UMKM selected, set role later.
+        // Create UMKM profile first
+        $umkm = UmkmProfile::create([
+            'nama_usaha' => $request->nama_usaha,
+            'deskripsi' => $request->deskripsi ?? null,
+            'kategori_usaha' => $request->kategori_usaha,
+            'alamat' => $request->alamat ?? null,
+        ]);
+
+        // Create user with UMKM role and pending status
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $isUmkm ? 'umkm' : 'user',
-            'status' => $isUmkm ? 'pending' : 'approved',
+            'role' => 'umkm',
+            'status' => 'pending',
+            'umkm_id' => $umkm->id,
         ]);
-
-        // If registering as UMKM, create UMKM profile and link
-        if ($isUmkm) {
-            $umkm = UmkmProfile::create([
-                'nama_usaha' => $request->nama_usaha,
-                'deskripsi' => $request->deskripsi ?? null,
-                'kategori_usaha' => $request->kategori_usaha ?? null,
-                'alamat' => $request->alamat ?? null,
-            ]);
-
-            // link user -> umkm
-            $user->umkm_id = $umkm->id;
-            $user->save();
-        }
         try {
             // Kirim email ke semua superadmin untuk approval
             $superadmins = User::where('role', 'superadmin')->get();

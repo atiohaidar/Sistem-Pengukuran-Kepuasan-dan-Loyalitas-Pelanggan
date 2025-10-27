@@ -43,8 +43,7 @@
                         <ol class="list-decimal list-inside text-gray-700 text-sm space-y-2">
                             <li>Tim admin meninjau data Anda.</li>
                             <li>Jika data lengkap, admin akan menyetujui dan Anda akan menerima email konfirmasi.</li>
-                            <li>Setelah disetujui, Anda bisa mengakses fitur manajemen UMKM seperti membuat survei dan
-                                impor transaksi.</li>
+                            <li>Setelah disetujui, Anda bisa mengakses fitur yang ada pada website ini</li>
                         </ol>
 
                         <div class="mt-4 text-xs text-gray-500">Estimasi waktu proses bergantung pada ketersediaan

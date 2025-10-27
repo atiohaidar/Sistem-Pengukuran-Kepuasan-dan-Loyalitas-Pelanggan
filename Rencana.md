@@ -18,7 +18,7 @@ Target penyelesaian: 25 November 2025
 
 ## Update Fitur
 1. Registrasi UMKM & alur approval
-    - Tambah role `superadmin`, `admin_umkm`.
+    - Tambah role `superadmin`, `umkm`.
 	- Middleware untuk membatasi akses per UMKM.
 	- Form pendaftaran UMKM (email, password, nama usaha, kontak, deskripsi).
 	- Status: pending, approved, rejected.
@@ -68,7 +68,7 @@ Berikut daftar langkah konkret yang bisa Anda (atau tim) lakukan untuk mengeksek
     - Tentukan API contract (endpoint, payload contoh) untuk import Excel dan preview.
 
 3) Auth / Roles / Registrasi UMKM
-    - Implementasi role `superadmin` dan `admin_umkm` (migrations + seeder untuk akun awal).
+    - Implementasi role `superadmin` dan `umkm` (migrations + seeder untuk akun awal).
     - Form registrasi UMKM: validasi server & client, simpan status `pending`.
     - Halaman `Menunggu ACC` untuk user yang belum di-approve, sertakan kontak admin.
     - Endpoint approve/reject untuk superadmin; kirim email notifikasi (queueable job).

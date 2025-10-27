@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // role: superadmin, admin_umkm, user, etc.
+            // role: superadmin, umkm, user, etc.
             $table->string('role')->default('user')->after('password');
             // link ke umkm_profiles jika user adalah admin umkm
             $table->unsignedBigInteger('umkm_id')->nullable()->after('role');

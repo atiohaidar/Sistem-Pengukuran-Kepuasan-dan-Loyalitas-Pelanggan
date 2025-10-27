@@ -5,11 +5,12 @@ use App\Http\Controllers\CustomerManagementEvaluationDashboardController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SurveyDashboardController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 
 Route::middleware(['auth', 'umkm.owner'])->group(function () {
@@ -55,8 +56,6 @@ Route::middleware(['auth', 'umkm.owner'])->group(function () {
     Route::get('/dashboard/produk', [GrafikController::class, 'dashboardProduk'])->name('dashboard.produk');
 
     // UMKM pages
-    Route::get('/umkm/pending', [App\Http\Controllers\UmkmController::class, 'pending'])->name('umkm.pending');
-    Route::get('/umkm/{umkm}/dashboard', [App\Http\Controllers\UmkmController::class, 'dashboard'])->name('umkm.dashboard')->middleware('umkm.owner');
 
     // Survey Management Dashboard Routes
     Route::prefix('dashboard/survey-management/{type}')->name('dashboard.survey-management.')->group(function () {
@@ -117,5 +116,20 @@ Route::prefix('customer-management-evaluation')->name('customer-management-evalu
     Route::post('/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
     Route::get('/dashboard/{token?}', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
 });
+// // ===== SuperAdmin Features =====
+// Route::prefix('superadmin')->name('superadmin.')->group(function () {
+//     Route::prefix('umkm')->name('umkm.')->group(function () {
+//         Route::get('/', [UmkmController::class, 'index'])->name('index');
+//         Route::post('/{umkm}/change-status', [UmkmController::class, 'umkmChangeStatus'])->name('change-status');
+//     });
+//     // Add superadmin specific routes here in the future
+// })->middleware(['auth', 'superadmin']);
+
+Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
+Route::put('/user-management/{id}/change-status', [UserManagementController::class, 'changeStatus'])->name('user-management.change-status');
+Route::get('/user-management/{user}', [UserManagementController::class, 'show'])->name('user-management.show');
+Route::put('/user-management/{id}', [UserManagementController::class, 'update'])->name('user-management.update');
+Route::put('/user-management/umkm/{id}', [UserManagementController::class, 'updateUmkm'])->name('user-management.update-umkm');
+
 
 require __DIR__ . '/auth.php';

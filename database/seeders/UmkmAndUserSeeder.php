@@ -38,7 +38,7 @@ class UmkmAndUserSeeder extends Seeder
             'name' => 'Admin UMKM',
             'email' => 'admin@umkm.example.com',
             'password' => bcrypt('password'),
-            'role' => 'admin_umkm',
+            'role' => 'umkm',
             'status' => 'approved',
             'umkm_id' => $umkm->id,
         ]);
@@ -48,7 +48,7 @@ class UmkmAndUserSeeder extends Seeder
             'name' => 'Pending UMKM Owner',
             'email' => 'pending@umkm.example.com',
             'password' => bcrypt('password'),
-            'role' => 'admin_umkm',
+            'role' => 'umkm',
             'status' => 'pending',
         ]);
     }

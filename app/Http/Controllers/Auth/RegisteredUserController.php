@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $isUmkm ? 'admin_umkm' : 'user',
+            'role' => $isUmkm ? 'umkm' : 'user',
             'status' => $isUmkm ? 'pending' : 'approved',
         ]);
 

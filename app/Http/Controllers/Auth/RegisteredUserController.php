@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UmkmProfile;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,17 +30,48 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
 
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ];
+
+        $isUmkm = $request->has('is_umkm');
+        if ($isUmkm) {
+            $rules = array_merge($rules, [
+                'nama_usaha' => ['required', 'string', 'max:255'],
+                'deskripsi' => ['nullable', 'string'],
+                'kategori_usaha' => ['nullable', 'string', 'max:255'],
+                'alamat' => ['nullable', 'string'],
+            ]);
+        }
+
+        $request->validate($rules);
+
+        // Create user with default role/status. If UMKM selected, set role later.
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $isUmkm ? 'admin_umkm' : 'user',
+            'status' => $isUmkm ? 'pending' : 'approved',
         ]);
+
+        // If registering as UMKM, create UMKM profile and link
+        if ($isUmkm) {
+            $umkm = UmkmProfile::create([
+                'nama_usaha' => $request->nama_usaha,
+                'deskripsi' => $request->deskripsi ?? null,
+                'kategori_usaha' => $request->kategori_usaha ?? null,
+                'alamat' => $request->alamat ?? null,
+                'status' => 'pending',
+            ]);
+
+            // link user -> umkm
+            $user->umkm_id = $umkm->id;
+            $user->save();
+        }
 
         event(new Registered($user));
 

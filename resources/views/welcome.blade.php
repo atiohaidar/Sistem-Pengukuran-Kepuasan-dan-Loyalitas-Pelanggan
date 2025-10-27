@@ -282,4 +282,3 @@
 </html>
 </content>
 <parameter name="filePath">
-    /workspaces/Sistem-Pengukuran-Kepuasan-dan-Loyalitas-Pelanggan/resources/views/welcome.blade.php

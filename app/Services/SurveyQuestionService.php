@@ -5,6 +5,79 @@ namespace App\Services;
 class SurveyQuestionService
 {
     /**
+     * Cached questions to avoid rebuilding the array repeatedly during a request lifecycle.
+     */
+    protected ?array $cachedQuestions = null;
+
+    /**
+     * Retrieve the base question definition, cached per request.
+     */
+    protected function questions(): array
+    {
+        if ($this->cachedQuestions === null) {
+            $this->cachedQuestions = $this->getPelatihanQuestions();
+        }
+
+        return $this->cachedQuestions;
+    }
+
+    /**
+     * Get harapan questions only.
+     */
+    public function getHarapanQuestions(): array
+    {
+        return $this->questions()['harapan_answers'] ?? [];
+    }
+
+    /**
+     * Get persepsi questions only.
+     */
+    public function getPersepsiQuestions(): array
+    {
+        return $this->questions()['persepsi_answers'] ?? [];
+    }
+
+    /**
+     * Get kepuasan questions only.
+     */
+    public function getKepuasanQuestions(): array
+    {
+        return $this->questions()['kepuasan_answers'] ?? [];
+    }
+
+    /**
+     * Get loyalitas questions only.
+     */
+    public function getLoyalitasQuestions(): array
+    {
+        return $this->questions()['loyalitas_answers'] ?? [];
+    }
+
+    /**
+     * Get feedback questions only.
+     */
+    public function getFeedbackQuestions(): array
+    {
+        return $this->questions()['feedback_answers'] ?? [];
+    }
+
+    /**
+     * Backward-compatible accessor used by older controllers/views.
+     */
+    public function getQuestions(): array
+    {
+        return $this->questions();
+    }
+
+    /**
+     * Backward-compatible alias for loyalitas getters.
+     */
+    public function getLoyaltyQuestions(): array
+    {
+        return $this->getLoyalitasQuestions();
+    }
+
+    /**
      * Get all questions for pelatihan survey
      */
     public function getPelatihanQuestions(): array

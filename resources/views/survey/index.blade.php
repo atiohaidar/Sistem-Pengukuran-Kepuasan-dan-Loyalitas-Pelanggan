@@ -1,19 +1,28 @@
-<x-guest-layout title="Survei Kepuasan {{ ucfirst($type ?? 'Pelatihan') }}">
+<x-guest-layout title="Survei Kepuasan {{ $campaign->name ?? ucfirst($type ?? 'Pelatihan') }}">
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-16 px-4">
                 <div
                     class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-6 shadow-lg">
-                    <i class="fas fa-poll-h text-white text-3xl"></i>
+                    <i class="fas {{ isset($campaign) ? $campaign->getTypeIcon() : 'fa-poll-h' }} text-white text-3xl"></i>
                 </div>
                 <h1
                     class="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
-                    Survei Kepuasan dan Loyalitas {{ ucfirst($type ?? 'Pelatihan') }}
+                    {{ $campaign->name ?? 'Survei Kepuasan dan Loyalitas ' . ucfirst($type ?? 'Pelatihan') }}
                 </h1>
-                <p class="text-xl text-gray-600 mb-2 font-medium">
-                    {{ $type === 'produk' ? 'Produk/Layanan' : 'Lembaga Pelatihan Professional' }}
-                </p>
+                @if(isset($campaign))
+                    <p class="text-xl text-gray-600 mb-2 font-medium">
+                        {{ $campaign->umkm->umkm->nama_usaha ?? $campaign->umkm->name }}
+                    </p>
+                    @if($campaign->description)
+                        <p class="text-gray-600 mb-2">{{ $campaign->description }}</p>
+                    @endif
+                @else
+                    <p class="text-xl text-gray-600 mb-2 font-medium">
+                        {{ $type === 'produk' ? 'Produk/Layanan' : 'Lembaga Pelatihan Professional' }}
+                    </p>
+                @endif
                 <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full mb-8"></div>
             </div>
             <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border border-gray-100">
@@ -28,7 +37,7 @@
                 <p class="text-gray-600 mb-8 text-lg leading-relaxed text-center max-w-2xl mx-auto">
                     Terima kasih atas partisipasi Anda dalam survei ini. Survei ini bertujuan untuk mengukur
                     tingkat kepuasan dan loyalitas Anda terhadap
-                    {{ $type === 'produk' ? 'produk/layanan' : 'layanan pelatihan' }} yang kami berikan.
+                    {{ isset($campaign) ? ($campaign->type === 'produk' ? 'produk/layanan' : 'layanan pelatihan') : ($type === 'produk' ? 'produk/layanan' : 'layanan pelatihan') }} yang kami berikan.
                 </p>
 
                 <!-- <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -85,7 +94,7 @@
 
         <!-- Start Survey Button -->
         <div class="text-center">
-            <form method="POST" action="{{ route('survey.start', $type ?? 'pelatihan') }}">
+            <form method="POST" action="{{ isset($campaign) ? route('public-survey.start', $campaign->slug) : route('survey.start', $type ?? 'pelatihan') }}">
                 @csrf
                 <button type="submit"
                     class="group bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-5 px-10 rounded-xl text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg border-2 border-transparent hover:border-blue-300">

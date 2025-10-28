@@ -4,13 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\PelatihanSurveyResponse;
 use App\Models\ProdukSurveyResponse;
+use App\Models\SurveyCampaign;
 use App\Services\SurveyQuestionService;
 use App\Services\ProdukSurveyQuestionService;
+use App\Services\SurveyCampaignService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class SurveyController extends Controller
 {
+    protected $produkQuestionService;
+    protected $pelatihanQuestionService;
+    protected $campaignService;
+
+    public function __construct(
+        ProdukSurveyQuestionService $produkQuestionService,
+        SurveyQuestionService $pelatihanQuestionService,
+        SurveyCampaignService $campaignService
+    ) {
+        $this->produkQuestionService = $produkQuestionService;
+        $this->pelatihanQuestionService = $pelatihanQuestionService;
+        $this->campaignService = $campaignService;
+    }
+
     private const STEPS = [
         'profile' => 1,
         'harapan' => 2,
@@ -49,10 +65,29 @@ class SurveyController extends Controller
 
     /**
      * Landing page survei
+     * Support both legacy (by type) and campaign (by slug)
      */
-    public function index($type = 'pelatihan')
+    public function index($typeOrSlug = 'pelatihan')
     {
-        // Validate type
+        // Check if it's a campaign slug
+        $campaign = SurveyCampaign::where('slug', $typeOrSlug)->first();
+        
+        if ($campaign) {
+            // Campaign mode
+            // Check if campaign can accept responses
+            if (!$campaign->canAcceptResponses()) {
+                $reason = $this->campaignService->getClosureReason($campaign);
+                return view('survey.closed', compact('campaign', 'reason'));
+            }
+            
+            return view('survey.index', [
+                'campaign' => $campaign,
+                'type' => $campaign->type
+            ]);
+        }
+        
+        // Legacy mode - validate type
+        $type = $typeOrSlug;
         if (!in_array($type, ['pelatihan', 'produk'])) {
             abort(404);
         }
@@ -62,19 +97,48 @@ class SurveyController extends Controller
 
     /**
      * Mulai survei baru
+     * Support both legacy and campaign mode
      */
-    public function start($type, Request $request = null)
+    public function start($typeOrSlug, Request $request = null)
     {
-        // Validate type
+        // Check if it's a campaign slug
+        $campaign = SurveyCampaign::where('slug', $typeOrSlug)->first();
+        
+        if ($campaign) {
+            // Campaign mode
+            // Check if campaign can accept responses
+            if (!$campaign->canAcceptResponses()) {
+                $reason = $this->campaignService->getClosureReason($campaign);
+                return view('survey.closed', compact('campaign', 'reason'));
+            }
+            
+            $type = $campaign->type;
+            $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+            $sessionToken = \Str::random(64);
+            
+            // Create response record with campaign_id
+            $survey = $model::create([
+                'survey_campaign_id' => $campaign->id,
+                'session_token' => $sessionToken,
+            ]);
+            
+            // Save session with campaign identifier
+            Session::put('survey_session_' . $campaign->id, $sessionToken);
+            Session::put('campaign_id', $campaign->id);
+            
+            return redirect()->route('survey.step', ['type' => $typeOrSlug, 'step' => 'profile']);
+        }
+        
+        // Legacy mode - validate type
+        $type = $typeOrSlug;
         if (!in_array($type, ['pelatihan', 'produk'])) {
             abort(404);
         }
 
         $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-
         $sessionToken = $model::generateSessionToken();
 
-        // Buat record baru
+        // Buat record baru (legacy without campaign)
         $survey = $model::create([
             'session_token' => $sessionToken,
             'started_at' => now(),
@@ -88,14 +152,31 @@ class SurveyController extends Controller
 
     /**
      * Tampilkan step tertentu
+     * Support both legacy and campaign mode
      */
-    public function step($type, $step)
+    public function step($typeOrSlug, $step)
     {
-        // Validate type and step
-        if (!in_array($type, ['pelatihan', 'produk'])) {
-            abort(404);
+        // Detect campaign mode
+        $campaign = SurveyCampaign::where('slug', $typeOrSlug)->first();
+        $isCampaignMode = $campaign !== null;
+        
+        if ($isCampaignMode) {
+            $type = $campaign->type;
+            
+            // Check campaign availability
+            if (!$campaign->canAcceptResponses()) {
+                $reason = $this->campaignService->getClosureReason($campaign);
+                return view('survey.closed', compact('campaign', 'reason'));
+            }
+        } else {
+            // Legacy mode
+            $type = $typeOrSlug;
+            if (!in_array($type, ['pelatihan', 'produk'])) {
+                abort(404);
+            }
         }
 
+        // Validate step
         if (!array_key_exists($step, self::STEPS)) {
             abort(404);
         }
@@ -103,14 +184,19 @@ class SurveyController extends Controller
         $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
 
         // Get survey from session
-        $sessionToken = Session::get('survey_token');
+        if ($isCampaignMode) {
+            $sessionToken = Session::get('survey_session_' . $campaign->id);
+        } else {
+            $sessionToken = Session::get('survey_token');
+        }
+        
         if (!$sessionToken) {
-            return redirect()->route('survey.index', $type)->with('error', 'Sesi survei tidak valid');
+            return redirect()->route('survey.index', $typeOrSlug)->with('error', 'Sesi survei tidak valid');
         }
 
         $survey = $model::where('session_token', $sessionToken)->first();
         if (!$survey) {
-            return redirect()->route('survey.index', $type)->with('error', 'Data survei tidak ditemukan');
+            return redirect()->route('survey.index', $typeOrSlug)->with('error', 'Data survei tidak ditemukan');
         }
 
         // Check if step is accessible
@@ -119,7 +205,7 @@ class SurveyController extends Controller
 
         if ($currentStepNumber > $lastCompletedStep + 1) {
             $lastAccessibleStep = array_search($lastCompletedStep + 1, self::STEPS);
-            return redirect()->route('survey.step', ['type' => $type, 'step' => $lastAccessibleStep]);
+            return redirect()->route('survey.step', ['type' => $typeOrSlug, 'step' => $lastAccessibleStep]);
         }
 
         // Calculate progress variables for progress bar
@@ -129,39 +215,65 @@ class SurveyController extends Controller
 
         // Get questions based on survey type
         $questions = $type === 'produk'
-            ? (new ProdukSurveyQuestionService())->getProdukQuestions()
-            : (new SurveyQuestionService())->getPelatihanQuestions();
+            ? $this->produkQuestionService->getProdukQuestions()
+            : $this->pelatihanQuestionService->getPelatihanQuestions();
 
         // Navigation variables
         $canGoBack = $currentStepNumber > 1;
         $routePrefix = 'survey.';
         $controllerClass = self::class;
 
-        return view('survey.' . $step, compact('survey', 'step', 'type', 'stepNumber', 'totalSteps', 'progress', 'questions', 'canGoBack', 'routePrefix', 'controllerClass'));
+        return view('survey.' . $step, compact(
+            'survey', 
+            'step', 
+            'type', 
+            'stepNumber', 
+            'totalSteps', 
+            'progress', 
+            'questions', 
+            'canGoBack', 
+            'routePrefix', 
+            'controllerClass',
+            'campaign'
+        ));
     }
 
     /**
      * Simpan data step
+     * Support both legacy and campaign mode
      */
-    public function store(Request $request, $type, $step)
+    public function store(Request $request, $typeOrSlug, $step)
     {
-        // Validate type
-        if (!in_array($type, ['pelatihan', 'produk'])) {
-            abort(404);
+        // Detect campaign mode
+        $campaign = SurveyCampaign::where('slug', $typeOrSlug)->first();
+        $isCampaignMode = $campaign !== null;
+        
+        if ($isCampaignMode) {
+            $type = $campaign->type;
+        } else {
+            $type = $typeOrSlug;
+            if (!in_array($type, ['pelatihan', 'produk'])) {
+                abort(404);
+            }
         }
 
         $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
 
-        $sessionToken = Session::get('survey_token');
+        // Get session token
+        if ($isCampaignMode) {
+            $sessionToken = Session::get('survey_session_' . $campaign->id);
+        } else {
+            $sessionToken = Session::get('survey_token');
+        }
 
         if (!$sessionToken) {
-            return redirect()->route('survey.index', $type)->with('error', 'Sesi survei tidak valid');
+            return redirect()->route('survey.index', $typeOrSlug)->with('error', 'Sesi survei tidak valid');
         }
 
         $survey = $model::where('session_token', $sessionToken)->first();
 
         if (!$survey) {
-            return redirect()->route('survey.index', $type)->with('error', 'Data survei tidak ditemukan');
+            return redirect()->route('survey.index', $typeOrSlug)->with('error', 'Data survei tidak ditemukan');
         }
 
         // Validasi dan simpan berdasarkan step
@@ -186,6 +298,11 @@ class SurveyController extends Controller
             case 'feedback':
                 $survey->setAnswers('feedback', $validatedData);
                 $survey->markAsCompleted();
+                
+                // Auto close campaign if full (campaign mode only)
+                if ($isCampaignMode) {
+                    $campaign->autoCloseIfFull();
+                }
                 break;
         }
 
@@ -194,48 +311,87 @@ class SurveyController extends Controller
 
         if ($action === 'back') {
             $prevStep = $this->getPreviousStep($step);
-            return redirect()->route('survey.step', ['type' => $type, 'step' => $prevStep]);
+            return redirect()->route('survey.step', ['type' => $typeOrSlug, 'step' => $prevStep]);
         } elseif ($action === 'save') {
             return back()->with('success', 'Data berhasil disimpan');
         } else {
             // Next or complete
             if ($step === 'feedback') {
-                return redirect()->route('survey.complete', ['type' => $type]);
+                // Clear session
+                if ($isCampaignMode) {
+                    Session::forget('survey_session_' . $campaign->id);
+                    Session::forget('campaign_id');
+                    return redirect()->route('survey.complete', ['type' => $typeOrSlug]);
+                } else {
+                    return redirect()->route('survey.complete', ['type' => $type]);
+                }
             } else {
                 $nextStep = $this->getNextStep($step);
-                return redirect()->route('survey.step', ['type' => $type, 'step' => $nextStep])->with('success', 'Data berhasil disimpan');
+                return redirect()->route('survey.step', ['type' => $typeOrSlug, 'step' => $nextStep])->with('success', 'Data berhasil disimpan');
             }
         }
     }
 
     /**
      * Halaman selesai
+     * Support both legacy and campaign mode
      */
-    public function complete($type = 'pelatihan')
+    public function complete($typeOrSlug = 'pelatihan')
     {
-        // Validate type
-        if (!in_array($type, ['pelatihan', 'produk'])) {
-            abort(404);
+        // Detect campaign mode
+        $campaign = SurveyCampaign::where('slug', $typeOrSlug)->first();
+        $isCampaignMode = $campaign !== null;
+        
+        if ($isCampaignMode) {
+            $type = $campaign->type;
+            $sessionToken = Session::get('survey_session_' . $campaign->id);
+        } else {
+            $type = $typeOrSlug;
+            if (!in_array($type, ['pelatihan', 'produk'])) {
+                abort(404);
+            }
+            $sessionToken = Session::get('survey_token');
         }
 
         $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
 
-        $sessionToken = Session::get('survey_token');
-
         if (!$sessionToken) {
-            return redirect()->route('survey.index', $type);
+            return redirect()->route('survey.index', $typeOrSlug);
         }
 
         $survey = $model::where('session_token', $sessionToken)->first();
 
         if (!$survey || !$survey->isCompleted()) {
-            return redirect()->route('survey.step', ['type' => $type, 'step' => 'profile']);
+            return redirect()->route('survey.step', ['type' => $typeOrSlug, 'step' => 'profile']);
         }
 
         // Clear session
-        Session::forget('survey_token');
+        if ($isCampaignMode) {
+            Session::forget('survey_session_' . $campaign->id);
+            Session::forget('campaign_id');
+        } else {
+            Session::forget('survey_token');
+        }
+
+        // For campaign mode, use thank-you view
+        if ($isCampaignMode) {
+            return view('survey.thank-you', compact('campaign'));
+        }
 
         return view('survey.complete', compact('survey', 'type'));
+    }
+
+    /**
+     * Submit step for campaign mode (step comes from request body)
+     * This is specifically for public-survey.submit route
+     */
+    public function submitStep(Request $request, $slug)
+    {
+        // Get step from request
+        $step = $request->input('step', 'profile');
+        
+        // Call the main store method
+        return $this->store($request, $slug, $step);
     }
 
     /**

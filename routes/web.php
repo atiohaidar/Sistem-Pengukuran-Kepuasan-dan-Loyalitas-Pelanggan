@@ -6,11 +6,22 @@ use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SurveyDashboardController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\SurveyCampaignController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+// Public Survey Routes (NO AUTH REQUIRED)
+// Now using SurveyController for both campaign and legacy modes
+Route::prefix('survey')->name('public-survey.')->group(function () {
+    Route::get('/{slug}', [SurveyController::class, 'index'])->name('show');
+    Route::post('/{slug}/start', [SurveyController::class, 'start'])->name('start');
+    Route::post('/{slug}/submit', [SurveyController::class, 'submitStep'])->name('submit');
+    Route::get('/{slug}/thank-you', [SurveyController::class, 'complete'])->name('thank-you');
+});
 
 
 Route::middleware(['auth', 'umkm.owner'])->group(function () {
@@ -57,6 +68,35 @@ Route::middleware(['auth', 'umkm.owner'])->group(function () {
 
     // UMKM pages
 
+    // Survey Campaign Management Routes (NEW)
+    Route::prefix('survey-campaigns')->name('survey-campaigns.')->group(function () {
+        // List & CRUD
+        Route::get('/', [SurveyCampaignController::class, 'index'])->name('index');
+        Route::get('/create', [SurveyCampaignController::class, 'create'])->name('create');
+        Route::post('/', [SurveyCampaignController::class, 'store'])->name('store');
+        Route::get('/{campaign}/edit', [SurveyCampaignController::class, 'edit'])->name('edit');
+        Route::put('/{campaign}', [SurveyCampaignController::class, 'update'])->name('update');
+        Route::delete('/{campaign}', [SurveyCampaignController::class, 'destroy'])->name('destroy');
+        
+        // Dashboard & Analytics per Campaign
+        Route::get('/{campaign}/dashboard', [SurveyCampaignController::class, 'dashboard'])->name('dashboard');
+        
+        // Responses Management
+        Route::get('/{campaign}/responses', [SurveyCampaignController::class, 'responses'])->name('responses');
+        Route::get('/{campaign}/responses/{response}', [SurveyCampaignController::class, 'responseDetail'])->name('response-detail');
+        Route::get('/{campaign}/export', [SurveyCampaignController::class, 'export'])->name('export');
+        
+        // Status Management
+        Route::post('/{campaign}/activate', [SurveyCampaignController::class, 'activate'])->name('activate');
+        Route::post('/{campaign}/close', [SurveyCampaignController::class, 'close'])->name('close');
+        Route::post('/{campaign}/archive', [SurveyCampaignController::class, 'archive'])->name('archive');
+        
+        // Duplicate Campaign
+        Route::post('/{campaign}/duplicate', [SurveyCampaignController::class, 'duplicate'])->name('duplicate');
+    });
+
+    // UMKM pages (Legacy)
+
     // Survey Management Dashboard Routes
     Route::prefix('dashboard/survey-management/{type}')->name('dashboard.survey-management.')->group(function () {
         Route::get('/', [SurveyDashboardController::class, 'index'])->name('index');
@@ -71,8 +111,6 @@ Route::middleware(['auth', 'umkm.owner'])->group(function () {
         Route::get('/export', [CustomerManagementEvaluationDashboardController::class, 'export'])->name('export');
     });
 });
-
-use App\Http\Controllers\SurveyController;
 
 // Survey Routes (Generic for pelatihan and produk)
 Route::prefix('survey/{type}')->name('survey.')->group(function () {

@@ -19,6 +19,36 @@
                 class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
                 {{ __('Dashboard') }}
             </x-nav-link>
+
+            <!-- Manajemen Kampanye Survei (UMKM & Superadmin) -->
+            @role('umkm|superadmin')
+            <div x-data="{ subOpen: {{ request()->routeIs('survey-campaigns.*') ? 'true' : 'false' }} }">
+                <button @click="subOpen = !subOpen"
+                    class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium {{ request()->routeIs('survey-campaigns.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }} rounded-md focus:outline-none text-left">
+                    <span class="flex items-center">
+                        <i class="fas fa-poll-h mr-2"></i>
+                        {{ __('Manajemen Kampanye Survei') }}
+                    </span>
+                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': subOpen }" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="subOpen" x-transition class="ml-4 mt-1 space-y-1">
+                    <a href="{{ route('survey-campaigns.index') }}"
+                        class="flex items-center px-4 py-2 text-sm {{ request()->routeIs('survey-campaigns.index') || request()->routeIs('survey-campaigns.create') || request()->routeIs('survey-campaigns.edit') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                        <i class="fas fa-list-alt mr-2 text-xs"></i>
+                        Daftar Kampanye
+                    </a>
+                    <a href="{{ route('survey-campaigns.create') }}"
+                        class="flex items-center px-4 py-2 text-sm {{ request()->routeIs('survey-campaigns.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                        <i class="fas fa-plus-circle mr-2 text-xs"></i>
+                        Buat Kampanye Baru
+                    </a>
+                </div>
+            </div>
+            @endrole
+            
             <!-- Manajemen User (Superadmin) -->
             @role('superadmin')
             <x-nav-link :href="route('user-management.index')" :active="request()->routeIs('user-management.*')"

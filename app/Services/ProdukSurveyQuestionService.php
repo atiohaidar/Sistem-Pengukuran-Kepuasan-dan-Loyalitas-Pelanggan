@@ -5,6 +5,79 @@ namespace App\Services;
 class ProdukSurveyQuestionService
 {
     /**
+     * Cached question bank to avoid rebuilding arrays every lookup.
+     */
+    protected ?array $cachedQuestions = null;
+
+    /**
+     * Retrieve the produk question dataset with simple caching.
+     */
+    protected function questions(): array
+    {
+        if ($this->cachedQuestions === null) {
+            $this->cachedQuestions = $this->getProdukQuestions();
+        }
+
+        return $this->cachedQuestions;
+    }
+
+    /**
+     * Get harapan question set only.
+     */
+    public function getHarapanQuestions(): array
+    {
+        return $this->questions()['harapan_answers'] ?? [];
+    }
+
+    /**
+     * Get persepsi question set only.
+     */
+    public function getPersepsiQuestions(): array
+    {
+        return $this->questions()['persepsi_answers'] ?? [];
+    }
+
+    /**
+     * Get kepuasan question set only.
+     */
+    public function getKepuasanQuestions(): array
+    {
+        return $this->questions()['kepuasan_answers'] ?? [];
+    }
+
+    /**
+     * Get loyalitas question set only.
+     */
+    public function getLoyalitasQuestions(): array
+    {
+        return $this->questions()['loyalitas_answers'] ?? [];
+    }
+
+    /**
+     * Get feedback question set only.
+     */
+    public function getFeedbackQuestions(): array
+    {
+        return $this->questions()['feedback_answers'] ?? [];
+    }
+
+    /**
+     * Backward-compatible accessor used by legacy controllers/views.
+     */
+    public function getQuestions(): array
+    {
+        return $this->questions();
+    }
+
+    /**
+     * Backward-compatible alias mirroring old naming.
+     */
+    public function getLoyaltyQuestions(): array
+    {
+        return $this->getLoyalitasQuestions();
+    }
+
+    /**
      * Get all questions for produk survey
      * Questions are adapted to describe products/layanan (originally copied from pelatihan)
      * Structure is designed to be easily updated later

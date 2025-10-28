@@ -12,6 +12,7 @@ class ProdukSurveyResponse extends Model
     protected $table = 'produk_survey_responses';
 
     protected $fillable = [
+        'survey_campaign_id',
         'session_token',
         'survey_type',
         'profile_data',
@@ -35,6 +36,14 @@ class ProdukSurveyResponse extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
+
+    /**
+     * Relationship ke SurveyCampaign
+     */
+    public function campaign()
+    {
+        return $this->belongsTo(SurveyCampaign::class, 'survey_campaign_id');
+    }
 
     /**
      * Generate unique session token

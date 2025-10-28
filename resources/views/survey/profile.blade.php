@@ -14,9 +14,12 @@
                 </div>
 
                 <form method="POST"
-                    action="{{ route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'profile']) }}"
+                    action="{{ isset($campaign) ? route('public-survey.submit', ['slug' => $campaign->slug, 'step' => 'profile']) : route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'profile']) }}"
                     class="p-6">
                     @csrf
+                    @if(isset($campaign))
+                        <input type="hidden" name="step" value="profile">
+                    @endif
 
                     @if(session('success'))
                         <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">

@@ -13,8 +13,11 @@
                 <p class="text-red-100 mt-1">Dengan anda mengisi kritik dan saran ini, diharapkan kualitas {{ $type === 'produk' ? 'produk/layanan' : 'layanan pelatihan' }} ini akan semakin baik dan sesuai dengan kepentingan anda.</p>
             </div>
 
-            <form method="POST" action="{{ route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'feedback']) }}" class="p-6">
+            <form method="POST" action="{{ isset($campaign) ? route('public-survey.submit', ['slug' => $campaign->slug, 'step' => 'feedback']) : route('survey.store', ['type' => $type ?? 'pelatihan', 'step' => 'feedback']) }}" class="p-6">
                 @csrf
+                @if(isset($campaign))
+                    <input type="hidden" name="step" value="feedback">
+                @endif
 
                 @if(session('success'))
                     <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">

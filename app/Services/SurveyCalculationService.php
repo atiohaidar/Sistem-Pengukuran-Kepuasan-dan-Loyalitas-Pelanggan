@@ -3,9 +3,57 @@
 namespace App\Services;
 
 use App\Models\PelatihanSurveyResponse;
+use App\Models\ProdukSurveyResponse;
+use App\Models\SurveyCampaign;
 
 class SurveyCalculationService
 {
+    /**
+     * Calculate results for a specific campaign
+     */
+    public function calculateCampaignResults(SurveyCampaign $campaign)
+    {
+        $responses = $campaign->responses;
+        
+        if ($responses->isEmpty()) {
+            return $this->getEmptyResults();
+        }
+        
+        return $this->calculateCompleteSurveyResults($responses->toArray());
+    }
+
+    /**
+     * Get responses for calculation (with campaign filter)
+     */
+    public function getResponsesForCalculation(string $type, ?int $campaignId = null)
+    {
+        $model = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+        
+        $query = $model::query()->where('status', 'completed');
+        
+        if ($campaignId) {
+            $query->where('survey_campaign_id', $campaignId);
+        }
+        
+        return $query->get();
+    }
+
+    /**
+     * Get empty results structure
+     */
+    protected function getEmptyResults(): array
+    {
+        return [
+            'basic_analysis' => [],
+            'ikp_analysis' => [],
+            'ilp_analysis' => [],
+            'gap_analysis' => [],
+            'loyalitas_probabilities' => [],
+            'demographic_statistics' => ['total_respondents' => 0],
+            'scale_frequency_analysis' => []
+        ];
+    }
+
     /**
      * Calculate survey results based on responses
      * This implements calculations similar to the survey application methodology

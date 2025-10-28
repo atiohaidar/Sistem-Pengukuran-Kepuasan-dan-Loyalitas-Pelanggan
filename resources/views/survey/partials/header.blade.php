@@ -33,12 +33,7 @@
                 <!-- Campaign Period -->
                 <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
                     <div class="flex items-center gap-1">
-                        <h3 class="text-lg font-semibold text-gray-800">Progress Survei</h3>
-                        <!-- Deprecated: use survey.partials.header and survey.partials.progress instead. -->
-                        @include('survey.partials.header')
-                        <div class="mt-8">
-                            @include('survey.partials.progress')
-                        </div>
+                        <i class="fas fa-calendar-alt"></i>
                         <span>{{ $campaign->start_date->format('d M Y') }} - {{ $campaign->end_date->format('d M Y') }}</span>
                     </div>
                     @if($campaign->max_respondents)
@@ -56,68 +51,23 @@
     <div class="bg-white rounded-lg shadow-sm border p-6 mb-4">
         <div class="flex items-start gap-4">
             <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg p-3 shadow-md">
-                <i class="fas {{ $type === 'produk' ? 'fa-box' : 'fa-graduation-cap' }} text-white text-2xl"></i>
+                <i class="fas {{ ($type ?? 'pelatihan') === 'produk' ? 'fa-box' : 'fa-graduation-cap' }} text-white text-2xl"></i>
             </div>
             
             <div class="flex-1">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $type === 'produk' ? 'purple' : 'indigo' }}-100 text-{{ $type === 'produk' ? 'purple' : 'indigo' }}-800 mb-2">
-                    <i class="fas {{ $type === 'produk' ? 'fa-box' : 'fa-graduation-cap' }} mr-1"></i>
-                    {{ ucfirst($type) }}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ ($type ?? 'pelatihan') === 'produk' ? 'purple' : 'indigo' }}-100 text-{{ ($type ?? 'pelatihan') === 'produk' ? 'purple' : 'indigo' }}-800 mb-2">
+                    <i class="fas {{ ($type ?? 'pelatihan') === 'produk' ? 'fa-box' : 'fa-graduation-cap' }} mr-1"></i>
+                    {{ ucfirst($type ?? 'pelatihan') }}
                 </span>
                 
                 <h2 class="text-xl font-bold text-gray-900 mb-2">
-                    Survei Kepuasan {{ $type === 'produk' ? 'Produk/Layanan' : 'Pelatihan' }}
+                    Survei Kepuasan {{ ($type ?? 'pelatihan') === 'produk' ? 'Produk/Layanan' : 'Pelatihan' }}
                 </h2>
                 
                 <p class="text-sm text-gray-600 leading-relaxed">
-                    Kami mengundang Anda untuk mengisi survei kepuasan ini. Masukan Anda sangat berharga untuk membantu kami meningkatkan kualitas {{ $type === 'produk' ? 'produk/layanan' : 'pelatihan' }} kami.
+                    Kami mengundang Anda untuk mengisi survei kepuasan ini. Masukan Anda sangat berharga untuk membantu kami meningkatkan kualitas {{ ($type ?? 'pelatihan') === 'produk' ? 'produk/layanan' : 'pelatihan' }} kami.
                 </p>
             </div>
         </div>
     </div>
 @endif
-
-<!-- Progress Bar -->
-<div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-    <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Progress Survei</h3>
-        <span class="text-sm text-gray-600">{{ $stepNumber }} dari {{ $totalSteps }} langkah</span>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-        <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: {{ $progress }}%"></div>
-    </div>
-
-    <!-- Step Indicators -->
-    <div class="grid grid-cols-6 gap-2">
-        @php
-            $steps = [
-                'profile' => 'Profil',
-                'harapan' => 'Harapan',
-                'persepsi' => 'Persepsi',
-                'kepuasan' => 'Kepuasan',
-                'loyalitas' => 'Loyalitas',
-                'feedback' => 'Saran'
-            ];
-        @endphp
-
-        @foreach($steps as $stepKey => $stepName)
-            <div class="text-center">
-                <div class="relative">
-                    <div class="w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-bold
-                        @if($stepKey === $step)
-                            bg-blue-600 text-white
-                        @elseif(array_search($stepKey, array_keys($steps)) < array_search($step, array_keys($steps)))
-                            bg-green-600 text-white
-                        @else
-                            bg-gray-300 text-gray-600
-                        @endif">
-                        {{ array_search($stepKey, array_keys($steps)) + 1 }}
-                    </div>
-                    <div class="text-xs mt-1 text-gray-600">{{ $stepName }}</div>
-                </div>
-            </div>
-        @endforeach
-    </div>
-</div>

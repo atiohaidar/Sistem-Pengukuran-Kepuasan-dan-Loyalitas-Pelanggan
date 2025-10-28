@@ -23,11 +23,11 @@
                                 Jenis Survei <span class="text-red-500">*</span>
                             </label>
                             <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 {{ old('type') === 'produk' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300' }}">
+                                <label class="type-option relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 border-gray-300">
                                     <input type="radio" 
                                            name="type" 
                                            value="produk" 
-                                           class="sr-only"
+                                           class="sr-only type-radio"
                                            {{ old('type') === 'produk' ? 'checked' : '' }}
                                            required>
                                     <div class="flex items-center">
@@ -41,11 +41,11 @@
                                     </div>
                                 </label>
 
-                                <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 {{ old('type') === 'pelatihan' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300' }}">
+                                <label class="type-option relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 border-gray-300">
                                     <input type="radio" 
                                            name="type" 
                                            value="pelatihan" 
-                                           class="sr-only"
+                                           class="sr-only type-radio"
                                            {{ old('type') === 'pelatihan' ? 'checked' : '' }}
                                            required>
                                     <div class="flex items-center">
@@ -192,11 +192,11 @@
                                 Status Awal <span class="text-red-500">*</span>
                             </label>
                             <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 {{ old('status', 'draft') === 'draft' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300' }}">
+                                <label class="status-option relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 border-indigo-500 bg-indigo-50">
                                     <input type="radio" 
                                            name="status" 
                                            value="draft" 
-                                           class="sr-only"
+                                           class="sr-only status-radio"
                                            {{ old('status', 'draft') === 'draft' ? 'checked' : '' }}
                                            required>
                                     <div class="flex items-center">
@@ -210,11 +210,11 @@
                                     </div>
                                 </label>
 
-                                <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 {{ old('status') === 'active' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300' }}">
+                                <label class="status-option relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition hover:border-indigo-500 border-gray-300">
                                     <input type="radio" 
                                            name="status" 
                                            value="active" 
-                                           class="sr-only"
+                                           class="sr-only status-radio"
                                            {{ old('status') === 'active' ? 'checked' : '' }}>
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
@@ -253,6 +253,28 @@
 
     @push('scripts')
     <script>
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            
+            // Set default start date to today
+            const today = new Date();
+            const todayStr = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+            
+            // Set default end date to tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().slice(0, 16);
+            
+            if (!startDateInput.value) {
+                startDateInput.value = todayStr;
+            }
+            if (!endDateInput.value) {
+                endDateInput.value = tomorrowStr;
+            }
+        });
+
         // Auto-generate slug from name
         const nameInput = document.getElementById('name');
         const slugInput = document.getElementById('slug');
@@ -277,22 +299,42 @@
         nameInput.addEventListener('input', updateSlug);
         
         slugInput.addEventListener('input', function() {
-            previewUrl.textContent = baseUrl + this.value;
+            const slug = this.value;
+            previewUrl.textContent = baseUrl + slug;
         });
 
         document.getElementById('regenerateSlug').addEventListener('click', updateSlug);
 
-        // Radio button styling
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        // Radio button styling for Jenis Survei
+        document.querySelectorAll('.type-radio').forEach(radio => {
             radio.addEventListener('change', function() {
-                const labels = this.closest('.grid').querySelectorAll('label');
-                labels.forEach(label => {
+                // Remove active state from all type options
+                document.querySelectorAll('.type-option').forEach(label => {
                     label.classList.remove('border-indigo-500', 'bg-indigo-50');
                     label.classList.add('border-gray-300');
                 });
                 
+                // Add active state to selected option
                 if (this.checked) {
-                    const label = this.closest('label');
+                    const label = this.closest('.type-option');
+                    label.classList.remove('border-gray-300');
+                    label.classList.add('border-indigo-500', 'bg-indigo-50');
+                }
+            });
+        });
+
+        // Radio button styling for Status
+        document.querySelectorAll('.status-radio').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove active state from all status options
+                document.querySelectorAll('.status-option').forEach(label => {
+                    label.classList.remove('border-indigo-500', 'bg-indigo-50');
+                    label.classList.add('border-gray-300');
+                });
+                
+                // Add active state to selected option
+                if (this.checked) {
+                    const label = this.closest('.status-option');
                     label.classList.remove('border-gray-300');
                     label.classList.add('border-indigo-500', 'bg-indigo-50');
                 }

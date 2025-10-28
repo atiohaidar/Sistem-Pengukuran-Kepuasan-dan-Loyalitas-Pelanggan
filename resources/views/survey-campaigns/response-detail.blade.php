@@ -86,119 +86,179 @@
 
             {{-- Answers Detail --}}
             <div class="space-y-6">
-                @php
-                    $sections = [
-                        'harapan' => [
-                            'title' => 'Harapan Pelanggan',
-                            'icon' => 'fa-star',
-                            'color' => 'yellow',
-                            'questions' => $questions
-                        ],
-                        'persepsi' => [
-                            'title' => 'Persepsi/Kinerja',
-                            'icon' => 'fa-chart-bar',
-                            'color' => 'blue',
-                            'questions' => $questions
-                        ],
-                        'kepuasan' => [
-                            'title' => 'Kepuasan Pelanggan',
-                            'icon' => 'fa-smile',
-                            'color' => 'green',
-                            'questions' => $questions
-                        ],
-                        'loyalitas' => [
-                            'title' => 'Loyalitas Pelanggan',
-                            'icon' => 'fa-heart',
-                            'color' => 'red',
-                            'questions' => $loyaltyQuestions ?? []
-                        ]
-                    ];
-                @endphp
-
-                @foreach($sections as $sectionKey => $section)
-                    @if(count($section['questions']) > 0 || $sectionKey === 'loyalitas')
-                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                            {{-- Section Header --}}
-                            <div class="bg-gradient-to-r from-{{ $section['color'] }}-500 to-{{ $section['color'] }}-600 px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                                        <i class="fas {{ $section['icon'] }} text-white"></i>
-                                    </div>
-                                    <h3 class="text-lg font-bold text-white">{{ $section['title'] }}</h3>
+                {{-- Harapan Section --}}
+                @if($response->harapan_answers && count($harapanQuestions) > 0)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                    <i class="fas fa-star text-white"></i>
                                 </div>
-                            </div>
-
-                            {{-- Section Content --}}
-                            <div class="p-6">
-                                @if($sectionKey === 'loyalitas')
-                                    {{-- Loyalty Questions --}}
-                                    @foreach($section['questions'] as $index => $question)
-                                        <div class="mb-6 last:mb-0 pb-6 last:pb-0 border-b last:border-b-0 border-gray-200">
-                                            <div class="flex items-start gap-3">
-                                                <div class="flex-shrink-0 bg-{{ $section['color'] }}-100 rounded-full h-8 w-8 flex items-center justify-center">
-                                                    <span class="text-{{ $section['color'] }}-600 font-medium text-sm">{{ $loop->iteration }}</span>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm font-medium text-gray-900 mb-3">{{ $question }}</p>
-                                                    @php
-                                                        $fieldName = 'loyalitas_' . $loop->iteration;
-                                                        $answer = $response->{$fieldName} ?? null;
-                                                    @endphp
-                                                    @if($answer)
-                                                        <div class="bg-{{ $section['color'] }}-50 rounded-lg p-4">
-                                                            <div class="flex items-center justify-between">
-                                                                <span class="text-{{ $section['color'] }}-900 font-medium">{{ $answer }}</span>
-                                                                <div class="flex items-center gap-1">
-                                                                    @for($i = 1; $i <= 5; $i++)
-                                                                        <i class="fas fa-star text-{{ $i <= (int)$answer ? $section['color'] . '-500' : 'gray-300' }}"></i>
-                                                                    @endfor
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    {{-- Regular Questions (Harapan, Persepsi, Kepuasan) --}}
-                                    @foreach($section['questions'] as $index => $question)
-                                        <div class="mb-6 last:mb-0 pb-6 last:pb-0 border-b last:border-b-0 border-gray-200">
-                                            <div class="flex items-start gap-3">
-                                                <div class="flex-shrink-0 bg-{{ $section['color'] }}-100 rounded-full h-8 w-8 flex items-center justify-center">
-                                                    <span class="text-{{ $section['color'] }}-600 font-medium text-sm">{{ $loop->iteration }}</span>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm font-medium text-gray-900 mb-3">{{ $question }}</p>
-                                                    @php
-                                                        $fieldName = $sectionKey . '_' . $loop->iteration;
-                                                        $answer = $response->{$fieldName} ?? null;
-                                                    @endphp
-                                                    @if($answer)
-                                                        <div class="bg-{{ $section['color'] }}-50 rounded-lg p-4">
-                                                            <div class="flex items-center justify-between">
-                                                                <span class="text-{{ $section['color'] }}-900 font-medium">{{ $answer }}</span>
-                                                                <div class="flex items-center gap-1">
-                                                                    @for($i = 1; $i <= 5; $i++)
-                                                                        <i class="fas fa-star text-{{ $i <= (int)$answer ? $section['color'] . '-500' : 'gray-300' }}"></i>
-                                                                    @endfor
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
+                                <h3 class="text-lg font-bold text-white">Harapan Pelanggan</h3>
                             </div>
                         </div>
-                    @endif
-                @endforeach
+                        <div class="p-6">
+                            @foreach($harapanQuestions as $category => $questions)
+                                <h4 class="text-md font-semibold text-gray-800 mb-3 mt-4 first:mt-0">{{ ucfirst($category) }}</h4>
+                                @foreach($questions as $key => $question)
+                                    <div class="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-gray-200">
+                                        <div class="flex items-start gap-3">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900 mb-2">{{ $question }}</p>
+                                                @php
+                                                    $answer = $response->harapan_answers[$category][$key] ?? null;
+                                                @endphp
+                                                @if($answer)
+                                                    <div class="bg-yellow-50 rounded-lg p-3">
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="text-yellow-900 font-medium">Nilai: {{ $answer }}</span>
+                                                            <div class="flex items-center gap-1">
+                                                                @for($i = 1; $i <= 5; $i++)
+                                                                    <i class="fas fa-star text-{{ $i <= (int)$answer ? 'yellow-500' : 'gray-300' }}"></i>
+                                                                @endfor
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Persepsi Section --}}
+                @if($response->persepsi_answers && count($persepsiQuestions) > 0)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                    <i class="fas fa-chart-bar text-white"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Persepsi/Kinerja</h3>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            @foreach($persepsiQuestions as $category => $questions)
+                                <h4 class="text-md font-semibold text-gray-800 mb-3 mt-4 first:mt-0">{{ ucfirst($category) }}</h4>
+                                @foreach($questions as $key => $question)
+                                    <div class="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-gray-200">
+                                        <div class="flex items-start gap-3">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900 mb-2">{{ $question }}</p>
+                                                @php
+                                                    $answer = $response->persepsi_answers[$category][$key] ?? null;
+                                                @endphp
+                                                @if($answer)
+                                                    <div class="bg-blue-50 rounded-lg p-3">
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="text-blue-900 font-medium">Nilai: {{ $answer }}</span>
+                                                            <div class="flex items-center gap-1">
+                                                                @for($i = 1; $i <= 5; $i++)
+                                                                    <i class="fas fa-star text-{{ $i <= (int)$answer ? 'blue-500' : 'gray-300' }}"></i>
+                                                                @endfor
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Kepuasan Section --}}
+                @if($response->kepuasan_answers && count($kepuasanQuestions) > 0)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                    <i class="fas fa-smile text-white"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Kepuasan Pelanggan</h3>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            @foreach($kepuasanQuestions as $key => $question)
+                                <div class="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-gray-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 mb-2">{{ $question }}</p>
+                                            @php
+                                                $answer = $response->kepuasan_answers[$key] ?? null;
+                                            @endphp
+                                            @if($answer)
+                                                <div class="bg-green-50 rounded-lg p-3">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-green-900 font-medium">Nilai: {{ $answer }}</span>
+                                                        <div class="flex items-center gap-1">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                <i class="fas fa-star text-{{ $i <= (int)$answer ? 'green-500' : 'gray-300' }}"></i>
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Loyalitas Section --}}
+                @if($response->loyalitas_answers && count($loyaltyQuestions) > 0)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                                    <i class="fas fa-heart text-white"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Loyalitas Pelanggan</h3>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            @foreach($loyaltyQuestions as $key => $question)
+                                <div class="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-b-0 border-gray-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900 mb-2">{{ $question }}</p>
+                                            @php
+                                                $answer = $response->loyalitas_answers[$key] ?? null;
+                                            @endphp
+                                            @if($answer)
+                                                <div class="bg-red-50 rounded-lg p-3">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-red-900 font-medium">Nilai: {{ $answer }}</span>
+                                                        <div class="flex items-center gap-1">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                <i class="fas fa-star text-{{ $i <= (int)$answer ? 'red-500' : 'gray-300' }}"></i>
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <p class="text-sm text-gray-400 italic">Tidak dijawab</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 {{-- Feedback Section --}}
                 @if($response->kritik_saran)

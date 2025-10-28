@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\PelatihanSurveyResponse;
 use App\Models\ProdukSurveyResponse;
+use App\Models\SurveyCampaign;
 use App\Services\SurveyCalculationService;
+use Illuminate\Support\Facades\Auth;
 
 class GrafikController extends Controller
 {
@@ -15,11 +17,51 @@ class GrafikController extends Controller
         $this->surveyService = $surveyService;
     }
 
-    public function mean_gap_per_dimensi($type = 'pelatihan')
+    /**
+     * Halaman pemilihan campaign untuk analytics
+     */
+    public function selectCampaign()
     {
+        $user = Auth::user();
+
+        // Get campaigns milik UMKM yang login
+        $campaigns = SurveyCampaign::where('umkm_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('grafik.select-campaign', compact('campaigns'));
+    }
+
+    /**
+     * Dashboard analytics untuk campaign tertentu
+     */
+    public function dashboardCampaign($campaignId)
+    {
+        $campaign = SurveyCampaign::findOrFail($campaignId);
+
+        // Check ownership
+        if ($campaign->umkm_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to this campaign');
+        }
+
+        return view('grafik.dashboard-campaign', compact('campaign'));
+    }
+
+    public function mean_gap_per_dimensi($type = 'pelatihan', $campaignId = null)
+    {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil responses dari database berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::where('status', 'completed')->get();
+        $query = $modelClass::where('status', 'completed');
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -39,21 +81,31 @@ class GrafikController extends Controller
         foreach ($dimensionsConfig as $config) {
             $data = [];
             for ($i = 1; $i <= $config['count']; $i++) {
-                $key = $config['prefix'].$i;
-                $data[$key.'_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
-                $data[$key.'_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
+                $key = $config['prefix'] . $i;
+                $data[$key . '_ratapersepsi_rata'] = $persepsiAverages[$key] ?? 0;
+                $data[$key . '_ratakepentingan_rata'] = $harapanAverages[$key] ?? 0;
             }
             $dimensions[] = array_merge($config, ['data' => $data]);
         }
 
-        return view('grafik.mean-gap-per-dimensi', compact('dimensions', 'type'));
+        return view('grafik.mean-gap-per-dimensi', compact('dimensions', 'type', 'campaign'));
     }
 
-    public function profilResponden($type = 'pelatihan')
+    public function profilResponden($type = 'pelatihan', $campaignId = null)
     {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil data profil responden berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::completed()->get();
+        $query = $modelClass::completed();
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Data untuk chart batang usia berdasarkan gender
         $ageGroups = ['18-25', '26-35', '36-45', '46-55', '56+'];
@@ -78,12 +130,18 @@ class GrafikController extends Controller
 
         // Data untuk pie chart jenis kelamin
         $genderData = [
-            ['label' => 'Laki-laki', 'value' => $responses->filter(function ($response) {
-                return ($response->profile_data['jenis_kelamin'] ?? '') === 'L';
-            })->count()],
-            ['label' => 'Perempuan', 'value' => $responses->filter(function ($response) {
-                return ($response->profile_data['jenis_kelamin'] ?? '') === 'P';
-            })->count()],
+            [
+                'label' => 'Laki-laki',
+                'value' => $responses->filter(function ($response) {
+                    return ($response->profile_data['jenis_kelamin'] ?? '') === 'L';
+                })->count()
+            ],
+            [
+                'label' => 'Perempuan',
+                'value' => $responses->filter(function ($response) {
+                    return ($response->profile_data['jenis_kelamin'] ?? '') === 'P';
+                })->count()
+            ],
         ];
 
         // Data untuk pie chart pekerjaan
@@ -100,7 +158,7 @@ class GrafikController extends Controller
             return ['label' => $group->first()->profile_data['domisili'] ?? 'Tidak Diketahui', 'value' => $group->count()];
         })->values()->toArray();
 
-        return view('grafik.profil-responden', compact('ageData', 'genderData', 'occupationData', 'domicileData', 'type'));
+        return view('grafik.profil-responden', compact('ageData', 'genderData', 'occupationData', 'domicileData', 'type', 'campaign'));
     }
 
     private function getAgeGroup($usia)
@@ -121,11 +179,21 @@ class GrafikController extends Controller
         return '56+';
     }
 
-    public function mean_persepsi_harapan_gap_per_dimensi($type = 'pelatihan')
+    public function mean_persepsi_harapan_gap_per_dimensi($type = 'pelatihan', $campaignId = null)
     {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil responses dari database berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::where('status', 'completed')->get();
+        $query = $modelClass::where('status', 'completed');
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Gunakan SurveyCalculationService untuk menghitung rata-rata dan gap
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -149,7 +217,7 @@ class GrafikController extends Controller
             $count = $config['count'];
 
             for ($i = 1; $i <= $count; $i++) {
-                $key = $config['prefix'].$i;
+                $key = $config['prefix'] . $i;
                 $persepsiSum += $persepsiAverages[$key] ?? 0;
                 $harapanSum += $harapanAverages[$key] ?? 0;
                 $gapSum += ($persepsiAverages[$key] ?? 0) - ($harapanAverages[$key] ?? 0);
@@ -166,14 +234,24 @@ class GrafikController extends Controller
             ]);
         }
 
-        return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions', 'type'));
+        return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions', 'type', 'campaign'));
     }
 
-    public function rekomendasi($type = 'pelatihan')
+    public function rekomendasi($type = 'pelatihan', $campaignId = null)
     {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil responses dari database berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::where('status', 'completed')->get();
+        $query = $modelClass::where('status', 'completed');
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -204,14 +282,24 @@ class GrafikController extends Controller
             $stdDevData[$config['prefix']] = max(0.1, $baseStdDev + $variation);
         }
 
-        return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation', 'type'));
+        return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation', 'type', 'campaign'));
     }
 
-    public function kepuasan($type = 'pelatihan')
+    public function kepuasan($type = 'pelatihan', $campaignId = null)
     {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil responses dari database berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::where('status', 'completed')->get();
+        $query = $modelClass::where('status', 'completed');
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Gunakan SurveyCalculationService untuk menghitung data yang diperlukan
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
@@ -236,15 +324,26 @@ class GrafikController extends Controller
             'ilpPercentage',
             'responses',
             'questions',
-            'type'
+            'type',
+            'campaign'
         ) + $kepuasanDetails);
     }
 
-    public function loyalitas($type = 'pelatihan')
+    public function loyalitas($type = 'pelatihan', $campaignId = null)
     {
+        // Get campaign if provided
+        $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
+
         // Ambil responses dari database berdasarkan tipe
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
-        $responses = $modelClass::where('status', 'completed')->get();
+        $query = $modelClass::where('status', 'completed');
+
+        // Filter by campaign if specified
+        if ($campaign) {
+            $query->where('survey_campaign_id', $campaign->id);
+        }
+
+        $responses = $query->get();
 
         // Gunakan SurveyCalculationService untuk menghitung ILP
         $ilpResults = $this->surveyService->calculateILP($responses->toArray());
@@ -266,7 +365,8 @@ class GrafikController extends Controller
             'ilpInterpretation',
             'responses',
             'questions',
-            'type'
+            'type',
+            'campaign'
         ) + $loyalitasDetails);
     }
 

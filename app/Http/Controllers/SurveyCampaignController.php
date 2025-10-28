@@ -266,31 +266,17 @@ class SurveyCampaignController extends Controller
             $loyaltyQuestions = $this->pelatihanQuestionService->getLoyaltyQuestions();
         }
 
-        // Flatten questions for display
-        $flattenedQuestions = [];
-        foreach (['harapan_answers', 'persepsi_answers'] as $section) {
-            if (isset($allQuestions[$section])) {
-                foreach ($allQuestions[$section] as $category => $categoryQuestions) {
-                    foreach ($categoryQuestions as $key => $question) {
-                        $flattenedQuestions[] = $question;
-                    }
-                }
-            }
-        }
-
-        // Kepuasan questions are already flat
-        if (isset($allQuestions['kepuasan_answers'])) {
-            foreach ($allQuestions['kepuasan_answers'] as $question) {
-                $flattenedQuestions[] = $question;
-            }
-        }
-
-        $questions = $flattenedQuestions;
+        // Prepare structured questions with answers
+        $harapanQuestions = $allQuestions['harapan_answers'] ?? [];
+        $persepsiQuestions = $allQuestions['persepsi_answers'] ?? [];
+        $kepuasanQuestions = $allQuestions['kepuasan_answers'] ?? [];
 
         return view('survey-campaigns.response-detail', compact(
             'campaign', 
             'response', 
-            'questions',
+            'harapanQuestions',
+            'persepsiQuestions',
+            'kepuasanQuestions',
             'loyaltyQuestions'
         ));
     }

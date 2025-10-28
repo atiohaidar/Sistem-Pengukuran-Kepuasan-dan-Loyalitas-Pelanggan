@@ -7,9 +7,9 @@
 <x-guest-layout title="Loyalitas Responden - Survei Kepuasan {{ ucfirst($type ?? 'Pelatihan') }}">
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Progress Bar -->
+        <!-- Survey Header -->
         <div class="mb-8">
-            @include('survey.partials.progress-bar')
+            @include('survey.partials.header')
         </div>
 
         <!-- Form -->
@@ -82,6 +82,11 @@
                     </div>
                 </div>
             </form>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-8">
+            @include('survey.partials.progress')
         </div>
     </div>
 </div>

@@ -20,7 +20,7 @@ Route::prefix('survey')->name('public-survey.')->group(function () {
     Route::get('/{slug}', [SurveyController::class, 'index'])->name('show');
     Route::post('/{slug}/start', [SurveyController::class, 'start'])->name('start');
     Route::post('/{slug}/submit', [SurveyController::class, 'submitStep'])->name('submit');
-    Route::get('/{slug}/thank-you', [SurveyController::class, 'complete'])->name('thank-you');
+    Route::get('/{slug}/thank-you', [SurveyController::class, 'campaignThankYou'])->name('thank-you');
 });
 
 
@@ -32,7 +32,13 @@ Route::middleware(['auth', 'umkm.owner'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Grafik Routes - Pelatihan (default)
+    // NEW: Campaign-Based Analytics Routes
+    Route::prefix('analytics')->name('grafik.')->group(function () {
+        Route::get('/', [GrafikController::class, 'selectCampaign'])->name('select-campaign');
+        Route::get('/campaign/{campaign}', [GrafikController::class, 'dashboardCampaign'])->name('dashboard-campaign');
+    });
+
+    // Grafik Routes - Pelatihan (default - Legacy, kept for backward compatibility)
     Route::get('/grafik/mean-gap-per-dimensi', [GrafikController::class, 'mean_gap_per_dimensi'])->name('grafik.mean-gap-per-dimensi');
     Route::get('/grafik/mean-persepsi-harapan-gap-per-dimensi', [GrafikController::class, 'mean_persepsi_harapan_gap_per_dimensi'])->name('grafik.mean-persepsi-harapan-gap-per-dimensi');
     Route::get('/grafik/profil-responden', [GrafikController::class, 'profilResponden'])->name('grafik.profil-responden');
@@ -122,25 +128,23 @@ Route::prefix('survey/{type}')->name('survey.')->group(function () {
 });
 
 // Legacy routes for backward compatibility
-use App\Http\Controllers\ProdukSurveyController;
-
-Route::prefix('survey/produk')->name('survey.produk.')->group(function () {
-    Route::get('/', [ProdukSurveyController::class, 'index'])->name('index');
-    Route::post('/start', [ProdukSurveyController::class, 'start'])->name('start');
-    Route::get('/step/{step}', [ProdukSurveyController::class, 'step'])->name('step');
-    Route::post('/step/{step}', [ProdukSurveyController::class, 'store'])->name('store');
-    Route::get('/complete', [ProdukSurveyController::class, 'complete'])->name('complete');
+Route::prefix('survey/produk')->name('survey.produk.')->controller(SurveyController::class)->group(function () {
+    Route::get('/', 'index')->defaults('typeOrSlug', 'produk')->name('index');
+    Route::post('/start', 'start')->defaults('typeOrSlug', 'produk')->name('start');
+    Route::get('/step/{step}', 'step')->defaults('typeOrSlug', 'produk')->name('step');
+    Route::post('/step/{step}', 'store')->defaults('typeOrSlug', 'produk')->name('store');
+    Route::get('/complete', 'complete')->defaults('typeOrSlug', 'produk')->name('complete');
 });
 
 // Pelatihan Survey Routes (mirror Produk flow, namespaced)
 use App\Http\Controllers\SurveyController as PelatihanSurveyController;
 
 Route::prefix('survey/pelatihan')->name('survey.pelatihan.')->group(function () {
-    Route::get('/', [PelatihanSurveyController::class, 'index'])->name('index');
-    Route::post('/start', [PelatihanSurveyController::class, 'start'])->name('start');
-    Route::get('/step/{step}', [PelatihanSurveyController::class, 'step'])->name('step');
-    Route::post('/step/{step}', [PelatihanSurveyController::class, 'store'])->name('store');
-    Route::get('/complete', [PelatihanSurveyController::class, 'complete'])->name('complete');
+    Route::get('/', [PelatihanSurveyController::class, 'index'])->defaults('typeOrSlug', 'pelatihan')->name('index');
+    Route::post('/start', [PelatihanSurveyController::class, 'start'])->defaults('typeOrSlug', 'pelatihan')->name('start');
+    Route::get('/step/{step}', [PelatihanSurveyController::class, 'step'])->defaults('typeOrSlug', 'pelatihan')->name('step');
+    Route::post('/step/{step}', [PelatihanSurveyController::class, 'store'])->defaults('typeOrSlug', 'pelatihan')->name('store');
+    Route::get('/complete', [PelatihanSurveyController::class, 'complete'])->defaults('typeOrSlug', 'pelatihan')->name('complete');
 });
 
 // Customer Management Evaluation Routes

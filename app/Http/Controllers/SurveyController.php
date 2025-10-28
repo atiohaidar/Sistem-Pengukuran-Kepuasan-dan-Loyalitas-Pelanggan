@@ -169,7 +169,8 @@ class SurveyController extends Controller
                 return view('survey.closed', compact('campaign', 'reason'));
             }
         } else {
-            // Legacy mode
+            // Legacy mode - set campaign to null
+            $campaign = null;
             $type = $typeOrSlug;
             if (!in_array($type, ['pelatihan', 'produk'])) {
                 abort(404);
@@ -317,11 +318,11 @@ class SurveyController extends Controller
         } else {
             // Next or complete
             if ($step === 'feedback') {
-                // Clear session
+                // Clear session and redirect to thank you page
                 if ($isCampaignMode) {
                     Session::forget('survey_session_' . $campaign->id);
                     Session::forget('campaign_id');
-                    return redirect()->route('survey.complete', ['type' => $typeOrSlug]);
+                    return redirect()->route('public-survey.thank-you', ['slug' => $campaign->slug]);
                 } else {
                     return redirect()->route('survey.complete', ['type' => $type]);
                 }
@@ -392,6 +393,29 @@ class SurveyController extends Controller
         
         // Call the main store method
         return $this->store($request, $slug, $step);
+    }
+
+    /**
+     * Campaign Thank You page (for public-survey.thank-you route)
+     */
+    public function campaignThankYou($slug)
+    {
+        $campaign = SurveyCampaign::where('slug', $slug)->firstOrFail();
+        
+        // Check if user has completed session
+        $sessionToken = Session::get('survey_session_' . $campaign->id);
+        
+        if ($sessionToken) {
+            // Get the response to verify completion
+            $model = $campaign->type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
+            $survey = $model::where('session_token', $sessionToken)->first();
+            
+            // Clear session after showing thank you
+            Session::forget('survey_session_' . $campaign->id);
+            Session::forget('campaign_id');
+        }
+        
+        return view('survey.thank-you', compact('campaign'));
     }
 
     /**

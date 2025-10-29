@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('survey_campaigns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('umkm_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('umkm_profile_id')->constrained('umkm_profiles')->onDelete('cascade');
             $table->enum('type', ['produk', 'pelatihan']);
             $table->string('name');
             $table->string('slug')->unique();
@@ -26,7 +26,7 @@ return new class extends Migration
             
             // Indexes
             $table->index('slug');
-            $table->index(['umkm_id', 'type']);
+            $table->index(['umkm_profile_id', 'type']);
             $table->index('status');
         });
     }

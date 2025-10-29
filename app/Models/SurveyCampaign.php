@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\UmkmProfile;
+use App\Models\User;
+use App\Models\ProdukSurveyResponse;
+use App\Models\PelatihanSurveyResponse;
 
 class SurveyCampaign extends Model
 {
     protected $fillable = [
-        'umkm_id',
+        'umkm_profile_id',
         'type',
         'name',
         'slug',
@@ -27,11 +31,19 @@ class SurveyCampaign extends Model
     ];
 
     /**
-     * Relationship ke UMKM (User)
+     * Relationship ke profil UMKM.
      */
     public function umkm(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'umkm_id');
+        return $this->belongsTo(UmkmProfile::class, 'umkm_profile_id');
+    }
+
+    /**
+     * Relationship ke user owner (opsional, berdasarkan profil UMKM).
+     */
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'umkm_profile_id', 'umkm_id');
     }
 
     /**
@@ -56,9 +68,9 @@ class SurveyCampaign extends Model
     /**
      * Scope untuk filter by UMKM
      */
-    public function scopeByUmkm($query, $umkmId)
+    public function scopeByUmkm($query, $umkmProfileId)
     {
-        return $query->where('umkm_id', $umkmId);
+        return $query->where('umkm_profile_id', $umkmProfileId);
     }
 
     /**

@@ -37,11 +37,11 @@ class SurveyCampaignService
     }
 
     /**
-     * Get campaign statistics for UMKM
+     * Get campaign statistics for UMKM profile
      */
-    public function getCampaignStats(int $umkmId): array
+    public function getCampaignStats(int $umkmProfileId): array
     {
-        $campaigns = SurveyCampaign::byUmkm($umkmId);
+        $campaigns = SurveyCampaign::byUmkm($umkmProfileId);
         
         return [
             'total' => $campaigns->count(),

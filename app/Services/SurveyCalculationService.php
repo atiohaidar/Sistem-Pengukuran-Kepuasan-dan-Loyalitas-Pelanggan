@@ -47,10 +47,18 @@ class SurveyCalculationService
             'basic_analysis' => [],
             'ikp_analysis' => [],
             'ilp_analysis' => [],
-            'gap_analysis' => [],
+            'gap_analysis' => [
+                'item_gaps' => [],
+                'dimension_gaps' => [],
+                'gap_statistics' => [],
+                'dimensions' => [],
+            ],
             'loyalitas_probabilities' => [],
             'demographic_statistics' => ['total_respondents' => 0],
-            'scale_frequency_analysis' => []
+            'scale_frequency_analysis' => [],
+            'kepuasan_pelanggan' => ['overall_mean' => 0, 'total_items' => 0],
+            'harapan' => ['overall_mean' => 0, 'total_items' => 0],
+            'persepsi' => ['overall_mean' => 0, 'total_items' => 0],
         ];
     }
 
@@ -502,14 +510,28 @@ class SurveyCalculationService
      */
     public function calculateCompleteSurveyResults($responses)
     {
+        $basicAnalysis = $this->calculateSurveyResults($responses);
+        $ikpAnalysis = $this->calculateIKP($responses);
+        $ilpAnalysis = $this->calculateILP($responses);
+        $gapAnalysis = $this->calculateGapAnalysis($responses);
+        $loyalitasProbabilities = $this->calculateLoyalitasProbabilities($responses);
+        $demographicStatistics = $this->calculateDemographicStatistics($responses);
+        $scaleFrequencyAnalysis = $this->calculateScaleFrequencyAnalysis($responses);
+        $dashboardMetrics = $this->calculateDashboardMetrics($responses);
+
+        $gapAnalysis['dimensions'] = $dashboardMetrics['dimensions'];
+
         return [
-            'basic_analysis' => $this->calculateSurveyResults($responses),
-            'ikp_analysis' => $this->calculateIKP($responses),
-            'ilp_analysis' => $this->calculateILP($responses),
-            'gap_analysis' => $this->calculateGapAnalysis($responses),
-            'loyalitas_probabilities' => $this->calculateLoyalitasProbabilities($responses),
-            'demographic_statistics' => $this->calculateDemographicStatistics($responses),
-            'scale_frequency_analysis' => $this->calculateScaleFrequencyAnalysis($responses)
+            'basic_analysis' => $basicAnalysis,
+            'ikp_analysis' => $ikpAnalysis,
+            'ilp_analysis' => $ilpAnalysis,
+            'gap_analysis' => $gapAnalysis,
+            'loyalitas_probabilities' => $loyalitasProbabilities,
+            'demographic_statistics' => $demographicStatistics,
+            'scale_frequency_analysis' => $scaleFrequencyAnalysis,
+            'kepuasan_pelanggan' => $dashboardMetrics['kepuasan_pelanggan'],
+            'harapan' => $dashboardMetrics['harapan'],
+            'persepsi' => $dashboardMetrics['persepsi'],
         ];
     }
 
@@ -749,6 +771,134 @@ class SurveyCalculationService
         }
 
         return $results;
+    }
+
+    /**
+     * Calculate aggregated metrics required by the dashboard view.
+     */
+    protected function calculateDashboardMetrics(array $responses): array
+    {
+        $summary = [
+            'harapan' => ['overall_mean' => 0, 'total_items' => 0],
+            'persepsi' => ['overall_mean' => 0, 'total_items' => 0],
+            'kepuasan_pelanggan' => ['overall_mean' => 0, 'total_items' => 0],
+            'dimensions' => [],
+        ];
+
+        if (empty($responses)) {
+            return $summary;
+        }
+
+        $dimensionConfigs = $this->getDimensionsConfigForGap();
+        $dimensionAccumulator = [];
+        foreach ($dimensionConfigs as $config) {
+            $dimensionAccumulator[$config['prefix']] = [
+                'name' => $config['name'],
+                'harapan_total' => 0,
+                'harapan_count' => 0,
+                'persepsi_total' => 0,
+                'persepsi_count' => 0,
+            ];
+        }
+
+        $harapanTotal = 0;
+        $harapanCount = 0;
+        $persepsiTotal = 0;
+        $persepsiCount = 0;
+        $kepuasanTotal = 0;
+        $kepuasanCount = 0;
+
+        foreach ($responses as $response) {
+            $harapanAnswers = $response['harapan_answers'] ?? [];
+            if (!is_array($harapanAnswers)) {
+                $harapanAnswers = [];
+            }
+            foreach ($harapanAnswers as $dimension => $items) {
+                if (!is_array($items)) {
+                    continue;
+                }
+                foreach ($items as $value) {
+                    if (!is_numeric($value)) {
+                        continue;
+                    }
+                    $harapanTotal += $value;
+                    $harapanCount++;
+                    if (isset($dimensionAccumulator[$dimension])) {
+                        $dimensionAccumulator[$dimension]['harapan_total'] += $value;
+                        $dimensionAccumulator[$dimension]['harapan_count']++;
+                    }
+                }
+            }
+
+            $persepsiAnswers = $response['persepsi_answers'] ?? [];
+            if (!is_array($persepsiAnswers)) {
+                $persepsiAnswers = [];
+            }
+            foreach ($persepsiAnswers as $dimension => $items) {
+                if (!is_array($items)) {
+                    continue;
+                }
+                foreach ($items as $value) {
+                    if (!is_numeric($value)) {
+                        continue;
+                    }
+                    $persepsiTotal += $value;
+                    $persepsiCount++;
+                    if (isset($dimensionAccumulator[$dimension])) {
+                        $dimensionAccumulator[$dimension]['persepsi_total'] += $value;
+                        $dimensionAccumulator[$dimension]['persepsi_count']++;
+                    }
+                }
+            }
+
+            $kepuasanAnswers = $response['kepuasan_answers'] ?? [];
+            if (!is_array($kepuasanAnswers)) {
+                $kepuasanAnswers = [];
+            }
+            foreach ($kepuasanAnswers as $value) {
+                if (!is_numeric($value)) {
+                    continue;
+                }
+                $kepuasanTotal += $value;
+                $kepuasanCount++;
+            }
+        }
+
+        $summary['harapan']['overall_mean'] = $harapanCount > 0 ? round($harapanTotal / $harapanCount, 2) : 0;
+        $summary['harapan']['total_items'] = $harapanCount;
+
+        $summary['persepsi']['overall_mean'] = $persepsiCount > 0 ? round($persepsiTotal / $persepsiCount, 2) : 0;
+        $summary['persepsi']['total_items'] = $persepsiCount;
+
+        $summary['kepuasan_pelanggan']['overall_mean'] = $kepuasanCount > 0 ? round($kepuasanTotal / $kepuasanCount, 2) : 0;
+        $summary['kepuasan_pelanggan']['total_items'] = $kepuasanCount;
+
+        foreach ($dimensionConfigs as $config) {
+            $key = $config['prefix'];
+            $dimensionData = $dimensionAccumulator[$key] ?? null;
+            if (!$dimensionData) {
+                continue;
+            }
+
+            $hasHarapan = $dimensionData['harapan_count'] > 0;
+            $hasPersepsi = $dimensionData['persepsi_count'] > 0;
+
+            if (!$hasHarapan || !$hasPersepsi) {
+                continue;
+            }
+
+            $harapanMean = $hasHarapan ? $dimensionData['harapan_total'] / $dimensionData['harapan_count'] : 0;
+            $persepsiMean = $hasPersepsi ? $dimensionData['persepsi_total'] / $dimensionData['persepsi_count'] : 0;
+
+            $summary['dimensions'][] = [
+                'name' => $dimensionData['name'],
+                'harapan_mean' => round($harapanMean, 2),
+                'persepsi_mean' => round($persepsiMean, 2),
+                'gap' => round($persepsiMean - $harapanMean, 2),
+            ];
+        }
+
+        return $summary;
     }
 
     /**

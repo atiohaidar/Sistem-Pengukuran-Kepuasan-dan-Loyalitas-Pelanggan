@@ -31,12 +31,30 @@ class SurveyCampaignController extends Controller
         $this->pelatihanQuestionService = $pelatihanQuestionService;
     }
 
+    protected function currentUmkmProfileId(): ?int
+    {
+        return Auth::user()->umkm_id ?? null;
+    }
+
+    protected function assertOwnership(SurveyCampaign $campaign): void
+    {
+        $umkmProfileId = $this->currentUmkmProfileId();
+
+        if ($umkmProfileId === null || $campaign->umkm_profile_id !== $umkmProfileId) {
+            abort(403);
+        }
+    }
+
     /**
      * Display a listing of campaigns
      */
     public function index(Request $request)
     {
-        $query = SurveyCampaign::byUmkm(Auth::id())
+        $umkmProfileId = $this->currentUmkmProfileId();
+
+        abort_if(!$umkmProfileId, 403);
+
+        $query = SurveyCampaign::byUmkm($umkmProfileId)
             ->with('umkm')
             ->latest();
 
@@ -58,7 +76,7 @@ class SurveyCampaignController extends Controller
         $campaigns = $query->paginate(10)->appends($request->query());
         
         // Get stats
-        $stats = $this->campaignService->getCampaignStats(Auth::id());
+    $stats = $this->campaignService->getCampaignStats($umkmProfileId);
 
         return view('survey-campaigns.index', compact('campaigns', 'stats'));
     }
@@ -87,7 +105,11 @@ class SurveyCampaignController extends Controller
             'status' => 'required|in:draft,active',
         ]);
 
-        $validated['umkm_id'] = Auth::id();
+        $umkmProfileId = $this->currentUmkmProfileId();
+
+        abort_if(!$umkmProfileId, 403);
+
+        $validated['umkm_profile_id'] = $umkmProfileId;
 
         $campaign = SurveyCampaign::create($validated);
 
@@ -100,10 +122,7 @@ class SurveyCampaignController extends Controller
      */
     public function dashboard(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         // Calculate results
         $results = $this->calculationService->calculateCampaignResults($campaign);
@@ -140,10 +159,7 @@ class SurveyCampaignController extends Controller
      */
     public function edit(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         return view('survey-campaigns.edit', compact('campaign'));
     }
@@ -153,10 +169,7 @@ class SurveyCampaignController extends Controller
      */
     public function update(Request $request, SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $validated = $request->validate([
             'type' => 'required|in:produk,pelatihan',
@@ -180,10 +193,7 @@ class SurveyCampaignController extends Controller
      */
     public function destroy(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $campaign->delete();
 
@@ -196,10 +206,7 @@ class SurveyCampaignController extends Controller
      */
     public function responses(Request $request, SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $query = $campaign->responses()->latest();
 
@@ -250,10 +257,7 @@ class SurveyCampaignController extends Controller
      */
     public function responseDetail(SurveyCampaign $campaign, $responseId)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $response = $campaign->responses()->findOrFail($responseId);
 
@@ -286,10 +290,7 @@ class SurveyCampaignController extends Controller
      */
     public function export(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $filename = 'survey-' . $campaign->slug . '-' . date('Y-m-d') . '.xlsx';
         
@@ -304,10 +305,7 @@ class SurveyCampaignController extends Controller
      */
     public function activate(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         if ($this->campaignService->activateCampaign($campaign)) {
             return back()->with('success', 'Kampanye survei berhasil diaktifkan!');
@@ -321,10 +319,7 @@ class SurveyCampaignController extends Controller
      */
     public function close(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $this->campaignService->closeCampaign($campaign);
 
@@ -336,10 +331,7 @@ class SurveyCampaignController extends Controller
      */
     public function archive(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         if ($this->campaignService->archiveCampaign($campaign)) {
             return back()->with('success', 'Kampanye survei berhasil diarsipkan!');
@@ -353,10 +345,7 @@ class SurveyCampaignController extends Controller
      */
     public function duplicate(SurveyCampaign $campaign)
     {
-        // Check ownership
-        if ($campaign->umkm_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->assertOwnership($campaign);
 
         $newCampaign = $this->campaignService->duplicateCampaign($campaign);
 

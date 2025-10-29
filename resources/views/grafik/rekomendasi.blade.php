@@ -7,12 +7,33 @@
 
     <div class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Back Button -->
+            <!-- Back Button / Campaign Header -->
             <div class="mb-6">
-                <a href="{{ route($type === 'produk' ? 'dashboard.produk' : 'dashboard.pelatihan') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-red-600 hover:to-red-700 hover:border-red-600 transition-all duration-200 transform hover:scale-105">
-                    <i class="fas fa-arrow-left mr-2 text-lg"></i>
-                    <span class="font-semibold">Kembali ke Dashboard</span>
-                </a>
+                @if(!empty($campaign))
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <a href="{{ route('grafik.dashboard-campaign', $campaign->id) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-red-600 hover:to-red-700 hover:border-red-600 transition-all duration-200">
+                                <i class="fas fa-arrow-left mr-2 text-lg"></i>
+                                <span class="font-semibold">Kembali ke Analytics</span>
+                            </a>
+                            <div class="mt-3">
+                                <h3 class="text-2xl font-bold">{{ $campaign->name }}</h3>
+                                <p class="text-sm text-gray-600">{{ $campaign->responses_count }} responden • {{ $campaign->start_date->format('d M Y') }} - {{ $campaign->end_date->format('d M Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $campaign->getTypeBadgeColor() }}-100 text-{{ $campaign->getTypeBadgeColor() }}-800">
+                                <i class="fas {{ $campaign->getTypeIcon() }} mr-1"></i>
+                                {{ ucfirst($campaign->type) }}
+                            </span>
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route($type === 'produk' ? 'dashboard.produk' : 'dashboard.pelatihan') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-500 rounded-lg shadow-sm text-sm font-medium text-white hover:from-red-600 hover:to-red-700 hover:border-red-600 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-arrow-left mr-2 text-lg"></i>
+                        <span class="font-semibold">Kembali ke Dashboard</span>
+                    </a>
+                @endif
             </div>
 
 

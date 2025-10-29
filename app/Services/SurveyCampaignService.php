@@ -38,17 +38,24 @@ class SurveyCampaignService
 
     /**
      * Get campaign statistics for UMKM profile
+     * If null is passed, aggregate across all campaigns (for superadmin)
      */
-    public function getCampaignStats(int $umkmProfileId): array
+    public function getCampaignStats(?int $umkmProfileId): array
     {
-        $campaigns = SurveyCampaign::byUmkm($umkmProfileId);
-        
+        if ($umkmProfileId === null) {
+            $campaignsQuery = SurveyCampaign::query();
+        } else {
+            $campaignsQuery = SurveyCampaign::byUmkm($umkmProfileId);
+        }
+
+        $campaigns = $campaignsQuery->get();
+
         return [
             'total' => $campaigns->count(),
             'active' => $campaigns->where('status', 'active')->count(),
             'closed' => $campaigns->where('status', 'closed')->count(),
             'draft' => $campaigns->where('status', 'draft')->count(),
-            'total_responses' => $campaigns->get()->sum(function($campaign) {
+            'total_responses' => $campaigns->sum(function($campaign) {
                 return $campaign->responses_count;
             }),
         ];

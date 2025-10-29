@@ -48,7 +48,7 @@
                 </div>
             </div>
             @endrole
-            
+
             <!-- Manajemen User (Superadmin) -->
             @role('superadmin')
             <x-nav-link :href="route('user-management.index')" :active="request()->routeIs('user-management.*')"
@@ -67,10 +67,18 @@
                     </svg>
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
+                    @role('umkm|superadmin')
+                    <a href="{{ route('grafik.select-campaign') }}"
+                        class="block px-4 py-2 text-sm {{ request()->routeIs('grafik.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                        <i class="fas fa-chart-pie mr-2 text-xs"></i>
+                        Analytics
+                    </a>
                     <a href="{{ route('dashboard.pelatihan') }}"
                         class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Pelatihan</a>
                     <a href="{{ route('dashboard.produk') }}"
                         class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Produk</a>
+
+                    @endrole
                 </div>
             </div>
             <!-- Manajemen Evaluasi CRM with Submenu -->

@@ -13,16 +13,38 @@ class SurveyResponseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 50 sample survey responses
-        PelatihanSurveyResponse::factory()->count(50)->create([
-            'status' => 'completed'
-        ]);
+        $produkCampaigns = \App\Models\SurveyCampaign::where('type', 'produk')->get();
+        $pelatihanCampaigns = \App\Models\SurveyCampaign::where('type', 'pelatihan')->get();
 
-        // Create some draft responses
-        PelatihanSurveyResponse::factory()->count(10)->create([
-            'status' => 'draft'
-        ]);
+        $totalProduk = 0;
+        $totalPelatihan = 0;
 
-        $this->command->info('Created 60 survey responses (50 completed, 10 draft)');
+        // Untuk setiap campaign produk, buat 20 response completed dan 5 draft
+        foreach ($produkCampaigns as $campaign) {
+            \App\Models\ProdukSurveyResponse::factory()->count(20)->create([
+                'survey_campaign_id' => $campaign->id,
+                'status' => 'completed'
+            ]);
+            \App\Models\ProdukSurveyResponse::factory()->count(5)->create([
+                'survey_campaign_id' => $campaign->id,
+                'status' => 'draft'
+            ]);
+            $totalProduk += 25;
+        }
+
+        // Untuk setiap campaign pelatihan, buat 20 response completed dan 5 draft
+        foreach ($pelatihanCampaigns as $campaign) {
+            \App\Models\PelatihanSurveyResponse::factory()->count(20)->create([
+                'survey_campaign_id' => $campaign->id,
+                'status' => 'completed'
+            ]);
+            \App\Models\PelatihanSurveyResponse::factory()->count(5)->create([
+                'survey_campaign_id' => $campaign->id,
+                'status' => 'draft'
+            ]);
+            $totalPelatihan += 25;
+        }
+
+        $this->command->info("Created $totalProduk produk responses and $totalPelatihan pelatihan responses (completed & draft) based on existing campaigns.");
     }
 }

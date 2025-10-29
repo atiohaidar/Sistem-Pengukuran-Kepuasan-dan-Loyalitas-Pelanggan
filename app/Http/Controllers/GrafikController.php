@@ -6,6 +6,7 @@ use App\Models\PelatihanSurveyResponse;
 use App\Models\ProdukSurveyResponse;
 use App\Models\SurveyCampaign;
 use App\Services\SurveyCalculationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GrafikController extends Controller
@@ -28,9 +29,21 @@ class GrafikController extends Controller
             return;
         }
 
+        // Allow superadmin users to access any campaign
+        $user = Auth::user();
+        if (isset($user->role) && $user->role === 'superadmin') {
+            return;
+        }
+
         if ($campaign->umkm_profile_id !== $this->currentUmkmProfileId()) {
             abort(403, 'Unauthorized access to this campaign');
         }
+    }
+
+    protected function isSuperAdmin(): bool
+    {
+        $user = Auth::user();
+        return isset($user->role) && $user->role === 'superadmin';
     }
 
     /**
@@ -40,11 +53,16 @@ class GrafikController extends Controller
     {
         $umkmProfileId = $this->currentUmkmProfileId();
 
-        abort_if(!$umkmProfileId, 403);
+        // Superadmin can see all campaigns; UMKM owners only their own
+        if ($this->isSuperAdmin()) {
+            $campaigns = SurveyCampaign::orderBy('created_at', 'desc')->get();
+        } else {
+            abort_if(!$umkmProfileId, 403);
 
-        $campaigns = SurveyCampaign::where('umkm_profile_id', $umkmProfileId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+            $campaigns = SurveyCampaign::where('umkm_profile_id', $umkmProfileId)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         return view('grafik.select-campaign', compact('campaigns'));
     }
@@ -61,8 +79,11 @@ class GrafikController extends Controller
         return view('grafik.dashboard-campaign', compact('campaign'));
     }
 
-    public function mean_gap_per_dimensi($type = 'pelatihan', $campaignId = null)
+    public function mean_gap_per_dimensi(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
 
@@ -70,10 +91,22 @@ class GrafikController extends Controller
         $responsesQuery = $modelClass::where('status', 'completed');
 
         if ($campaign) {
+
             $responsesQuery->where('survey_campaign_id', $campaign->id);
+        } else {
+            // If not superadmin, restrict to campaigns owned by current UMKM
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $responsesQuery->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $responsesQuery->get();
+
 
         $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
         $gapResults = $this->surveyService->calculateGapAnalysis($responses->toArray());
@@ -97,16 +130,27 @@ class GrafikController extends Controller
         return view('grafik.mean-gap-per-dimensi', compact('dimensions', 'type', 'campaign'));
     }
 
-    public function profilResponden($type = 'pelatihan', $campaignId = null)
+    public function profilResponden(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
-
         $modelClass = $type === 'produk' ? ProdukSurveyResponse::class : PelatihanSurveyResponse::class;
         $query = $modelClass::completed();
 
         if ($campaign) {
             $query->where('survey_campaign_id', $campaign->id);
+        } else {
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $query->get();
@@ -179,8 +223,11 @@ class GrafikController extends Controller
         return '56+';
     }
 
-    public function mean_persepsi_harapan_gap_per_dimensi($type = 'pelatihan', $campaignId = null)
+    public function mean_persepsi_harapan_gap_per_dimensi(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
 
@@ -189,6 +236,15 @@ class GrafikController extends Controller
 
         if ($campaign) {
             $query->where('survey_campaign_id', $campaign->id);
+        } else {
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $query->get();
@@ -229,8 +285,11 @@ class GrafikController extends Controller
         return view('grafik.mean-persepsi-harapan-gap-per-dimensi', compact('dimensions', 'type', 'campaign'));
     }
 
-    public function rekomendasi($type = 'pelatihan', $campaignId = null)
+    public function rekomendasi(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
 
@@ -239,6 +298,15 @@ class GrafikController extends Controller
 
         if ($campaign) {
             $query->where('survey_campaign_id', $campaign->id);
+        } else {
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $query->get();
@@ -267,8 +335,11 @@ class GrafikController extends Controller
         return view('grafik.rekomendasi', compact('dimensionsConfig', 'gapData', 'stdDevData', 'ikpPercentage', 'ikpInterpretation', 'type', 'campaign'));
     }
 
-    public function kepuasan($type = 'pelatihan', $campaignId = null)
+    public function kepuasan(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
 
@@ -277,6 +348,15 @@ class GrafikController extends Controller
 
         if ($campaign) {
             $query->where('survey_campaign_id', $campaign->id);
+        } else {
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $query->get();
@@ -286,8 +366,8 @@ class GrafikController extends Controller
         $ilpResults = $this->surveyService->calculateILP($responses->toArray());
         $kepuasanDetails = $this->surveyService->calculateKepuasanDetails($responses->toArray());
 
-    $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
-    $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+        $ikpPercentage = $ikpResults['ikp_percentage'] ?? 0;
+        $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
 
         if ($type === 'produk') {
             $questions = app(\App\Services\ProdukSurveyQuestionService::class)->getProdukQuestions();
@@ -305,8 +385,11 @@ class GrafikController extends Controller
         ) + $kepuasanDetails);
     }
 
-    public function loyalitas($type = 'pelatihan', $campaignId = null)
+    public function loyalitas(Request $request, $type = 'pelatihan', $campaignId = null)
     {
+        // Check query string first, then route parameter
+        $type = $request->query('type') ?? $type;
+        $campaignId = $request->query('campaignId') ?? $campaignId;
         $campaign = $campaignId ? SurveyCampaign::findOrFail($campaignId) : null;
         $this->assertOwnership($campaign);
 
@@ -315,6 +398,15 @@ class GrafikController extends Controller
 
         if ($campaign) {
             $query->where('survey_campaign_id', $campaign->id);
+        } else {
+            if (!$this->isSuperAdmin()) {
+                $umkmProfileId = $this->currentUmkmProfileId();
+                abort_if(!$umkmProfileId, 403);
+
+                $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                    $q->where('umkm_profile_id', $umkmProfileId);
+                });
+            }
         }
 
         $responses = $query->get();
@@ -322,8 +414,8 @@ class GrafikController extends Controller
         $ilpResults = $this->surveyService->calculateILP($responses->toArray());
         $loyalitasDetails = $this->surveyService->calculateLoyalitasDetails($responses->toArray());
 
-    $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
-    $ilpInterpretation = $ilpResults['ilp_interpretation'] ?? '';
+        $ilpPercentage = $ilpResults['ilp_percentage'] ?? 0;
+        $ilpInterpretation = $ilpResults['ilp_interpretation'] ?? '';
 
         if ($type === 'produk') {
             $questions = app(\App\Services\ProdukSurveyQuestionService::class)->getProdukQuestions();
@@ -343,10 +435,21 @@ class GrafikController extends Controller
     public function dashboardPelatihan()
     {
         // Ambil data statistik dasar untuk dashboard
-        $totalResponses = PelatihanSurveyResponse::where('status', 'completed')->count();
+        $query = PelatihanSurveyResponse::where('status', 'completed');
+
+        if (!$this->isSuperAdmin()) {
+            $umkmProfileId = $this->currentUmkmProfileId();
+            abort_if(!$umkmProfileId, 403);
+
+            $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                $q->where('umkm_profile_id', $umkmProfileId);
+            });
+        }
+
+        $totalResponses = $query->count();
 
         // Hitung statistik dasar menggunakan service
-        $responses = PelatihanSurveyResponse::where('status', 'completed')->get();
+        $responses = $query->get();
         if ($responses->count() > 0) {
             $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
             $ilpResults = $this->surveyService->calculateILP($responses->toArray());
@@ -363,10 +466,21 @@ class GrafikController extends Controller
     public function dashboardProduk()
     {
         // Ambil data statistik dasar untuk dashboard
-        $totalResponses = ProdukSurveyResponse::where('status', 'completed')->count();
+        $query = ProdukSurveyResponse::where('status', 'completed');
+
+        if (!$this->isSuperAdmin()) {
+            $umkmProfileId = $this->currentUmkmProfileId();
+            abort_if(!$umkmProfileId, 403);
+
+            $query->whereHas('campaign', function ($q) use ($umkmProfileId) {
+                $q->where('umkm_profile_id', $umkmProfileId);
+            });
+        }
+
+        $totalResponses = $query->count();
 
         // Hitung statistik dasar menggunakan service
-        $responses = ProdukSurveyResponse::where('status', 'completed')->get();
+        $responses = $query->get();
         if ($responses->count() > 0) {
             $ikpResults = $this->surveyService->calculateIKP($responses->toArray());
             $ilpResults = $this->surveyService->calculateILP($responses->toArray());

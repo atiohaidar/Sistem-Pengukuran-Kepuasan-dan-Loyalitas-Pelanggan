@@ -36,8 +36,18 @@ class SurveyCampaignController extends Controller
         return Auth::user()->umkm_id ?? null;
     }
 
+    protected function isSuperAdmin(): bool
+    {
+        return Auth::check() && (Auth::user()->role === 'superadmin');
+    }
+
     protected function assertOwnership(SurveyCampaign $campaign): void
     {
+        // Superadmin can access any campaign
+        if ($this->isSuperAdmin()) {
+            return;
+        }
+
         $umkmProfileId = $this->currentUmkmProfileId();
 
         if ($umkmProfileId === null || $campaign->umkm_profile_id !== $umkmProfileId) {
@@ -50,13 +60,27 @@ class SurveyCampaignController extends Controller
      */
     public function index(Request $request)
     {
-        $umkmProfileId = $this->currentUmkmProfileId();
+        // Ensure user is authenticated; if not, redirect to login
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
 
-        abort_if(!$umkmProfileId, 403);
+        $user = Auth::user();
 
-        $query = SurveyCampaign::byUmkm($umkmProfileId)
-            ->with('umkm')
-            ->latest();
+        // If superadmin, allow listing all campaigns; otherwise require an UMKM id
+        if ($this->isSuperAdmin()) {
+            $query = SurveyCampaign::with('umkm')->latest();
+            $umkmProfileId = null;
+        } else {
+            $umkmProfileId = $user->umkm_id ?? null;
+
+            // Authenticated but not associated with an UMKM (or pending) cannot access
+            abort_if(!$umkmProfileId, 403);
+
+            $query = SurveyCampaign::byUmkm($umkmProfileId)
+                ->with('umkm')
+                ->latest();
+        }
 
         // Search
         if ($request->filled('search')) {
@@ -74,9 +98,9 @@ class SurveyCampaignController extends Controller
         }
 
         $campaigns = $query->paginate(10)->appends($request->query());
-        
-        // Get stats
-    $stats = $this->campaignService->getCampaignStats($umkmProfileId);
+
+        // Get stats (for superadmin pass null to aggregate across all UMKMs)
+        $stats = $this->campaignService->getCampaignStats($this->isSuperAdmin() ? null : $umkmProfileId);
 
         return view('survey-campaigns.index', compact('campaigns', 'stats'));
     }

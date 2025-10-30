@@ -252,27 +252,23 @@ class SurveyCampaignController extends Controller
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        $responses = $query->paginate(20)->appends($request->query());
+        $surveyResponses = $query->paginate(20)->appends($request->query());
 
-        // Stats
-        $todayCount = $campaign->responses()
-            ->whereDate('created_at', today())
-            ->count();
+        // Stats for survey-management.blade.php compatibility
+        $stats = [
+            'total_responses' => $campaign->responses()->count(),
+            'completed_responses' => $campaign->responses()->where('status', 'completed')->count(),
+            'draft_responses' => $campaign->responses()->where('status', 'draft')->count(),
+            'unique_sessions' => $campaign->responses()->distinct('session_token')->count(),
+        ];
 
-        $weekCount = $campaign->responses()
-            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->count();
-
-        $monthCount = $campaign->responses()
-            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->count();
+        $type = $campaign->type;
 
         return view('survey-campaigns.responses', compact(
             'campaign',
-            'responses',
-            'todayCount',
-            'weekCount',
-            'monthCount'
+            'surveyResponses',
+            'stats',
+            'type'
         ));
     }
 
@@ -288,24 +284,20 @@ class SurveyCampaignController extends Controller
         // Get questions based on campaign type
         if ($campaign->type === 'produk') {
             $allQuestions = $this->produkQuestionService->getQuestions();
-            $loyaltyQuestions = $this->produkQuestionService->getLoyaltyQuestions();
         } else {
             $allQuestions = $this->pelatihanQuestionService->getQuestions();
-            $loyaltyQuestions = $this->pelatihanQuestionService->getLoyaltyQuestions();
         }
 
-        // Prepare structured questions with answers
-        $harapanQuestions = $allQuestions['harapan_answers'] ?? [];
-        $persepsiQuestions = $allQuestions['persepsi_answers'] ?? [];
-        $kepuasanQuestions = $allQuestions['kepuasan_answers'] ?? [];
+        // Prepare variables to match survey-detail.blade.php
+        $surveyResponse = $response;
+        $questionLabels = $allQuestions;
+        $type = $campaign->type;
 
         return view('survey-campaigns.response-detail', compact(
             'campaign',
-            'response',
-            'harapanQuestions',
-            'persepsiQuestions',
-            'kepuasanQuestions',
-            'loyaltyQuestions'
+            'surveyResponse',
+            'questionLabels',
+            'type'
         ));
     }
 

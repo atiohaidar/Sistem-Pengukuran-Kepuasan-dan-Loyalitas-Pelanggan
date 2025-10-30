@@ -12,6 +12,7 @@ class CustomerManagementEvaluation extends Model
     protected $fillable = [
         'token',
         'company_name',
+        'umkm_id',
         'maturity_data',
         'priority_data',
         'readiness_data',
@@ -23,4 +24,12 @@ class CustomerManagementEvaluation extends Model
         'priority_data' => 'array', // Cast sebagai array untuk nilai prioritas (misalnya: ['kepemimpinan_strategis' => 85.5, ...])
         'readiness_data' => 'array', // Cast sebagai array untuk skor readiness (misalnya: ['q1' => 4, 'q2' => 3, ...])
     ];
+
+    /**
+     * Relationship with UMKM Profile
+     */
+    public function umkm()
+    {
+        return $this->belongsTo(UmkmProfile::class, 'umkm_id');
+    }
 }

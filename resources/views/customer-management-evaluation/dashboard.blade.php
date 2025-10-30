@@ -1,35 +1,34 @@
-<x-guest-layout>
+<x-app-layout>
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto space-y-8">
-            <!-- Debug: Print $data -->
-            <!-- <div class="bg-white shadow rounded-lg p-6 mb-6">
-                <h2 class="text-xl font-bold text-red-600">Debug: Isi $data</h2>
-                <pre class="bg-gray-100 p-4 rounded text-sm">{{ json_encode($data, JSON_PRETTY_PRINT) }}</pre>
-                <pre class="bg-gray-100 p-4 rounded text-sm">{{ json_encode($results, JSON_PRETTY_PRINT) }}</pre>
-
-            </div> -->
-
             <!-- Header -->
             <div class="bg-white shadow rounded-lg p-6">
-                <h1 class="text-3xl font-bold text-gray-900">Dashboard Hasil Evaluasi</h1>
-                <h2 class="text-xl text-gray-700 mt-2">{{ $data['company_name'] }}</h2>
-                <div class="mt-4 flex space-x-4">
-                    @if(!$isShared)
-                        <a href="{{ route('customer-management-evaluation.maturity') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Edit Evaluasi
-                        </a>
-                        <a href="{{ route('customer-management-evaluation.welcome') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Mulai Asesmen Baru
-                        </a>
-                    @endif
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard Hasil Evaluasi CRM</h1>
+                <h2 class="text-xl text-gray-700 mt-2">{{ $umkm->name }}</h2>
+                <div class="mt-4 flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700">Total Respondents:</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {{ $totalRespondents }}
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700">Evaluasi Lengkap:</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {{ $completedEvaluations }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4">
                     <div class="flex items-center">
-                        <label for="share-link" class="block text-sm font-medium text-gray-700 mr-2">Link Share:</label>
-                        <input id="share-link" type="text" readonly
-                            value="{{ url('/customer-management-evaluation/dashboard/' . $token) }}"
+                        <label for="survey-link" class="block text-sm font-medium text-gray-700 mr-2">Link Survey:</label>
+                        <input id="survey-link" type="text" readonly
+                            value="{{ url('/crm/survey/' . $umkm->crm_token) }}"
                             class="block w-96 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm"
                             onclick="this.select()">
+                        <button onclick="copyToClipboard()" class="ml-2 inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Copy
+                        </button>
                     </div>
                 </div>
             </div>
@@ -42,17 +41,16 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Komponen</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Nilai</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Rata-rata Nilai</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Jumlah Response</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @php
-                                    // Define labels for maturity keys
                                     $maturityLabels = [
                                         'visi' => 'Visi',
                                         'strategi' => 'Strategi',
@@ -71,14 +69,20 @@
                                             {{ $label }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $data['maturity'][$key] ?? 0 }}
+                                            {{ number_format($aggregatedData['maturity'][$key]['average'] ?? 0, 2) }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $aggregatedData['maturity'][$key]['count'] ?? 0 }}
                                         </td>
                                     </tr>
                                 @endforeach
                                 <tr class="bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Average</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Rata-rata Keseluruhan</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                        {{ number_format($results['maturityAverage'], 2) }}
+                                        {{ number_format($aggregatedData['maturityAverage'], 2) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                        {{ $totalRespondents }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -87,10 +91,10 @@
                     <div>
                         <h4 class="text-lg font-medium text-gray-900 mb-2">Insights Gained</h4>
                         <h5 class="text-md font-semibold text-indigo-600 mb-3">
-                            {{ $results['maturityInsightData']['title'] }}
+                            {{ $aggregatedData['maturityInsightData']['title'] }}
                         </h5>
                         <p class="text-sm text-gray-600 whitespace-pre-wrap">
-                            {{ $results['maturityInsightData']['description'] }}
+                            {{ $aggregatedData['maturityInsightData']['description'] }}
                         </p>
                     </div>
                 </div>
@@ -104,27 +108,30 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Bobot Kepentingan</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Bobot</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Performansi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Rata-rata Bobot</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Rata-rata Performansi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Jumlah Response</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($results['persepsiData'] as $item)
+                                @foreach($aggregatedData['persepsiData'] as $item)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {{ $item['label'] }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['harapan'] }}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ number_format($item['harapan'], 1) }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ number_format($item['persepsi'], 0) }}%
+                                            {{ number_format($item['persepsi'], 1) }}%
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $item['count'] }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -136,10 +143,8 @@
                         <div class="bg-white p-4 rounded-lg border">
                             <div id="scatter-chart" class="w-full" style="height: 300px;"></div>
                             <div class="mt-3">
-                                <button id="toggle-debug" class="text-sm text-indigo-600 underline">Toggle plot
-                                    debug</button>
-                                <pre id="scatter-debug" class="hidden mt-2 p-2 bg-gray-100 text-xs rounded"
-                                    style="max-height:200px;overflow:auto;"></pre>
+                                <button id="toggle-debug" class="text-sm text-indigo-600 underline">Toggle plot debug</button>
+                                <pre id="scatter-debug" class="hidden mt-2 p-2 bg-gray-100 text-xs rounded" style="max-height:200px;overflow:auto;"></pre>
                             </div>
                         </div>
                     </div>
@@ -481,5 +486,22 @@
 
             }, 0);
         });
+
+        function copyToClipboard() {
+            const copyText = document.getElementById('survey-link');
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+
+            // Show feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.classList.add('bg-green-50', 'text-green-700');
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('bg-green-50', 'text-green-700');
+            }, 2000);
+        }
     </script>
-    </x-mylayout>
+</x-app-layout>

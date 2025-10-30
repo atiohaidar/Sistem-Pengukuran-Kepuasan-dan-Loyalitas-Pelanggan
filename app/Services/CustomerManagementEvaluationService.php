@@ -3,14 +3,18 @@
 namespace App\Services;
 
 use App\Models\CustomerManagementEvaluation;
+use App\Models\UmkmProfile;
+use Illuminate\Support\Str;
 
 class CustomerManagementEvaluationService
 {
-    public function createEvaluation($companyName, $token)
+    public function createEvaluationForUmkm(UmkmProfile $umkm)
     {
+        $token = Str::uuid()->toString();
         return CustomerManagementEvaluation::create([
             'token' => $token,
-            'company_name' => $companyName,
+            'company_name' => $umkm->nama_usaha,
+            'umkm_id' => $umkm->id,
             'maturity_data' => [],
             'priority_data' => [],
             'readiness_data' => [],
@@ -54,11 +58,108 @@ class CustomerManagementEvaluationService
         }
     }
 
+    public function getAggregatedDataForUmkm(UmkmProfile $umkm)
+    {
+        // All evaluations (including drafts/incomplete)
+        $allEvaluations = $umkm->customerManagementEvaluations()->get();
+        // Only completed evaluations used for aggregated metrics
+        $evaluations = $umkm->customerManagementEvaluations()->where('completed', true)->get();
+
+        if ($evaluations->isEmpty()) {
+            return [
+                'company_name' => $umkm->nama_usaha,
+                // total_respondents remains count of completed evaluations (used for aggregation)
+                'total_respondents' => 0,
+                // Provide counts so caller can distinguish drafts vs completed
+                'total_evaluations' => $allEvaluations->count(),
+                'completed_evaluations' => $evaluations->count(),
+                'maturity' => [],
+                'priority' => [],
+                'readiness' => [],
+            ];
+        }
+
+        // Aggregate maturity data (average + count)
+        $maturityData = [];
+        $maturityKeys = ['visi', 'strategi', 'pengalamanKonsumen', 'kolaborasiOrganisasi', 'proses', 'informasi', 'teknologi', 'matriks'];
+        foreach ($maturityKeys as $key) {
+            $values = $evaluations->pluck('maturity_data.' . $key)->filter()->values();
+            $avg = $values->isNotEmpty() ? round($values->avg(), 2) : 0;
+            $count = $values->count();
+            $maturityData[$key] = [
+                'average' => $avg,
+                'count' => $count,
+            ];
+        }
+
+        // Aggregate priority data (average + count)
+        $priorityData = [];
+        $priorityKeys = ['kepemimpinanStrategis', 'posisiKompetitif', 'kepuasanPelanggan', 'nilaiUmurPelanggan', 'efisiensiBiaya', 'aksesPelanggan', 'solusiAplikasiPelanggan', 'informasiPelanggan', 'prosesPelanggan', 'standarSDM', 'pelaporanKinerja'];
+        foreach ($priorityKeys as $key) {
+            $values = $evaluations->pluck('priority_data.' . $key)->filter()->values();
+            $avg = $values->isNotEmpty() ? round($values->avg(), 2) : 0;
+            $count = $values->count();
+            $priorityData[$key] = [
+                'average' => $avg,
+                'count' => $count,
+            ];
+        }
+
+        // Aggregate readiness data (average + count)
+        $readinessData = [];
+        for ($i = 1; $i <= 11; $i++) {
+            $values = $evaluations->pluck('readiness_data.q' . $i)->filter()->values();
+            $avg = $values->isNotEmpty() ? round($values->avg(), 2) : 0;
+            $count = $values->count();
+            $readinessData['q' . $i] = [
+                'average' => $avg,
+                'count' => $count,
+            ];
+        }
+
+        // Compute overall maturity average (for backward compatibility with view)
+        $maturityAverages = collect($maturityData)->map(function ($item) {
+            return $item['average'];
+        })->filter()->values();
+        $maturityAverage = $maturityAverages->isNotEmpty() ? round($maturityAverages->avg(), 2) : 0;
+
+        return [
+            'company_name' => $umkm->nama_usaha,
+            'total_respondents' => $evaluations->count(),
+            'total_evaluations' => $allEvaluations->count(),
+            'completed_evaluations' => $evaluations->count(),
+            'maturity' => $maturityData,
+            'maturityAverage' => $maturityAverage,
+            'priority' => $priorityData,
+            'readiness' => $readinessData,
+        ];
+    }
+
     public function calculateResults($data)
     {
-        // Maturity
-        $maturityScores = array_values($data['maturity'] ?? []);
+        // Maturity (normalize shape: support numeric or ['average'=>..] entries)
+        $maturityRaw = $data['maturity'] ?? [];
+        $maturityScores = [];
+        foreach ($maturityRaw as $val) {
+            if (is_array($val) && array_key_exists('average', $val)) {
+                $maturityScores[] = $val['average'];
+            } elseif (is_numeric($val)) {
+                $maturityScores[] = $val;
+            }
+        }
         $maturityAverage = count($maturityScores) > 0 ? array_sum($maturityScores) / count($maturityScores) : 0;
+
+        // Helper to read average value from arrays produced by aggregation or raw numeric values
+        $getAverageValue = function ($container, $key, $default = 0) {
+            if (!isset($container[$key])) {
+                return $default;
+            }
+            $v = $container[$key];
+            if (is_array($v)) {
+                return $v['average'] ?? $default;
+            }
+            return is_numeric($v) ? $v : $default;
+        };
 
         $roundedAvg = round($maturityAverage);
         $insightIndex = max(0, min(4, $roundedAvg - 1));
@@ -118,12 +219,13 @@ class CustomerManagementEvaluationService
         $persepsiData = [];
         foreach ($priorityItems as $item) {
             $readinessQuestion = collect($readinessQuestions)->firstWhere('target', $item['id']);
-            $score = $readinessQuestion ? ($data['readiness'][$readinessQuestion['id']] ?? 3) : 3;
+            $score = $readinessQuestion ? ($getAverageValue($data['readiness'] ?? [], $readinessQuestion['id'], 3)) : 3;
             $persepsi = ($score / 5) * 100;
+            $harapan = $getAverageValue($data['priority'] ?? [], $item['id'], 0);
             $persepsiData[] = [
                 'id' => $item['id'],
                 'label' => $item['label'],
-                'harapan' => $data['priority'][$item['id']] ?? 0,
+                'harapan' => $harapan,
                 'persepsi' => $persepsi,
             ];
         }

@@ -83,20 +83,20 @@ Route::middleware(['auth', 'umkm.owner'])->group(function () {
         Route::get('/{campaign}/edit', [SurveyCampaignController::class, 'edit'])->name('edit');
         Route::put('/{campaign}', [SurveyCampaignController::class, 'update'])->name('update');
         Route::delete('/{campaign}', [SurveyCampaignController::class, 'destroy'])->name('destroy');
-        
+
         // Dashboard & Analytics per Campaign
         Route::get('/{campaign}/dashboard', [SurveyCampaignController::class, 'dashboard'])->name('dashboard');
-        
+
         // Responses Management
         Route::get('/{campaign}/responses', [SurveyCampaignController::class, 'responses'])->name('responses');
         Route::get('/{campaign}/responses/{response}', [SurveyCampaignController::class, 'responseDetail'])->name('response-detail');
         Route::get('/{campaign}/export', [SurveyCampaignController::class, 'export'])->name('export');
-        
+
         // Status Management
         Route::post('/{campaign}/activate', [SurveyCampaignController::class, 'activate'])->name('activate');
         Route::post('/{campaign}/close', [SurveyCampaignController::class, 'close'])->name('close');
         Route::post('/{campaign}/archive', [SurveyCampaignController::class, 'archive'])->name('archive');
-        
+
         // Duplicate Campaign
         Route::post('/{campaign}/duplicate', [SurveyCampaignController::class, 'duplicate'])->name('duplicate');
     });
@@ -147,16 +147,21 @@ Route::prefix('survey/pelatihan')->name('survey.pelatihan.')->group(function () 
     Route::get('/complete', [PelatihanSurveyController::class, 'complete'])->defaults('typeOrSlug', 'pelatihan')->name('complete');
 });
 
-// Customer Management Evaluation Routes
-Route::prefix('customer-management-evaluation')->name('customer-management-evaluation.')->group(function () {
-    Route::get('/', [CustomerManagementEvaluationController::class, 'welcome'])->name('welcome');
-    Route::match(['get', 'post'], '/maturity', [CustomerManagementEvaluationController::class, 'maturity'])->name('maturity');
-    Route::post('/maturity/store', [CustomerManagementEvaluationController::class, 'storeMaturity'])->name('store-maturity');
-    Route::get('/priority', [CustomerManagementEvaluationController::class, 'priority'])->name('priority');
-    Route::post('/priority', [CustomerManagementEvaluationController::class, 'storePriority'])->name('store-priority');
-    Route::get('/readiness', [CustomerManagementEvaluationController::class, 'readiness'])->name('readiness');
-    Route::post('/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
-    Route::get('/dashboard/{token?}', [CustomerManagementEvaluationController::class, 'dashboard'])->name('dashboard');
+// Customer Management Evaluation Routes (Public - for respondents)
+Route::prefix('crm')->name('customer-management-evaluation.')->group(function () {
+    Route::get('/survey/{token}', [CustomerManagementEvaluationController::class, 'welcome'])->name('welcome');
+    Route::match(['get', 'post'], '/survey/{token}/maturity', [CustomerManagementEvaluationController::class, 'maturity'])->name('maturity');
+    Route::post('/survey/{token}/maturity/store', [CustomerManagementEvaluationController::class, 'storeMaturity'])->name('store-maturity');
+    Route::get('/survey/{token}/priority', [CustomerManagementEvaluationController::class, 'priority'])->name('priority');
+    Route::post('/survey/{token}/priority', [CustomerManagementEvaluationController::class, 'storePriority'])->name('store-priority');
+    Route::get('/survey/{token}/readiness', [CustomerManagementEvaluationController::class, 'readiness'])->name('readiness');
+    Route::post('/survey/{token}/readiness', [CustomerManagementEvaluationController::class, 'storeReadiness'])->name('store-readiness');
+    Route::get('/survey/{token}/thank-you', [CustomerManagementEvaluationController::class, 'thankYou'])->name('thank-you');
+});
+
+// CRM Dashboard (Auth required - for UMKM owners)
+Route::middleware(['auth', 'umkm.owner'])->group(function () {
+    Route::get('/crm/dashboard', [CustomerManagementEvaluationDashboardController::class, 'index'])->name('crm.dashboard');
 });
 // // ===== SuperAdmin Features =====
 // Route::prefix('superadmin')->name('superadmin.')->group(function () {

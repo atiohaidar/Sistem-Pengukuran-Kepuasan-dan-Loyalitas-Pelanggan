@@ -16,6 +16,7 @@ class UmkmProfile extends Model
         'deskripsi',
         'kategori_usaha',
         'alamat',
+        'crm_token',
     ];
 
     /**
@@ -24,5 +25,13 @@ class UmkmProfile extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'umkm_id');
+    }
+
+    /**
+     * One UMKM has many CRM evaluations (from multiple respondents)
+     */
+    public function customerManagementEvaluations()
+    {
+        return $this->hasMany(CustomerManagementEvaluation::class, 'umkm_id');
     }
 }

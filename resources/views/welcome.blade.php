@@ -177,13 +177,23 @@
                                     </div>
                                 </div>
 
-                                <a href="{{ route('customer-management-evaluation.welcome') }}"
-                                    class="inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-green-600 group-hover:to-teal-700">
-                                    <i class="fas fa-play-circle mr-3"></i>
-                                    Mulai Evaluasi Pelanggan
-                                    <i
-                                        class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
-                                </a>
+                                @auth
+                                    <a href="{{ route('crm.dashboard') }}"
+                                        class="inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-green-600 group-hover:to-teal-700">
+                                        <i class="fas fa-tachometer-alt mr-3"></i>
+                                        Akses Dashboard CRM
+                                        <i
+                                            class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </a>
+                                @else
+                                    <a href="{{ route('login') }}"
+                                        class="inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 group-hover:from-green-600 group-hover:to-teal-700">
+                                        <i class="fas fa-sign-in-alt mr-3"></i>
+                                        Masuk untuk Evaluasi
+                                        <i
+                                            class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </a>
+                                @endauth
                             </div>
                         </div>
                     </div>

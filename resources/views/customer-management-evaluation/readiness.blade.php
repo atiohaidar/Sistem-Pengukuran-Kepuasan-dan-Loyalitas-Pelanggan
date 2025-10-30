@@ -17,7 +17,7 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Audit Sistem Pengelolaan Pelanggan</h2>
             <p class="text-gray-600 mb-6">Pada tahap ini, pilih kondisi sistem manajemen pelanggan yang paling sesuai dengan perusahaan anda.</p>
 
-            <form action="{{ route('customer-management-evaluation.store-readiness') }}" method="POST">
+            <form action="{{ route('customer-management-evaluation.store-readiness', ['token' => request()->route('token')]) }}" method="POST">
                 @csrf
 
                 <!-- Readiness Questions -->
@@ -43,7 +43,7 @@
 
                 <!-- Navigation Buttons -->
                 <div class="mt-8 flex justify-between">
-                    <a href="{{ route('customer-management-evaluation.priority') }}"
+                    <a href="{{ route('customer-management-evaluation.priority', ['token' => request()->route('token')]) }}"
                        class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Kembali
                     </a>
@@ -55,4 +55,4 @@
         </div>
     </div>
 </div>
-</x-mylayout>
+</x-guest-layout>

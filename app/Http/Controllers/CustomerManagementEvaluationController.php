@@ -7,6 +7,7 @@ use App\Services\CustomerManagementEvaluationService;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Str;
+use App\Models\UmkmProfile;
 
 class CustomerManagementEvaluationController extends Controller
 {
@@ -16,38 +17,61 @@ class CustomerManagementEvaluationController extends Controller
     {
         $this->evaluationService = $evaluationService;
     }
-    public function welcome()
+    public function welcome(Request $request, $token)
     {
-        return view('customer-management-evaluation.welcome');
+        // Get UMKM by token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
+        }
+
+        return view('customer-management-evaluation.welcome', [
+            'umkm' => $umkm,
+            'token' => $token
+        ]);
     }
 
     public function maturity(Request $request)
     {
+        // Get UMKM by token
+        $token = $request->route('token');
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
+        }
+
         if ($request->isMethod('post')) {
-            $validated = $request->validate([
-                'company_name' => 'required|string|max:255',
+            // Create new evaluation for this respondent
+            $evaluation = $this->evaluationService->createEvaluationForUmkm($umkm);
+
+            $request->session()->put('evaluation_token', $evaluation->token);
+
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            // Show welcome page for new respondents
+            return view('customer-management-evaluation.welcome', [
+                'umkm' => $umkm,
+                'token' => $token
             ]);
-
-            $token = Str::uuid()->toString();
-            $this->evaluationService->createEvaluation($validated['company_name'], $token);
-
-            $request->session()->put('evaluation_token', $token);
-
-            return redirect()->route('customer-management-evaluation.maturity');
         }
 
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
-        }
-
-        $evaluation = $this->evaluationService->getEvaluationByToken($token);
-        if (!$evaluation) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            // Clear invalid session and show welcome again
+            $request->session()->forget('evaluation_token');
+            return view('customer-management-evaluation.welcome', [
+                'umkm' => $umkm,
+                'token' => $token
+            ]);
         }
 
         $data = [
-            'company_name' => $evaluation->company_name,
+            'company_name' => $umkm->nama_usaha,
             'maturity' => $evaluation->maturity_data ?? [],
             'priority' => $evaluation->priority_data ?? [],
             'readiness' => $evaluation->readiness_data ?? [],
@@ -56,7 +80,7 @@ class CustomerManagementEvaluationController extends Controller
         return view('customer-management-evaluation.maturity', compact('data'));
     }
 
-    public function storeMaturity(Request $request)
+    public function storeMaturity(Request $request, $token)
     {
         $validated = $request->validate([
             'visi' => 'required|integer|min:1|max:5',
@@ -69,14 +93,20 @@ class CustomerManagementEvaluationController extends Controller
             'matriks' => 'required|integer|min:1|max:5',
         ]);
 
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
         }
 
-        $evaluation = $this->evaluationService->getEvaluationByToken($token);
-        if (!$evaluation) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
         }
 
         $maturityData = array_intersect_key($validated, array_flip([
@@ -92,23 +122,29 @@ class CustomerManagementEvaluationController extends Controller
 
         $this->evaluationService->updateMaturityData($evaluation, $maturityData);
 
-        return redirect()->route('customer-management-evaluation.priority');
+        return redirect()->route('customer-management-evaluation.priority', ['token' => $token]);
     }
 
-    public function priority(Request $request)
+    public function priority(Request $request, $token)
     {
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
         }
 
-        $evaluation = $this->evaluationService->getEvaluationByToken($token);
-        if (!$evaluation) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
         }
 
         $data = [
-            'company_name' => $evaluation->company_name,
+            'company_name' => $umkm->nama_usaha,
             'maturity' => $evaluation->maturity_data ?? [],
             'priority' => $evaluation->priority_data ?? [],
             'readiness' => $evaluation->readiness_data ?? [],
@@ -117,7 +153,7 @@ class CustomerManagementEvaluationController extends Controller
         return view('customer-management-evaluation.priority', compact('data'));
     }
 
-    public function storePriority(Request $request)
+    public function storePriority(Request $request, $token)
     {
         $rules = [];
         $priorityItems = [
@@ -150,30 +186,47 @@ class CustomerManagementEvaluationController extends Controller
             return back()->withErrors(['total' => 'Total bobot dari item yang diisi harus sama dengan 100.']);
         }
 
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
         }
 
-        $this->evaluationService->updatePriorityData($token, $validated);
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
 
-        return redirect()->route('customer-management-evaluation.readiness');
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $this->evaluationService->updatePriorityData($sessionToken, $validated);
+
+        return redirect()->route('customer-management-evaluation.readiness', ['token' => $token]);
     }
 
-    public function readiness(Request $request)
+    public function readiness(Request $request, $token)
     {
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
         }
 
-        $evaluation = $this->evaluationService->getEvaluationByToken($token);
-        if (!$evaluation) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
         }
 
         $data = [
-            'company_name' => $evaluation->company_name,
+            'company_name' => $umkm->nama_usaha,
             'maturity' => $evaluation->maturity_data ?? [],
             'priority' => $evaluation->priority_data ?? [],
             'readiness' => $evaluation->readiness_data ?? [],
@@ -182,7 +235,7 @@ class CustomerManagementEvaluationController extends Controller
         return view('customer-management-evaluation.readiness', compact('data'));
     }
 
-    public function storeReadiness(Request $request)
+    public function storeReadiness(Request $request, $token)
     {
         $validated = $request->validate([
             'q1' => 'required|integer|min:1|max:5',
@@ -198,26 +251,63 @@ class CustomerManagementEvaluationController extends Controller
             'q11' => 'required|integer|min:1|max:5',
         ]);
 
-        $token = $request->session()->get('evaluation_token');
-        if (!$token) {
-            return redirect()->route('customer-management-evaluation.welcome');
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
         }
 
-        $this->evaluationService->updateReadinessData($token, $validated);
+        $sessionToken = $request->session()->get('evaluation_token');
+        if (!$sessionToken) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
 
-        return redirect()->route('customer-management-evaluation.dashboard');
+        $evaluation = $this->evaluationService->getEvaluationByToken($sessionToken);
+        if (!$evaluation || $evaluation->umkm_id !== $umkm->id) {
+            return redirect()->route('customer-management-evaluation.maturity', ['token' => $token]);
+        }
+
+        $this->evaluationService->updateReadinessData($sessionToken, $validated);
+
+        return redirect()->route('customer-management-evaluation.thank-you', ['token' => $token]);
+    }
+
+    public function thankYou($token)
+    {
+        // Validate UMKM token
+        $umkm = UmkmProfile::where('crm_token', $token)->first();
+        if (!$umkm) {
+            abort(404, 'Token tidak valid');
+        }
+
+        return view('customer-management-evaluation.thank-you', compact('umkm'));
     }
 
     public function dashboard(Request $request, $token = null)
     {
+        // For new system: dashboard is auth-only and shows aggregated data
+        if (auth()->check() && auth()->user()->role === 'umkm') {
+            $umkm = auth()->user()->umkm;
+            if (!$umkm) {
+                abort(403, 'UMKM profile not found');
+            }
+
+            $data = $this->evaluationService->getAggregatedDataForUmkm($umkm);
+            $results = $this->evaluationService->calculateResults($data);
+            $isShared = false;
+
+            return view('customer-management-evaluation.dashboard', compact('data', 'results', 'isShared'));
+        }
+
+        // Legacy: token-based access (for backward compatibility)
         if ($token) {
-            // Access via token
             $evaluation = $this->evaluationService->getCompletedEvaluationByToken($token);
             if (!$evaluation) {
                 abort(404);
             }
             $data = [
                 'company_name' => $evaluation->company_name,
+                'total_respondents' => 1,
                 'maturity' => $evaluation->maturity_data ?? [],
                 'priority' => $evaluation->priority_data ?? [],
                 'readiness' => $evaluation->readiness_data ?? [],
@@ -227,16 +317,17 @@ class CustomerManagementEvaluationController extends Controller
             // From session
             $sessionToken = $request->session()->get('evaluation_token');
             if (!$sessionToken) {
-                return redirect()->route('customer-management-evaluation.welcome');
+                abort(403, 'Akses tidak diizinkan. Silakan mulai evaluasi terlebih dahulu.');
             }
 
             $evaluation = $this->evaluationService->getCompletedEvaluationByToken($sessionToken);
             if (!$evaluation) {
-                return redirect()->route('customer-management-evaluation.welcome');
+                abort(404, 'Evaluasi tidak ditemukan atau belum selesai.');
             }
 
             $data = [
                 'company_name' => $evaluation->company_name,
+                'total_respondents' => 1,
                 'maturity' => $evaluation->maturity_data ?? [],
                 'priority' => $evaluation->priority_data ?? [],
                 'readiness' => $evaluation->readiness_data ?? [],

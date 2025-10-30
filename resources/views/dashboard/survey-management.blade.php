@@ -106,7 +106,8 @@
                                         <dl>
                                             <dt class="text-sm font-medium text-gray-500 truncate">Survei Selesai</dt>
                                             <dd class="text-3xl font-bold text-gray-900">
-                                                {{ $stats['completed_responses'] }}</dd>
+                                                {{ $stats['completed_responses'] }}
+                                            </dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -251,9 +252,11 @@
                                             <tr
                                                 class="hover:bg-gray-50 hover:transform hover:translate-y-[-1px] transition-all duration-200">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {{ $response->id }}</td>
+                                                    {{ $response->id }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $response->profile_data['email'] ?? '-' }}</td>
+                                                    {{ $response->profile_data['email'] ?? '-' }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     @if($response->profile_data['jenis_kelamin'] ?? null)
                                                         <span class="inline-flex items-center">
@@ -266,11 +269,14 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $response->profile_data['usia'] ?? '-' }}</td>
+                                                    {{ $response->profile_data['usia'] ?? '-' }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $response->profile_data['pekerjaan'] ?? '-' }}</td>
+                                                    {{ $response->profile_data['pekerjaan'] ?? '-' }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $response->profile_data['domisili'] ?? '-' }}</td>
+                                                    {{ $response->profile_data['domisili'] ?? '-' }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $response->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
@@ -280,7 +286,8 @@
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $response->created_at->format('d/m/Y H:i') }}</td>
+                                                    {{ $response->created_at->format('d/m/Y H:i') }}
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div class="flex space-x-2">
                                                         <a href="{{ route('dashboard.survey-management.show', [$type, $response->id]) }}"

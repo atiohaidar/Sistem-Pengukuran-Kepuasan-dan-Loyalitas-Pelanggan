@@ -15,14 +15,16 @@ class SurveyCampaignService
         $slug = Str::slug($name);
         $originalSlug = $slug;
         $counter = 1;
-        
-        while (SurveyCampaign::where('slug', $slug)
+
+        while (
+            SurveyCampaign::where('slug', $slug)
                 ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
-                ->exists()) {
+                ->exists()
+        ) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
-        
+
         return $slug;
     }
 
@@ -55,7 +57,7 @@ class SurveyCampaignService
             'active' => $campaigns->where('status', 'active')->count(),
             'closed' => $campaigns->where('status', 'closed')->count(),
             'draft' => $campaigns->where('status', 'draft')->count(),
-            'total_responses' => $campaigns->sum(function($campaign) {
+            'total_responses' => $campaigns->sum(function ($campaign) {
                 return $campaign->responses_count;
             }),
         ];
@@ -71,7 +73,7 @@ class SurveyCampaignService
         $newCampaign->slug = $this->generateSlug($newCampaign->name);
         $newCampaign->status = 'draft';
         $newCampaign->save();
-        
+
         return $newCampaign;
     }
 
@@ -84,12 +86,12 @@ class SurveyCampaignService
         if (!in_array($campaign->status, ['draft', 'closed'])) {
             return false;
         }
-        
+
         // Validasi: start_date harus sudah lewat atau hari ini
         if ($campaign->start_date->isFuture()) {
             return false;
         }
-        
+
         return $campaign->update(['status' => 'active']);
     }
 
@@ -110,7 +112,7 @@ class SurveyCampaignService
         if ($campaign->status !== 'closed') {
             return false;
         }
-        
+
         return $campaign->update(['status' => 'archived']);
     }
 
@@ -130,19 +132,19 @@ class SurveyCampaignService
                 return 'Survei ini telah diarsipkan.';
             }
         }
-        
+
         if (!$campaign->has_started) {
             return 'Survei ini akan dibuka pada: ' . $campaign->start_date->format('d M Y H:i');
         }
-        
+
         if ($campaign->has_ended) {
             return 'Survei ini telah berakhir pada: ' . $campaign->end_date->format('d M Y H:i');
         }
-        
+
         if ($campaign->is_full) {
             return 'Survei ini sudah mencapai batas maksimal responden.';
         }
-        
+
         return null;
     }
 }

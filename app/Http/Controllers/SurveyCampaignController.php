@@ -150,7 +150,7 @@ class SurveyCampaignController extends Controller
 
         // Calculate results
         $results = $this->calculationService->calculateCampaignResults($campaign);
-        
+
         // Get recent responses
         $recentResponses = $campaign->responses()
             ->latest()
@@ -159,18 +159,18 @@ class SurveyCampaignController extends Controller
 
         // Stats
         $totalResponses = $campaign->responses_count;
-        
+
         $todayCount = $campaign->responses()
             ->whereDate('created_at', today())
             ->count();
-        
+
         $weekCount = $campaign->responses()
             ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->count();
 
         return view('survey-campaigns.dashboard', compact(
-            'campaign', 
-            'results', 
+            'campaign',
+            'results',
             'recentResponses',
             'totalResponses',
             'todayCount',
@@ -237,10 +237,10 @@ class SurveyCampaignController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('nomor_hp', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('nomor_hp', 'like', "%{$search}%");
             });
         }
 
@@ -258,20 +258,20 @@ class SurveyCampaignController extends Controller
         $todayCount = $campaign->responses()
             ->whereDate('created_at', today())
             ->count();
-        
+
         $weekCount = $campaign->responses()
             ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->count();
-        
+
         $monthCount = $campaign->responses()
             ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
             ->count();
 
         return view('survey-campaigns.responses', compact(
-            'campaign', 
-            'responses', 
-            'todayCount', 
-            'weekCount', 
+            'campaign',
+            'responses',
+            'todayCount',
+            'weekCount',
             'monthCount'
         ));
     }
@@ -300,8 +300,8 @@ class SurveyCampaignController extends Controller
         $kepuasanQuestions = $allQuestions['kepuasan_answers'] ?? [];
 
         return view('survey-campaigns.response-detail', compact(
-            'campaign', 
-            'response', 
+            'campaign',
+            'response',
             'harapanQuestions',
             'persepsiQuestions',
             'kepuasanQuestions',
@@ -317,7 +317,7 @@ class SurveyCampaignController extends Controller
         $this->assertOwnership($campaign);
 
         $filename = 'survey-' . $campaign->slug . '-' . date('Y-m-d') . '.xlsx';
-        
+
         return Excel::download(
             new CustomerEvaluationsExport($campaign->responses),
             $filename

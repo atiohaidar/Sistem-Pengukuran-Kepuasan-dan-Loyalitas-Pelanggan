@@ -7,7 +7,8 @@
     <div class="flex items-center justify-between h-16 px-4 bg-gray-50 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-800 text-left">Menu</h2>
         <button @click="sidebarOpen = false" class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
@@ -35,16 +36,18 @@
                     </svg>
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 mt-1 space-y-1">
-                    <a href="{{ route('survey-campaigns.index') }}"
-                        class="flex items-center px-4 py-2 text-sm {{ request()->routeIs('survey-campaigns.index') || request()->routeIs('survey-campaigns.create') || request()->routeIs('survey-campaigns.edit') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                    <x-nav-link :href="route('survey-campaigns.index')"
+                        :active="request()->routeIs('survey-campaigns.index')"
+                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
                         <i class="fas fa-list-alt mr-2 text-xs"></i>
                         Daftar Kampanye
-                    </a>
-                    <a href="{{ route('survey-campaigns.create') }}"
-                        class="flex items-center px-4 py-2 text-sm {{ request()->routeIs('survey-campaigns.create') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                    </x-nav-link>
+                    <x-nav-link :href="route('survey-campaigns.create')"
+                        :active="request()->routeIs('survey-campaigns.create')"
+                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
                         <i class="fas fa-plus-circle mr-2 text-xs"></i>
                         Buat Kampanye Baru
-                    </a>
+                    </x-nav-link>
                 </div>
             </div>
             @endrole
@@ -68,15 +71,22 @@
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
                     @role('umkm|superadmin')
-                    <a href="{{ route('grafik.select-campaign') }}"
-                        class="block px-4 py-2 text-sm {{ request()->routeIs('grafik.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-md text-left">
+                    <x-nav-link :href="route('grafik.select-campaign')"
+                        :active="request()->routeIs('grafik.*')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
                         <i class="fas fa-chart-pie mr-2 text-xs"></i>
                         Analytics
-                    </a>
-                    <a href="{{ route('dashboard.pelatihan') }}"
-                        class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Pelatihan</a>
-                    <a href="{{ route('dashboard.produk') }}"
-                        class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Produk</a>
+                    </x-nav-link>
+                    <x-nav-link :href="route('dashboard.pelatihan')"
+                        :active="request()->routeIs('dashboard.pelatihan')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
+                        Pelatihan
+                    </x-nav-link>
+                    <x-nav-link :href="route('dashboard.produk')"
+                        :active="request()->routeIs('dashboard.produk')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
+                        Produk
+                    </x-nav-link>
 
                     @endrole
                 </div>
@@ -92,10 +102,17 @@
                     </svg>
                 </button>
                 <div x-show="subOpen" x-transition class="ml-4 space-y-1">
+                    <x-nav-link :href="route('dashboard.customer-evaluation-management.index')"
+                        :active="request()->routeIs('dashboard.customer-evaluation-management.*')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
+                        Kelola Data Evaluasi
+                    </x-nav-link>
 
-                    <a href="{{ route('dashboard.customer-evaluation-management.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md text-left">Kelola
-                        Data Evaluasi</a>
+                    <x-nav-link :href="route('rfm.show', Auth::user()->umkm_id)"
+                        :active="request()->routeIs('rfm.*')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md text-left">
+                        RFM
+                    </x-nav-link>
                 </div>
             </div>
         </div>

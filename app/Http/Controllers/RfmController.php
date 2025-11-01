@@ -18,12 +18,26 @@ class RfmController extends Controller
             'monetary' => $request->get('monetary', 50000),
         ];
 
-        $service = new RfmService($thresholds);
-    $rfmResults = $service->calculateForUmkm($umkmId);
-    $clusterStats = $service->getClusterStats($rfmResults);
-    $overview = $service->buildOverview($rfmResults);
+        // Ambil filter tanggal (opsional) - default 30 hari terakhir
+        $endDate = $request->query('end_date');
+        $startDate = $request->query('start_date');
 
-    return view('rfm.show', compact('rfmResults', 'clusterStats', 'overview', 'umkmId', 'thresholds'));
+        $service = new RfmService($thresholds);
+        $rfmResults = $service->calculateForUmkm($umkmId, $startDate, $endDate);
+        $clusterStats = $service->getClusterStats($rfmResults);
+
+        // Pastikan tanggal yang dikirim ke view sudah ditetapkan (string Y-m-d)
+        $end = $endDate ? \Carbon\Carbon::parse($endDate) : \Carbon\Carbon::now();
+        $start = $startDate ? \Carbon\Carbon::parse($startDate) : $end->copy()->subDays(30);
+
+        $overview = $service->buildPeriodOverview($umkmId, $start, $end, $rfmResults);
+
+        $filters = [
+            'start_date' => $start->toDateString(),
+            'end_date' => $end->toDateString(),
+        ];
+
+        return view('rfm.show', compact('rfmResults', 'clusterStats', 'overview', 'umkmId', 'thresholds', 'filters'));
     }
 
     public function create($umkmId)

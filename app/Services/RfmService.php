@@ -21,15 +21,18 @@ class RfmService
     }
 
     /**
-     * Hitung RFM untuk semua customer di UMKM tertentu
+     * Hitung RFM untuk semua customer di UMKM tertentu dalam rentang tanggal (opsional)
      */
-    public function calculateForUmkm(int $umkmId): array
+    public function calculateForUmkm(int $umkmId, $startDate = null, $endDate = null): array
     {
+        $end = $endDate ? Carbon::parse($endDate) : Carbon::now();
+        $start = $startDate ? Carbon::parse($startDate) : $end->copy()->subDays(30);
+
         $customers = RfmCustomer::where('umkm_id', $umkmId)->with('transactions')->get();
 
         $results = [];
         foreach ($customers as $customer) {
-            $rfm = $this->calculateForCustomer($customer);
+            $rfm = $this->calculateForCustomer($customer, $start, $end);
             $results[] = array_merge($rfm, [
                 'customer' => $customer,
                 'type' => $customer->jenis_pelanggan,
@@ -40,25 +43,31 @@ class RfmService
     }
 
     /**
-     * Hitung RFM untuk satu customer
+     * Hitung RFM untuk satu customer pada rentang tanggal tertentu
      */
-    public function calculateForCustomer(RfmCustomer $customer): array
+    public function calculateForCustomer(RfmCustomer $customer, $startDate = null, $endDate = null): array
     {
+        $end = $endDate ? Carbon::parse($endDate) : Carbon::now();
+        $start = $startDate ? Carbon::parse($startDate) : $end->copy()->subDays(30);
+
         $transactions = $customer->transactions;
 
-        // Recency: hari sejak transaksi terakhir
+        // Recency: hari sejak transaksi terakhir dihitung terhadap tanggal akhir periode
         $lastTransaction = $transactions->max('tanggal_transaksi');
-        $recency = $lastTransaction ? Carbon::parse($lastTransaction)->diffInDays(Carbon::now()) : 999;
+        $recency = $lastTransaction ? Carbon::parse($lastTransaction)->diffInDays($end) : 999;
 
-        // Frequency: jumlah transaksi dalam 30 hari terakhir (atau semua jika tidak ada periode)
-    $recentTransactions = $transactions->filter(fn($t) => Carbon::parse($t->tanggal_transaksi)->gte(Carbon::now()->subDays(30)));
+        // Frequency & Monetary: dalam periode [start, end]
+        $recentTransactions = $transactions->filter(function ($t) use ($start, $end) {
+            $d = Carbon::parse($t->tanggal_transaksi);
+            return $d->between($start, $end);
+        });
         $frequency = $recentTransactions->count();
-
-        // Monetary: total nilai dalam 30 hari terakhir
         $monetary = $recentTransactions->sum('nilai_transaksi');
 
         // Klasifikasi aktif/baru: aktif jika ada transaksi pada periode; baru jika tidak ada transaksi sebelum periode
-    $previousTransactions = $transactions->filter(fn($t) => Carbon::parse($t->tanggal_transaksi)->lt(Carbon::now()->subDays(30)));
+        $previousTransactions = $transactions->filter(function ($t) use ($start) {
+            return Carbon::parse($t->tanggal_transaksi)->lt($start);
+        });
         $isActive = $frequency > 0;
         $isNew = $isActive && $previousTransactions->count() === 0;
 
@@ -181,6 +190,57 @@ class RfmService
             $overview['clusterCounts'][$cluster][$type]++;
             $overview['clusterCounts'][$cluster]['total']++;
         }
+
+        return $overview;
+    }
+
+    /**
+     * Hitung omzet dalam periode dan churn rate (berdasarkan periode sebelumnya dengan durasi sama)
+     */
+    public function buildPeriodOverview(int $umkmId, $start, $end, array $rfmResults): array
+    {
+        $start = $start instanceof Carbon ? $start : Carbon::parse($start);
+        $end = $end instanceof Carbon ? $end : Carbon::parse($end);
+
+        $overview = $this->buildOverview($rfmResults);
+
+        // Omzet periode langsung dari transaksi untuk akurasi
+        $overview['omzet'] = (float) RfmTransaction::where('umkm_id', $umkmId)
+            ->whereBetween('tanggal_transaksi', [$start->toDateString(), $end->toDateString()])
+            ->sum('nilai_transaksi');
+
+        // Churn Rate: pelanggan aktif periode sebelumnya yang tidak aktif di periode ini
+        $days = $start->diffInDays($end) + 1;
+        $prevEnd = $start->copy()->subDay();
+        $prevStart = $prevEnd->copy()->subDays($days - 1);
+
+        $currentActive = RfmTransaction::where('umkm_id', $umkmId)
+            ->whereBetween('tanggal_transaksi', [$start->toDateString(), $end->toDateString()])
+            ->distinct('customer_id')->pluck('customer_id')->toArray();
+
+        $prevActive = RfmTransaction::where('umkm_id', $umkmId)
+            ->whereBetween('tanggal_transaksi', [$prevStart->toDateString(), $prevEnd->toDateString()])
+            ->distinct('customer_id')->pluck('customer_id')->toArray();
+
+        $prevActiveSet = collect($prevActive);
+        $currentActiveSet = collect($currentActive);
+
+        $churners = $prevActiveSet->diff($currentActiveSet)->values();
+        $denom = max(count($prevActive), 0);
+        $rate = $denom > 0 ? (count($churners) / $denom) : null; // null => N/A
+
+        $overview['churn'] = [
+            'rate' => $rate,
+            'prev_active' => count($prevActive),
+            'current_active' => count($currentActive),
+            'churners' => count($churners),
+            'period' => [
+                'start' => $start->toDateString(),
+                'end' => $end->toDateString(),
+                'prev_start' => $prevStart->toDateString(),
+                'prev_end' => $prevEnd->toDateString(),
+            ],
+        ];
 
         return $overview;
     }

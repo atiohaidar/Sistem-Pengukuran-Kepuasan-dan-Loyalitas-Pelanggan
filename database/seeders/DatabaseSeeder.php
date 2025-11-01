@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UmkmAndUserSeeder::class,
             SurveyResponseSeeder::class,
+            RfmCustomerSeeder::class,
+            RfmTransactionSeeder::class,
         ]);
     }
 }

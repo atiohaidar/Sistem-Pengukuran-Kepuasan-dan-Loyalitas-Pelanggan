@@ -222,11 +222,21 @@ class CustomerManagementEvaluationService
             $score = $readinessQuestion ? ($getAverageValue($data['readiness'] ?? [], $readinessQuestion['id'], 3)) : 3;
             $persepsi = ($score / 5) * 100;
             $harapan = $getAverageValue($data['priority'] ?? [], $item['id'], 0);
+            
+            // Get count from readiness data
+            $readinessKey = $readinessQuestion ? $readinessQuestion['id'] : null;
+            $count = 0;
+            if ($readinessKey && isset($data['readiness'][$readinessKey])) {
+                $readinessItem = $data['readiness'][$readinessKey];
+                $count = is_array($readinessItem) ? ($readinessItem['count'] ?? 0) : 0;
+            }
+            
             $persepsiData[] = [
                 'id' => $item['id'],
                 'label' => $item['label'],
                 'harapan' => $harapan,
                 'persepsi' => $persepsi,
+                'count' => $count,
             ];
         }
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\SurveyDashboardController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SurveyCampaignController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\RfmController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -162,7 +163,15 @@ Route::prefix('crm')->name('customer-management-evaluation.')->group(function ()
 // CRM Dashboard (Auth required - for UMKM owners)
 Route::middleware(['auth', 'umkm.owner'])->group(function () {
     Route::get('/crm/dashboard', [CustomerManagementEvaluationDashboardController::class, 'index'])->name('crm.dashboard');
+    
+    // RFM Routes
+    Route::prefix('rfm')->name('rfm.')->group(function () {
+        Route::get('/{umkmId}', [RfmController::class, 'show'])->name('show');
+        Route::get('/{umkmId}/create', [RfmController::class, 'create'])->name('create');
+        Route::post('/{umkmId}', [RfmController::class, 'store'])->name('store');
+    });
 });
+
 // // ===== SuperAdmin Features =====
 // Route::prefix('superadmin')->name('superadmin.')->group(function () {
 //     Route::prefix('umkm')->name('umkm.')->group(function () {
